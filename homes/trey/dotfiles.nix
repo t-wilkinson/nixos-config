@@ -7,6 +7,7 @@
     "mpv".source = link ./.config/mpv;
     "thorium-flags.conf".source = link ./.config/thorium-flags.conf;
     "starship.toml".source = link ./.config/starship.toml;
+    "zellij".source = link ./.config/zellij;
   };
 }
 
