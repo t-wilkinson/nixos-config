@@ -43,6 +43,7 @@
       showmethekey
       vscode
       ydotool
+      tmux
 
       # theming tools
       gradience

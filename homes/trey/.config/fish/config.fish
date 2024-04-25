@@ -9,8 +9,10 @@ if status is-interactive
 end
 
 alias nrb='IMPURITY_PATH=$(pwd) sudo --preserve-env=IMPURITY_PATH nixos-rebuild switch --flake . --impure'
+alias ls='eza --icons -F -H --group-directories-first --git -1';
 
 starship init fish | source
+enable_transience
 if test -f ~/.cache/ags/user/colorschemes/sequences
     cat ~/.cache/ags/user/colorschemes/sequences
 end
