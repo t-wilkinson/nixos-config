@@ -82,7 +82,8 @@
 
   # dconf
   programs = {
-    zsh.enable = true;
+    # zsh.enable = true;
+    fish.enable = true;
     dconf.enable = true;
     # steam = {
     #   enable = true;
@@ -174,10 +175,10 @@
 
   # user
   users = {
-    defaultUserShell = pkgs.zsh;
+    defaultUserShell = pkgs.fish;
     users.${username} = {
       isNormalUser = true;
-      shell = pkgs.zsh;
+      shell = pkgs.fish;
       extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" "libvirtd" "lxd" ];
     };
   };

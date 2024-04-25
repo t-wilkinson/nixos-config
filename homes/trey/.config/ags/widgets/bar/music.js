@@ -168,7 +168,8 @@ export default () => {
     return Widget.EventBox({
         onScrollUp: (self) => switchToRelativeWorkspace(self, -1),
         onScrollDown: (self) => switchToRelativeWorkspace(self, +1),
-        onPrimaryClickRelease: () => showMusicControls.setValue(!showMusicControls.value),
+        // onPrimaryClickRelease: () => showMusicControls.setValue(!showMusicControls.value),
+        onPrimaryClickRelease: () => execAsync('playerctl play-pause').catch(print),
         onSecondaryClickRelease: () => execAsync(['bash', '-c', 'playerctl next || playerctl position `bc <<< "100 * $(playerctl metadata mpris:length) / 1000000 / 100"` &']),
         onMiddleClickRelease: () => execAsync('playerctl play-pause').catch(print),
         child: Box({

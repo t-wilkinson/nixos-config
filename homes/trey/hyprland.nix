@@ -331,7 +331,7 @@ in
         "Super, Apostrophe, splitratio, 0.1"
       ];
       windowrule = [
-        "noblur,.*" # Disables blur for windows. Substantially improves performance.
+        # "noblur,.*" # Disables blur for windows. Substantially improves performance.
         "float, ^(steam)$"
         "pin, ^(showmethekey-gtk)$"
         "float,title:^(Open File)(.*)$"
@@ -341,7 +341,10 @@ in
         "float,title:^(Save As)(.*)$"
         "float,title:^(Library)(.*)$ "
       ];
-      windowrulev2 = [ "tile,class:(wpsoffice)" ];
+      windowrulev2 = [ 
+        "tile,class:(wpsoffice)" 
+        "opacity 0.88 0.88,class:^(foot)$"
+      ];
       layerrule = [
         "xray 1, .*"
         "noanim, selection"
