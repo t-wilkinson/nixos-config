@@ -67,20 +67,6 @@ in
 
 
 #  home-manager = {
-#    extraSpecialArgs = { inherit inputs; };
-#    users.root = { config, pkgs, ... }: {
-#      home.stateVersion = "23.11";
-#      home.username = "root";
-#      home.homeDirectory = "/root";
-#      home.shellAliases = {
-#        vim = "nvim";
-#      };
-#      programs.zsh = {
-#      	enable = true;
-#	enableAutosuggestions = true;
-#	enableCompletion = true;
-#      };
-#    };
 #    users.trey = { config, pkgs, ... }: {
 #      home = {
 #        stateVersion = "23.11"; # Touch this and Covid 2.0 is released
