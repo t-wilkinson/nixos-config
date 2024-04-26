@@ -1,6 +1,6 @@
 let
   browser = "firefox.desktop";
-  editor = "code.desktop";
+  editor = "nvim.desktop";
   file-manager = "org.gnome.Nautilus.desktop";
   image-viewer = "org.gnome.Loupe.desktop";
   image-editor = "org.kde.kolourpaint";

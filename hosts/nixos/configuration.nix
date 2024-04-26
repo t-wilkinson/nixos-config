@@ -62,6 +62,7 @@
         ids = ["*"];
         settings = {
           main = {
+            control = "oneshot(control)";
             capslock = "overload(control, esc)";
             # esc = "overload(esc, capslock)";
             };
