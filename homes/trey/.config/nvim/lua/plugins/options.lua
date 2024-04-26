@@ -73,6 +73,7 @@ return {
 
   {
     "nvim-treesitter/nvim-treesitter",
+    enabled = false,
     opts = {
       ensure_installed = {
         "kdl",
@@ -135,6 +136,17 @@ return {
         opts = { skip = true },
       })
     end,
+  },
+
+  {
+    "telescope.nvim",
+    dependencies = {
+      "nvim-telescope/telescope-fzf-native.nvim",
+      build = "make",
+      config = function()
+        require("telescope").load_extension("fzf")
+      end,
+    },
   },
 
   {

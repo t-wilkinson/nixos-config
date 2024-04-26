@@ -13,3 +13,9 @@ vim.api.nvim_set_keymap(
   ":Telescope file_browser path=%:p:h select_buffer=true<CR>",
   { noremap = true, desc = "Telescope browser current path" }
 )
+vim.api.nvim_set_keymap(
+  "n",
+  "<leader>un",
+  ':execute "source" stdpath("config") . "/lua/config/colors.vim"<CR>',
+  { noremap = true, desc = "Reload nix-generated config" }
+)

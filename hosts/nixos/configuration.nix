@@ -138,6 +138,7 @@
       nixfmt-classic
       vim
       neovim
+      gnumake
     ];
   };
 
