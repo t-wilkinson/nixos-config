@@ -16,9 +16,6 @@ return {
     enabled = false,
   },
   {
-    "tribela/vim-transparent",
-  },
-  {
     "echasnovski/mini.surround",
     keys = function(_, keys)
       -- Populate the keys based on the user's options
@@ -119,13 +116,10 @@ return {
   {
     "rcarriga/nvim-notify",
     enabled = false,
-    -- render style minimal/simple/co
-    -- mpact/wrapped-compact
   },
 
   {
     "folke/noice.nvim",
-    enabled = false,
     opts = function(_, opts)
       table.insert(opts.routes, {
         filter = {

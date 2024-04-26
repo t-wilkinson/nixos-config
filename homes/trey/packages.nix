@@ -46,6 +46,7 @@
       lf
       tmux
       zellij
+      tree
 
       # theming tools
       gradience

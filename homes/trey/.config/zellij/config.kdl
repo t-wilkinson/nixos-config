@@ -156,7 +156,7 @@ keybinds clear-defaults=true {
 		bind "Alt [" { PreviousSwapLayout; }
 		bind "Alt ]" { NextSwapLayout; }
     bind "Ctrl y" {
-      LaunchOrFocusPlugin "file:~/.config/zellij/plugins/harpoon.wasm" {
+      LaunchOrFocusPlugin "https://github.com/Nacho114/harpoon/releases/latest/download/harpoon.wasm" {
           floating true; move_to_focused_tab true;
       }
     }
