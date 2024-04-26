@@ -1,7 +1,7 @@
 { self, ... }:
 let
   inherit (self) inputs;
-  inherit (inputs) nixpkgs home-manager;
+  inherit (inputs) nixpkgs home-manager zjstatus;
 
   username = "trey";
   hostname = "nixos";
@@ -26,6 +26,8 @@ in
           impurity.configRoot = self;
           impurity.enable = true;
         }
+
+        # ../modules/lf.nix
 
         ./nixos
 

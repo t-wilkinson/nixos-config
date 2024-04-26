@@ -344,9 +344,9 @@ default_layout "default"
 
 // The folder in which Zellij will look for layouts
 //
-layout_dir "/home/user/.config/zellij/layouts"
+layout_dir "/home/trey/.config/zellij/layouts"
 
 // The folder in which Zellij will look for themes
 //
-theme_dir "/home/user/.config/zellij/themes"
+theme_dir "/home/trey/.config/zellij/themes"
 

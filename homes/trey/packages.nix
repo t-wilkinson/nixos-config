@@ -43,7 +43,9 @@
       showmethekey
       vscode
       ydotool
+      lf
       tmux
+      zellij
 
       # theming tools
       gradience

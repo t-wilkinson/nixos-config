@@ -1,5 +1,5 @@
 layout {
-  cwd "/home/user/.config"
+  cwd "/home/trey/.config"
   tab name="nvim" cwd="nvim" {
     pane 
   }

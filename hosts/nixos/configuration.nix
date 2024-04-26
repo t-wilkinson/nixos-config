@@ -55,6 +55,20 @@
         ];
       };
     };
+    keyd = {
+      enable = true;
+      keyboards = {
+        default = {
+	  ids = ["*"];
+	  settings = {
+	    main = {
+	      capslock = "overload(control, esc)";
+              # esc = "overload(esc, capslock)";
+	    };
+	  };
+	};
+      };
+    };
   };
 
   systemd = {
