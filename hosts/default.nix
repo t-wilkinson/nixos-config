@@ -27,7 +27,7 @@ in
           impurity.enable = true;
         }
 
-        # ../modules/lf.nix
+        (import ./overlays.nix)
 
         ./nixos
 

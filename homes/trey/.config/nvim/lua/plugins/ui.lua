@@ -14,11 +14,11 @@ return {
     },
   },
 
-  { "dracula/vim" },
-  {
-    "LazyVim/LazyVim",
-    opts = { colorscheme = "dracula" },
-  },
+  -- { "dracula/vim" },
+  -- {
+  --  "LazyVim/LazyVim",
+  --  opts = { colorscheme = "dracula" },
+  --},
 
   {
     "nvim-lualine/lualine.nvim",

@@ -19,6 +19,7 @@ in
     # ./starship.nix
     ./sway.nix
     ./theme.nix
+    ../../modules/lf.nix
   ];
 
   home = {
