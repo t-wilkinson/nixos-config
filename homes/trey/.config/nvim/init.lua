@@ -1,6 +1,9 @@
 -- bootstrap lazy.nvim, LazyVim and your plugins
 require("config.lazy")
 require("colorizer").setup()
+-- local function noop_colorscheme() end
+-- _G.defaults.colorscheme = noop_colorscheme()
+
 vim.cmd([[
    " let s:init_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
    let s:init_dir = stdpath("config")

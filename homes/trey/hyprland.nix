@@ -2,7 +2,7 @@
 let
   hyprland = inputs.hyprland.packages.${pkgs.system}.hyprland;
   plugins = inputs.hyprland-plugins.packages.${pkgs.system};
-  swaylockCmd = "swaylock -f --screenshots --clock --indicator --indicator-radius 100 --indicator-thickness --effect-blur 7x5 --effect-vignette 0.5:0.5 --grace 180 --face-in 0.5";
+  swaylockCmd = "swaylock -f --screenshots --clock --indicator --indicator-radius 100 --indicator-thickness 7 --effect-blur 7x5 --effect-vignette 0.5:0.5 --grace 180 --fade-in 5";
 
   launcher = pkgs.writeShellScriptBin "hypr" ''
     #!/${pkgs.bash}/bin/bash

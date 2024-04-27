@@ -54,6 +54,18 @@ return {
   { "ben-grande/vim-qrexec" },
 
   {
+    dir = "~/dev/t-wilkinson/zortex.nvim",
+    enabled = true,
+    lazy = false,
+    dev = true,
+    config = function()
+      vim.cmd([[
+        echom 'test'
+      ]])
+    end,
+  },
+
+  {
     "williamboman/mason.nvim",
     opts = function(_, opts)
       vim.list_extend(opts.ensure_installed, {
@@ -71,7 +83,7 @@ return {
     end,
   },
 
-  {
+  --[[
     "nvim-treesitter/nvim-treesitter",
     enabled = false,
     opts = {
@@ -98,6 +110,7 @@ return {
       },
     },
   },
+  --]]
 
   {
     "hrsh7th/nvim-cmp",
@@ -138,7 +151,7 @@ return {
     end,
   },
 
-  {
+  --[[{
     "telescope.nvim",
     dependencies = {
       "nvim-telescope/telescope-fzf-native.nvim",
@@ -149,7 +162,7 @@ return {
     },
   },
 
-  {
+  --[[{
     "nvim-telescope/telescope.nvim",
     dependencies = {
       "nvim-telescope/telescope.nvim",
@@ -262,6 +275,7 @@ return {
       require("telescope").load_extension("file_browser")
     end,
   },
+  --]]
 
   {
     "akinsho/bufferline.nvim",

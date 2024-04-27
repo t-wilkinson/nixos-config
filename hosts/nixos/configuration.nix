@@ -59,12 +59,20 @@
       enable = true;
       keyboards = {
         default = {
-        ids = ["*"];
-        settings = {
-          main = {
-            control = "oneshot(control)";
-            capslock = "overload(control, esc)";
-            # esc = "overload(esc, capslock)";
+          ids = ["*"];
+          settings = {
+            main = {
+              control = "oneshot(control)";
+              capslock = "overload(control, esc)";
+              esc = "`";
+            };
+            # Make esc work on small fn keyboard, modularize this
+            "esc:S" = {
+              esc = "~";
+            };
+            shift = {
+              leftshift = "capslock";
+              rightshift = "capslock";
             };
           };
         };
@@ -142,44 +150,8 @@
     ];
   };
 
-  # environment.systemPackages = with pkgs; [
-  #   neovim
-  #   kitty
-  #   wget
-  #   waybar
-  #   dunst
-  #   # mako
-  #   libnotify
-  #   rofi-wayland
-  #   # wofi
-  #   # bemenu
-  #   # fuzzel
-  #   # tofi
-  #   # hyprpaper
-  #   # swabg
-  #   # wpaperd
-  #   # mpvpaper
-  #   swww
-  #   networkmanagerapplet
-  #   # virtualisation
-  #   virt-manager
-  #   virt-viewer
-  #   spice
-  #   spice-gtk
-  #   spice-protocol
-  #   win-virtio
-  #   win-spice
-  #   gnome.adwaita-icon-theme
-  #   nerdfonts
-  #   # home-manager
-  #   (pkgs.waybar.overrideAttrs (oldAttrs: {
-  #       mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
-  #     })
-  #   )
-  # ];
-
   # ZRAM
-  zramSwap.enable = true;
+  zramSwap.enable = false;
   zramSwap.memoryPercent = 100;
 
   # logind
@@ -302,9 +274,9 @@
 
   # Virtualisation
   virtualisation = {
-    lxd.enable = true;
+    lxd.enable = false;
     libvirtd = {
-      enable = true;
+      enable = false;
       qemu = {
         swtpm.enable = true;
         ovmf.enable = true;
@@ -349,7 +321,6 @@
       sansSerif = [ "Noto Sans" "Source Han Sans" ];
     };
   };
-
 
   system.stateVersion = "23.11"; # If you touch this, Covid 2.0 will be released
 }

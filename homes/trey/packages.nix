@@ -83,6 +83,15 @@
       eslint
       # very important stuff
       # uwuify
-    ];
+
+      # virtualisation
+      #   virt-manager
+      #   virt-viewer
+      #   spice
+      #   spice-gtk
+      #   spice-protocol
+      #   win-virtio
+      #   win-spice
+      ];
   };
 }

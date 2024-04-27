@@ -1,6 +1,10 @@
 Util = require("lazyvim.util")
 
 return {
+  { "catppuccin/nvim", enabled = false, },
+
+  { "folke/tokyonight.nvim", enabled = false, },
+
   {
     "akinsho/bufferline.nvim",
     dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -15,10 +19,11 @@ return {
   },
 
   -- { "dracula/vim" },
-  -- {
-  --   "LazyVim/LazyVim",
-  --   opts = { colorscheme = "dracula" },
-  -- },
+  -- { "catppuccin/nvim" },
+  {
+    "LazyVim/LazyVim",
+    opts = { colorscheme = "default" },
+  },
 
   {
     "nvim-lualine/lualine.nvim",
