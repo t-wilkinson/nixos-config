@@ -3,6 +3,7 @@ hi CursorLineNr guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi CursorLine guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi NonText guifg=#{{ $primary }} guibg=NONE gui=NONE cterm=NONE
 hi EndOfBuffer guifg=NONE guibg=NONE gui=NONE cterm=NONE
+hi Whitespace guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi LineNr guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi FoldColumn guifg=#{{ $onSurface }} guibg=#{{ $surface }} gui=NONE cterm=NONE
 hi Folded guifg=#{{ $onSurface }} guibg=#{{ $surface }} gui=NONE cterm=NONE
@@ -45,7 +46,7 @@ hi SpellBad guifg=#{{ $error }} guibg=NONE guisp=#{{ $error }} gui=undercurl cte
 hi SpellCap guifg=#{{ $tertiary }} guibg=NONE guisp=#{{ $tertiary }} gui=undercurl cterm=undercurl
 hi SpellLocal guifg=#{{ $secondary }} guibg=NONE guisp=#{{ $secondary }} gui=undercurl cterm=undercurl
 hi SpellRare guifg=#{{ $onTertiaryContainer }} guibg=NONE guisp=#{{ $onTertiaryContainer }} gui=undercurl cterm=undercurl
-hi ColorColumn guifg=NONE guibg=#{{ $inverseOnSurface }}c1c1c gui=NONE cterm=NONE
+hi ColorColumn guifg=NONE guibg=#{{ $inverseOnSurface }} gui=NONE cterm=NONE
 hi! link Terminal Normal
 hi! link CursorIM Cursor
 hi! link QuickFixLine Search
@@ -104,6 +105,29 @@ hi! link xmlTagName Statement
 hi! link xmlEndTag Statement
 hi! link markdownItalic Preproc
 hi! link asciidocQuotedEmphasized Preproc
+
+
+" Lualine
+" string = hl('String').fg or hl('Normal').fg,
+" normal = hl('Normal').fg,
+" func = hl('Function').fg or hl('Normal').fg,
+" type = hl('Type').fg or hl('Normal').fg,
+" debug = hl('Debug').fg or hl('Normal').fg,
+" comment = hl('Comment').fg or hl('Normal').fg,
+" directory = hl('Directory').fg or hl('Normal').fg,
+" constant = hl('Constant').fg or hl('Normal').fg,
+" statement = hl('Statement').fg or hl('Normal').fg,
+" special = hl('Special').fg or hl('Normal').fg,
+" diag_warn = hl('DiagnosticWarn').fg or hl('Normal').fg,
+" diag_error = hl('DiagnosticError').fg or hl('Normal').fg,
+" diag_hint = hl('DiagnosticHint').fg or hl('Normal').fg,
+" diag_info = hl('DiagnosticInfo').fg or hl('Normal').fg,
+" git_del = hl('GitsignsDelete').fg or hl('DiffRemoved').fg or hl('DiffDelete').bg,
+" git_add = hl('GitsignsAdd').fg or hl('DiffAdded').fg or hl('DiffAdded').bg,
+" git_change = hl('GitsignsChange').fg or hl('DiffChange').fg or hl('DiffChange').bg,
+" tabline_sel = hl('TabLineSel').bg or hl('Visual').bg,
+" tabline = hl('TabLine').bg,
+" statusline = hl('StatusLine').bg,
 
 
 " " Dracula Theme: {{{

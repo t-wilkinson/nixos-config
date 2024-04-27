@@ -37,16 +37,20 @@
       zip
       unzip
       glib
-      foot
-      kitty
       starship
       showmethekey
-      vscode
       ydotool
+      tree
+      nvd
+      nix-output-monitor
+      nh
+
+      vscode
       lf
       tmux
       zellij
-      tree
+      foot
+      kitty
 
       # theming tools
       gradience

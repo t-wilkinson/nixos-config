@@ -25,6 +25,7 @@ in
   home = {
     inherit username homeDirectory;
     sessionVariables = {
+      FLAKE = "/home/trey/dev/t-wilkinson/nixos";
       NIXPKGS_ALLOW_UNFREE = "1";
       NIXPKGS_ALLOW_INSECURE = "1";
     };

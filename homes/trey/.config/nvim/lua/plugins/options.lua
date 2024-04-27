@@ -55,6 +55,7 @@ return {
 
   {
     dir = "~/dev/t-wilkinson/zortex.nvim",
+    build = "cd app && yarn install",
     enabled = true,
     lazy = false,
     dev = true,
