@@ -136,6 +136,23 @@ apply_vim() {
 	cp "$HOME"/.cache/ags/user/generated/nvim/colors.vim "$HOME"/.config/nvim/lua/config/colors.vim
 }
 
+apply_zellij() {
+	# Check if scripts/templates/zellij/system.yaml exists
+	if [ ! -f "scripts/templates/zellij/system.yaml" ]; then
+		echo "Template file not found for Zellij. Skipping that."
+		return
+	fi
+	# Copy template
+	mkdir -p "$HOME"/.cache/ags/user/generated/zellij
+	cp "scripts/templates/zellij/system.yaml" "$HOME"/.cache/ags/user/generated/zellij/system.yaml
+	# Apply colors
+	for i in "${!colorlist[@]}"; do
+		sed -i "s/{{ ${colorlist[$i]} }}/${colorvalues[$i]#\#}/g" "$HOME"/.cache/ags/user/generated/zellij/system.yaml
+	done
+
+	cp "$HOME"/.cache/ags/user/generated/zellij/system.yaml "$HOME"/.config/zellij/themes/system.yaml
+}
+
 apply_hyprland() {
 	# Check if scripts/templates/hypr/colors.conf exists
 	if [ ! -f "scripts/templates/hypr/colors.conf" ]; then
@@ -194,3 +211,4 @@ apply_gtklock &
 apply_fuzzel &
 apply_term &
 apply_vim &
+apply_zellij &

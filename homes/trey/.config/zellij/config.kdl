@@ -10,7 +10,7 @@ keybinds clear-defaults=true {
 		unbind "Ctrl o"
 		unbind "Ctrl q"
 		unbind "Ctrl h"
-		unbind "Ctrl h"
+		unbind "Ctrl n"
 		// uncomment this and adjust key if using copy_on_select=false
 		// bind "Alt c" { Copy; }
 	}

@@ -3,7 +3,7 @@ hi CursorLineNr guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi CursorLine guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi NonText guifg=#{{ $primary }} guibg=NONE gui=NONE cterm=NONE
 hi EndOfBuffer guifg=NONE guibg=NONE gui=NONE cterm=NONE
-hi Whitespace guifg=NONE guibg=NONE gui=NONE cterm=NONE
+hi Whitespace guifg=#{{ $surface }} guibg=NONE gui=NONE cterm=NONE
 hi LineNr guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi FoldColumn guifg=#{{ $onSurface }} guibg=#{{ $surface }} gui=NONE cterm=NONE
 hi Folded guifg=#{{ $onSurface }} guibg=#{{ $surface }} gui=NONE cterm=NONE

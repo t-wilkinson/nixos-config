@@ -53,15 +53,117 @@ return {
 
   { "ben-grande/vim-qrexec" },
 
+  { "junegunn/fzf", build = "./install --all" },
   {
+    "junegunn/fzf.vim",
+    config = function()
+      vim.cmd([[
+        " CTRL-T(tab) / CTRL-X(split) / CTRL-V(ver-split)
+        " let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
+        let $FZF_DEFAULT_COMMAND =  "fd . --type f -E node_modules"
+        let $FZF_DEFAULT_OPTS=' --cycle --exact --color=dark --color=fg:16,bg:-1,hl:1,fg+:#ffffff,bg+:-1,hl+:1 --color=info:12,prompt:0,pointer:12,marker:4,spinner:11,header:-1 --layout=reverse  --margin=1,4 --preview-window=":60%" --bind ctrl-k:preview-up,ctrl-j:preview-down,ctrl-f:preview-page-down,ctrl-b:preview-page-up'
+        let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+        let g:fzf_command_prefix = "Fzf"
+
+        " https://github.com/junegunn/fzf.vim#advanced-customization
+        command! -bang -nargs=* FzfRg
+          \ call fzf#vim#grep(
+          \   'rg --column --line-number --no-heading --color=always --smart-case -g !node_modules -- '.shellescape(<q-args>), 1,
+          \   fzf#vim#with_preview(), <bang>0)
+
+        " https://www.reddit.com/r/neovim/comments/djmehv/im_probably_really_late_to_the_party_but_fzf_in_a/
+        function! FloatingFZF()
+          let buf = nvim_create_buf(v:false, v:true)
+          call setbufvar(buf, '&signcolumn', 'no')
+
+          let height = float2nr(50)
+          let width = float2nr(&columns - 8)
+          let horizontal = float2nr((&columns - width) / 2)
+          let vertical = 1
+
+          let opts = {
+                \ 'relative': 'editor',
+                \ 'row': vertical,
+                \ 'col': horizontal,
+                \ 'width': width,
+                \ 'height': height,
+                \ 'style': 'minimal'
+                \ }
+
+          call nvim_open_win(buf, v:true, opts)
+        endfunction
+      ]])
+    end,
+  },
+
+  {
+    "t-wilkinson/zortex.nvim",
     dir = "~/dev/t-wilkinson/zortex.nvim",
     build = "cd app && yarn install",
     enabled = true,
     lazy = false,
-    dev = true,
     config = function()
       vim.cmd([[
-        echom 'test'
+            let g:zortex_remote_wiki_port = 8081
+            let g:zortex_remote_server = 'klean-studios'
+            let g:zortex_remote_server_dir = '/www/zortex'
+
+            let g:zortex_fenced_languages = ['python', 'javascript', 'bindzone', 'rust', 'bash', 'sh', 'json', 'sql']
+            let g:zortex_notes_dir = $HOME . '/zortex/'
+            let g:zortex_window_command = 'call FloatingFZF()'
+            let g:zortex_extension = '.zortex'
+            let g:zortex_theme = 'light'
+            let g:zortex_auto_start_preview = 1
+            let g:zortex_auto_start_server = 1
+            let g:zortex_preview_options = {
+                \ 'mkit': {},
+                \ 'katex': {},
+                \ 'uml': {},
+                \ 'maid': {},
+                \ 'disable_sync_scroll': 0,
+                \ 'sync_scroll_type': 'middle',
+                \ 'hide_yaml_meta': 1,
+                \ 'sequence_diagrams': {},
+                \ 'flowchart_diagrams': {},
+                \ 'content_editable': v:false,
+                \ 'disable_filename': 0,
+                \ 'toc': {}
+                \ }
+            let g:zortex_port = '8080'
+
+            " map Zo o0␄Z<Tab>
+            " vmap Z- :g/^-/norm 2clZ<Tab><CR>
+            " vmap Z^ :g/^/norm iZ<Tab><CR>
+            " vmap <silent>Zc :s/- \(.*\)/\='- ' . tolower(substitute(submatch(1), " ", "-", "g"))<CR>
+            " map <silent>Zu :ZortexSearchUnique<CR>
+            " map <silent>Za :ZortexBranchToArticle<CR>
+            " map <silent>ZO :ZortexBranchToOutline<CR>
+            " map <silent>Zy :ZortexCopyZettelId<CR>
+            " map <silent>ZY :ZortexCopyZettel<CR>
+            " map <silent>Zl :ZortexCreateLink<CR>
+
+            nmap Z <Nop>
+            nmap ZZ <Nop>
+
+            autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+            autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+            map <silent>Zz :ZortexSearch<CR>
+            map <silent>ZZ :ZortexSearch<CR>
+
+            map <silent>Zr :ZortexResourceToZettel<CR>
+            map <silent>Zi :ZortexListitemToZettel<CR>
+            map <silent>Zs :ZortexOpenStructure<CR>
+
+            map Zw  :ZortexSearchWikipedia<Space>
+            map Zg  :ZortexSearchGoogle<Space>
+
+            map Zp  :ZortexPreview<CR>
+            map ZSs :ZortexStartServer<CR>
+            map ZSe :ZortexStopServer<CR>
+            map ZRs :ZortexStartRemoteServer<CR>
+            map ZRr :ZortexRestartRemoteServer<CR>
+            map ZRS :ZortexSyncRemoteServer<CR>
+            map ZRF :ZortexReloadFolds<CR>
       ]])
     end,
   },

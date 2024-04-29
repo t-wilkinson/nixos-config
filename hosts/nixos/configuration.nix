@@ -70,10 +70,6 @@
             "esc:S" = {
               esc = "~";
             };
-            shift = {
-              leftshift = "capslock";
-              rightshift = "capslock";
-            };
           };
         };
       };
@@ -147,6 +143,7 @@
       vim
       neovim
       gnumake
+      # nodePackages_latest.neovim
     ];
   };
 
@@ -278,8 +275,8 @@
     libvirtd = {
       enable = false;
       qemu = {
-        swtpm.enable = true;
-        ovmf.enable = true;
+        swtpm.enable = false;
+        ovmf.enable = false;
         ovmf.packages = [ pkgs.OVMFFull.fd ];
       };
     };
@@ -303,6 +300,8 @@
   environment.sessionVariables = {
     # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
     NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
+    NIXPKGS_ALLOW_UNFREE = "1";
+    NIXPKGS_ALLOW_INSECURE = "1";
   };
 
   fonts = {

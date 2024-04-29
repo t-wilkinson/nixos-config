@@ -1,0 +1,15 @@
+themes {
+    system {
+        fg 172 176 190
+        bg 172 176 190
+        black 76 79 105
+        red 210 15 57
+        green 64 160 43
+        yellow 223 142 29
+        blue 30 102 245
+        magenta 234 118 203
+        cyan 4 165 229
+        white 220 224 232
+        orange 254 100 11
+    }
+}

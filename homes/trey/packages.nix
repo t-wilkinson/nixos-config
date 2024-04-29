@@ -88,6 +88,9 @@
       # very important stuff
       # uwuify
 
+      # node
+      nodePackages_latest.neovim
+
       # virtualisation
       #   virt-manager
       #   virt-viewer

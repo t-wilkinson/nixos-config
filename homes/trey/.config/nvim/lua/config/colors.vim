@@ -1,69 +1,70 @@
 hi Normal guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi CursorLineNr guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi CursorLine guifg=NONE guibg=NONE gui=NONE cterm=NONE
-hi NonText guifg=#cdbdff guibg=NONE gui=NONE cterm=NONE
+hi NonText guifg=#90ccff guibg=NONE gui=NONE cterm=NONE
 hi EndOfBuffer guifg=NONE guibg=NONE gui=NONE cterm=NONE
+hi Whitespace guifg=#1a1c1e guibg=NONE gui=NONE cterm=NONE
 hi LineNr guifg=NONE guibg=NONE gui=NONE cterm=NONE
-hi FoldColumn guifg=#e6e1e6 guibg=#1c1b1e gui=NONE cterm=NONE
-hi Folded guifg=#e6e1e6 guibg=#1c1b1e gui=NONE cterm=NONE
-hi MatchParen guifg=#cac3dc guibg=#322e41 gui=NONE cterm=NONE
-hi SignColumn guifg=#c9c4cf guibg=#1c1b1e gui=NONE cterm=NONE
-hi Pmenu guifg=#938f99 guibg=#313033 gui=NONE cterm=NONE
-hi PmenuSbar guifg=NONE guibg=#e6e1e6 gui=NONE cterm=NONE
-hi PmenuSel guifg=#351684 guibg=#efb8cb gui=NONE cterm=NONE
-hi PmenuThumb guifg=#efb8cb guibg=#efb8cb gui=NONE cterm=NONE
-hi ErrorMsg guifg=#ffb4a9 guibg=#351684 gui=reverse cterm=reverse
-hi ModeMsg guifg=#efb8cb guibg=#351684 gui=reverse cterm=reverse
-hi MoreMsg guifg=#efb8cb guibg=NONE gui=NONE cterm=NONE
-hi Question guifg=#efb8cb guibg=NONE gui=NONE cterm=NONE
+hi FoldColumn guifg=#e2e2e5 guibg=#1a1c1e gui=NONE cterm=NONE
+hi Folded guifg=#e2e2e5 guibg=#1a1c1e gui=NONE cterm=NONE
+hi MatchParen guifg=#b8c8da guibg=#23323f gui=NONE cterm=NONE
+hi SignColumn guifg=#c2c7ce guibg=#1a1c1e gui=NONE cterm=NONE
+hi Pmenu guifg=#8c9198 guibg=#2f3032 gui=NONE cterm=NONE
+hi PmenuSbar guifg=NONE guibg=#e2e2e5 gui=NONE cterm=NONE
+hi PmenuSel guifg=#003352 guibg=#d1bfe7 gui=NONE cterm=NONE
+hi PmenuThumb guifg=#d1bfe7 guibg=#d1bfe7 gui=NONE cterm=NONE
+hi ErrorMsg guifg=#ffb4a9 guibg=#003352 gui=reverse cterm=reverse
+hi ModeMsg guifg=#d1bfe7 guibg=#003352 gui=reverse cterm=reverse
+hi MoreMsg guifg=#d1bfe7 guibg=NONE gui=NONE cterm=NONE
+hi Question guifg=#d1bfe7 guibg=NONE gui=NONE cterm=NONE
 hi WarningMsg guifg=#ffb4a9 guibg=NONE gui=NONE cterm=NONE
-hi TabLine guifg=#494459 guibg=#313033 gui=NONE cterm=NONE
-hi TabLineFill guifg=#313033 guibg=#313033 gui=NONE cterm=NONE
-hi TabLineSel guifg=#351684 guibg=#494459 gui=NONE cterm=NONE
-hi ToolbarLine guifg=NONE guibg=#313033  gui=NONE cterm=NONE
-hi ToolbarButton guifg=#938f99 guibg=#e6e1e6 gui=NONE cterm=NONE
-hi Cursor guifg=#351684 guibg=#938f99 gui=NONE cterm=NONE
-hi CursorColumn guifg=NONE guibg=#c9c4cf gui=NONE cterm=NONE
-hi StatusLine guifg=#351684 guibg=#494459 gui=NONE cterm=NONE
-hi StatusLineNC guifg=#494459 guibg=#313033 gui=NONE cterm=NONE
-hi StatusLineTerm guifg=#351684 guibg=#494459 gui=NONE cterm=NONE
-hi StatusLineTermNC guifg=#494459 guibg=#313033 gui=NONE cterm=NONE
-hi Visual guifg=#cdbdff guibg=#351684 gui=reverse cterm=reverse
+hi TabLine guifg=#394857 guibg=#2f3032 gui=NONE cterm=NONE
+hi TabLineFill guifg=#2f3032 guibg=#2f3032 gui=NONE cterm=NONE
+hi TabLineSel guifg=#003352 guibg=#394857 gui=NONE cterm=NONE
+hi ToolbarLine guifg=NONE guibg=#2f3032  gui=NONE cterm=NONE
+hi ToolbarButton guifg=#8c9198 guibg=#e2e2e5 gui=NONE cterm=NONE
+hi Cursor guifg=#003352 guibg=#8c9198 gui=NONE cterm=NONE
+hi CursorColumn guifg=NONE guibg=#c2c7ce gui=NONE cterm=NONE
+hi StatusLine guifg=#003352 guibg=#394857 gui=NONE cterm=NONE
+hi StatusLineNC guifg=#394857 guibg=#2f3032 gui=NONE cterm=NONE
+hi StatusLineTerm guifg=#003352 guibg=#394857 gui=NONE cterm=NONE
+hi StatusLineTermNC guifg=#394857 guibg=#2f3032 gui=NONE cterm=NONE
+hi Visual guifg=#90ccff guibg=#003352 gui=reverse cterm=reverse
 hi VisualNOS guifg=NONE guibg=NONE gui=underline ctermfg=NONE ctermbg=NONE cterm=underline
-hi VertSplit guifg=#313033 guibg=#313033 gui=NONE cterm=NONE
-hi WildMenu guifg=#351684 guibg=#cdbdff gui=NONE cterm=NONE
-hi DiffAdd guifg=#1c1b1e guibg=#c9c4cf gui=reverse cterm=reverse
-hi DiffChange guifg=#48454f guibg=#c9c4cf gui=reverse cterm=reverse
+hi VertSplit guifg=#2f3032 guibg=#2f3032 gui=NONE cterm=NONE
+hi WildMenu guifg=#003352 guibg=#90ccff gui=NONE cterm=NONE
+hi DiffAdd guifg=#1a1c1e guibg=#c2c7ce gui=reverse cterm=reverse
+hi DiffChange guifg=#41474d guibg=#c2c7ce gui=reverse cterm=reverse
 hi DiffDelete guifg=#ffb4a9 guibg=#680003 gui=reverse cterm=reverse
-hi DiffText guifg=#e6e1e6 guibg=#c9c4cf gui=reverse cterm=reverse
-hi IncSearch guifg=#351684 guibg=#ffb4a9 gui=NONE cterm=NONE
-hi Search guifg=#351684 guibg=#623b4a gui=NONE cterm=NONE
-hi Directory guifg=#efb8cb guibg=NONE gui=NONE cterm=NONE
-hi debugPC guifg=NONE guibg=#cac3dc gui=NONE cterm=NONE
+hi DiffText guifg=#e2e2e5 guibg=#c2c7ce gui=reverse cterm=reverse
+hi IncSearch guifg=#003352 guibg=#ffb4a9 gui=NONE cterm=NONE
+hi Search guifg=#003352 guibg=#4e4161 gui=NONE cterm=NONE
+hi Directory guifg=#d1bfe7 guibg=NONE gui=NONE cterm=NONE
+hi debugPC guifg=NONE guibg=#b8c8da gui=NONE cterm=NONE
 hi debugBreakpoint guifg=NONE guibg=#ffb4a9 gui=NONE cterm=NONE
 hi SpellBad guifg=#ffb4a9 guibg=NONE guisp=#ffb4a9 gui=undercurl cterm=undercurl
-hi SpellCap guifg=#efb8cb guibg=NONE guisp=#efb8cb gui=undercurl cterm=undercurl
-hi SpellLocal guifg=#cac3dc guibg=NONE guisp=#cac3dc gui=undercurl cterm=undercurl
-hi SpellRare guifg=#ffd9e6 guibg=NONE guisp=#ffd9e6 gui=undercurl cterm=undercurl
-hi ColorColumn guifg=NONE guibg=#313033c1c1c gui=NONE cterm=NONE
+hi SpellCap guifg=#d1bfe7 guibg=NONE guisp=#d1bfe7 gui=undercurl cterm=undercurl
+hi SpellLocal guifg=#b8c8da guibg=NONE guisp=#b8c8da gui=undercurl cterm=undercurl
+hi SpellRare guifg=#eedbff guibg=NONE guisp=#eedbff gui=undercurl cterm=undercurl
+hi ColorColumn guifg=NONE guibg=#2f3032 gui=NONE cterm=NONE
 hi! link Terminal Normal
 hi! link CursorIM Cursor
 hi! link QuickFixLine Search
-hi Comment guifg=1c1b1e guibg=NONE gui=NONE cterm=NONE
-hi Conceal guifg=#938f99 guibg=NONE gui=NONE cterm=NONE
-hi Constant guifg=#ffd9e6 guibg=NONE gui=NONE cterm=NONE
+hi Comment guifg=1a1c1e guibg=NONE gui=NONE cterm=NONE
+hi Conceal guifg=#8c9198 guibg=NONE gui=NONE cterm=NONE
+hi Constant guifg=#eedbff guibg=NONE gui=NONE cterm=NONE
 hi Error guifg=#ffb4a9 guibg=NONE gui=reverse cterm=reverse
-hi Identifier guifg=#cac3dc guibg=NONE gui=NONE cterm=NONE
+hi Identifier guifg=#b8c8da guibg=NONE gui=NONE cterm=NONE
 hi Ignore guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
-hi PreProc guifg=#efb8cb guibg=NONE gui=NONE cterm=NONE
-hi Special guifg=#cac3dc guibg=NONE gui=NONE cterm=NONE
-hi Statement guifg=#cdbdff guibg=NONE gui=NONE cterm=NONE
-hi String guifg=#efb8cb guibg=NONE gui=NONE cterm=NONE
+hi PreProc guifg=#d1bfe7 guibg=NONE gui=NONE cterm=NONE
+hi Special guifg=#b8c8da guibg=NONE gui=NONE cterm=NONE
+hi Statement guifg=#90ccff guibg=NONE gui=NONE cterm=NONE
+hi String guifg=#d1bfe7 guibg=NONE gui=NONE cterm=NONE
 hi Todo guifg=NONE guibg=NONE gui=reverse ctermfg=NONE ctermbg=NONE cterm=reverse
-hi Type guifg=#cac3dc guibg=NONE gui=NONE cterm=NONE
-hi Underlined guifg=#efb8cb guibg=NONE gui=underline cterm=underline
-hi Function guifg=#623b4a guibg=NONE gui=NONE cterm=NONE
-hi SpecialKey guifg=#938f99 guibg=NONE gui=NONE cterm=NONE
+hi Type guifg=#b8c8da guibg=NONE gui=NONE cterm=NONE
+hi Underlined guifg=#d1bfe7 guibg=NONE gui=underline cterm=underline
+hi Function guifg=#4e4161 guibg=NONE gui=NONE cterm=NONE
+hi SpecialKey guifg=#8c9198 guibg=NONE gui=NONE cterm=NONE
 hi Title guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
 hi helpLeadBlank guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
 hi helpNormal guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
@@ -104,6 +105,29 @@ hi! link xmlTagName Statement
 hi! link xmlEndTag Statement
 hi! link markdownItalic Preproc
 hi! link asciidocQuotedEmphasized Preproc
+
+
+" Lualine
+" string = hl('String').fg or hl('Normal').fg,
+" normal = hl('Normal').fg,
+" func = hl('Function').fg or hl('Normal').fg,
+" type = hl('Type').fg or hl('Normal').fg,
+" debug = hl('Debug').fg or hl('Normal').fg,
+" comment = hl('Comment').fg or hl('Normal').fg,
+" directory = hl('Directory').fg or hl('Normal').fg,
+" constant = hl('Constant').fg or hl('Normal').fg,
+" statement = hl('Statement').fg or hl('Normal').fg,
+" special = hl('Special').fg or hl('Normal').fg,
+" diag_warn = hl('DiagnosticWarn').fg or hl('Normal').fg,
+" diag_error = hl('DiagnosticError').fg or hl('Normal').fg,
+" diag_hint = hl('DiagnosticHint').fg or hl('Normal').fg,
+" diag_info = hl('DiagnosticInfo').fg or hl('Normal').fg,
+" git_del = hl('GitsignsDelete').fg or hl('DiffRemoved').fg or hl('DiffDelete').bg,
+" git_add = hl('GitsignsAdd').fg or hl('DiffAdded').fg or hl('DiffAdded').bg,
+" git_change = hl('GitsignsChange').fg or hl('DiffChange').fg or hl('DiffChange').bg,
+" tabline_sel = hl('TabLineSel').bg or hl('Visual').bg,
+" tabline = hl('TabLine').bg,
+" statusline = hl('StatusLine').bg,
 
 
 " " Dracula Theme: {{{
