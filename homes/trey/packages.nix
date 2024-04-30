@@ -20,6 +20,7 @@
       qt5.qtimageformats
       vlc
       yad
+      tor-browser-bundle-bin
 
       # tools
       bat
@@ -44,6 +45,7 @@
       nvd
       nix-output-monitor
       nh
+      zoxide
 
       vscode
       lf
@@ -90,15 +92,18 @@
 
       # node
       nodePackages_latest.neovim
+      # vimPlugins.nvim-treesitter.withPlugins
+      # neovimUtils.makeNeovim
 
       # virtualisation
-      #   virt-manager
-      #   virt-viewer
-      #   spice
-      #   spice-gtk
-      #   spice-protocol
-      #   win-virtio
-      #   win-spice
+      # kvm
+      # virt-manager
+      # virt-viewer
+      # spice
+      # spice-gtk
+      # spice-protocol
+      # win-virtio
+      # win-spice
       ];
   };
 }

@@ -211,4 +211,4 @@ apply_gtklock &
 apply_fuzzel &
 apply_term &
 apply_vim &
-apply_zellij &
+# apply_zellij &

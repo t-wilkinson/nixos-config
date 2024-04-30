@@ -25,17 +25,26 @@ in
   home = {
     inherit username homeDirectory;
     sessionVariables = {
-      FLAKE = "/home/trey/dev/t-wilkinson/nixos";
       NIXPKGS_ALLOW_UNFREE = "1";
       NIXPKGS_ALLOW_INSECURE = "1";
+      FLAKE = "$HOME/dev/t-wilkinson/nixos";
+      NODE_PATH = "$HOME/.npm-packages/lib/node_modules";
     };
     sessionPath = [
       "$HOME/.local/bin"
+      "$HOME/.npm-packages/bin"
     ];
   };
 
   xdg.userDirs = {
     createDirectories = true;
+  };
+
+  dconf.settings = {
+    "org/virt-manager/virt-manager/connections" = {
+      autoconnect = ["qemu:///system"];
+      uris = ["qemu:///system"];
+    };
   };
 
   gtk = {

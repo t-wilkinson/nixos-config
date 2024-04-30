@@ -10,6 +10,10 @@ $tertiary: adjust-hue(lighten($color4, 20%), 30deg);
 $onTertiary: adjust-hue(darken($color2, 20%), 30deg);
 $tertiaryContainer: adjust-hue(darken($color2, 10%), 30deg);
 $tertiaryContainer: adjust-hue(lighten($color4, 10%), 30deg);
+$success: #81c784;
+$onSuccess: #388e3c;
+$successContainer: #66bb6a;
+$onSuccessContainer: #81c784;
 $error: #ffb4a9;
 $onError: #680003;
 $errorContainer: #930006;
@@ -27,31 +31,87 @@ $inverseSurface: invert($surface);
 $inverseOnSurface: invert($onSurface);
 $inversePrimary: invert($primary);
 
-.primary { color: $primary; }
-.onPrimary { color: $onPrimary; }
-.primaryContainer { color: $primaryContainer; }
-.onPrimaryContainer { color: $onPrimaryContainer; }
-.secondary { color: $secondary; }
-.onSecondary { color: $onSecondary; }
-.secondaryContainer { color: $secondaryContainer; }
-.onSecondaryContainer { color: $onSecondaryContainer; }
-.tertiary { color: $tertiary; }
-.onTertiary { color: $onTertiary; }
-.tertiaryContainer { color: $tertiaryContainer; }
-.onTertiaryContainer { color: $tertiaryContainer; }
-.error { color: $error; }
-.onError { color: $onError; }
-.errorContainer { color: $errorContainer; }
-.onErrorContainer { color: $onErrorContainer; }
-.colorbarbg { color: $colorbarbg; }
-.background { color: $background; }
-.onBackground { color: $onBackground; }
-.surface { color: $surface; }
-.onSurface { color: $onSurface; }
-.surfaceVariant { color: $surfaceVariant; }
-.onSurfaceVariant { color: $onSurfaceVariant; }
-.outline { color: $outline; }
-.shadow { color: $shadow; }
-.inverseSurface { color: $inverseSurface; }
-.inverseOnSurface { color: $inverseOnSurface; }
-.inversePrimary { color: $inversePrimary; }
+.primary {
+  color: $primary;
+}
+.onPrimary {
+  color: $onPrimary;
+}
+.primaryContainer {
+  color: $primaryContainer;
+}
+.onPrimaryContainer {
+  color: $onPrimaryContainer;
+}
+.secondary {
+  color: $secondary;
+}
+.onSecondary {
+  color: $onSecondary;
+}
+.secondaryContainer {
+  color: $secondaryContainer;
+}
+.onSecondaryContainer {
+  color: $onSecondaryContainer;
+}
+.tertiary {
+  color: $tertiary;
+}
+.onTertiary {
+  color: $onTertiary;
+}
+.tertiaryContainer {
+  color: $tertiaryContainer;
+}
+.onTertiaryContainer {
+  color: $tertiaryContainer;
+}
+.error {
+  color: $error;
+}
+.onError {
+  color: $onError;
+}
+.errorContainer {
+  color: $errorContainer;
+}
+.onErrorContainer {
+  color: $onErrorContainer;
+}
+.colorbarbg {
+  color: $colorbarbg;
+}
+.background {
+  color: $background;
+}
+.onBackground {
+  color: $onBackground;
+}
+.surface {
+  color: $surface;
+}
+.onSurface {
+  color: $onSurface;
+}
+.surfaceVariant {
+  color: $surfaceVariant;
+}
+.onSurfaceVariant {
+  color: $onSurfaceVariant;
+}
+.outline {
+  color: $outline;
+}
+.shadow {
+  color: $shadow;
+}
+.inverseSurface {
+  color: $inverseSurface;
+}
+.inverseOnSurface {
+  color: $inverseOnSurface;
+}
+.inversePrimary {
+  color: $inversePrimary;
+}

@@ -1,3 +1,5 @@
+# EXAMPLES: https://github.com/starship/starship/discussions/1252
+
 # # Don't print a new line at the start of the prompt
 # add_newline = false
 # # Pipes ╰─ ╭─
@@ -102,7 +104,7 @@
 # 
 
 
-
+# PROMPT: pastel
 # format = """
 # [](#9A348E)\
 # $os\
@@ -373,8 +375,6 @@
 # symbol = " "
 
 
-
-
 # format = """\
 # [](bg:#030B16 fg:#7DF9AA)\
 # [󰀵 ](bg:#7DF9AA fg:#090c0c)\
@@ -428,52 +428,355 @@
 # format = '[[ 󱑍 $time ](bg:#1C3A5E fg:#8DFBD2)]($style)'
 
 
+# PROMPT: pure
+# format = """
+# $username\
+# $hostname\
+# $directory\
+# $git_branch\
+# $git_state\
+# $git_status\
+# $cmd_duration\
+# $line_break\
+# $python\
+# $character"""
+# 
+# [directory]
+# style = "blue"
+# 
+# [character]
+# success_symbol = "[❯](purple)"
+# error_symbol = "[❯](red)"
+# vimcmd_symbol = "[❮](green)"
+# 
+# [git_branch]
+# format = "[$branch]($style)"
+# style = "bright-black"
+# 
+# [git_status]
+# format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
+# style = "cyan"
+# conflicted = "​"
+# untracked = "​"
+# modified = "​"
+# staged = "​"
+# renamed = "​"
+# deleted = "​"
+# stashed = "≡"
+# 
+# [git_state]
+# format = '\([$state( $progress_current/$progress_total)]($style)\) '
+# style = "bright-black"
+# 
+# [cmd_duration]
+# format = "[$duration]($style) "
+# style = "yellow"
+# 
+# [python]
+# format = "[$virtualenv]($style) "
+# style = "bright-black"
 
 
+# Custom user
+# format = """
+# $username\
+# $shlvl\
+# $kubernetes\
+# ${custom.dir}\
+# ${custom.home_dir}\
+# $directory\
+# ${custom.git_host}\
+# $git_branch\
+# $git_commit\
+# $git_state\
+# $git_status\
+# $hg_branch\
+# $docker_context\
+# $package\
+# $cmake\
+# $dart\
+# $dotnet\
+# $elixir\
+# $elm\
+# $erlang\
+# $golang\
+# $helm\
+# $java\
+# $julia\
+# $kotlin\
+# $nim\
+# $nodejs\
+# $ocaml\
+# $perl\
+# $php\
+# $purescript\
+# $python\
+# $ruby\
+# $rust\
+# $swift\
+# $terraform\
+# $vagrant\
+# $zig\
+# $nix_shell\
+# $conda\
+# $aws\
+# $gcloud\
+# $openstack\
+# $env_var\
+# $crystal\
+# $custom\
+# $cmd_duration\
+# $lua\
+# $line_break\
+# $jobs\
+# $status\
+# $character"""
+# 
+# scan_timeout = 10
+# 
+# add_newline = false
+# 
+# [battery]
+# disabled = true
+# 
+# [character]
+# success_symbol = "[](bright-red)[](bright-blue)[](bright-cyan)"
+# error_symbol = "[](red)"
+# 
+# [directory]
+# truncation_length = 1
+# format = "[ $path ]($style)[$read_only]($read_only_style) "
+# style = "fg:white bg:black bold"
+# read_only = "  "
+# read_only_style = "fg:black bg:red"
+# 
+# [git_branch]
+# format = ":[$symbol$branch]($style) "
+# 
+# [git_status]
+# conflicted = "[<](white)=[$count](bright-white bold)[>](white)"
+# ahead = "[<](white)⇡[$count](bright-white bold)[>](white)"
+# behind = "[<](white)⇣[$count](bright-white bold)[>](white)"
+# diverged = "[<](white)⇕⇡[$ahead_count](bright-white bold)⇣[$behind_count](bright-white)[>](white)"
+# untracked = "[<](white)?[$count](bright-white bold)[>](white)"
+# stashed = "[<](white)$[$count](bright-white bold)[>](white)"
+# modified = "[<](white)![$count](bright-white bold)[>](white)"
+# staged = "[<](white)+[$count](bright-white bold)[>](white)"
+# renamed = "[<](white)»[$count](bright-white bold)[>](white)"
+# deleted = "[<](white)✗[$count](bright-white bold)[>](white)"
+# 
+# [custom.home_dir]
+# command = "echo  "
+# when = '[ "$PWD" == "$HOME" ]'
+# shell = ["bash", "--norc", "--noprofile"]
+# style = "fg:bright-white bg:bright-black"
+# format = "[ $output ]($style)"
+# 
+# [custom.dir]
+# command = "echo  "
+# when = '[ "$PWD" != "$HOME" ]'
+# shell = ["bash", "--norc", "--noprofile"]
+# style = "fg:blue bg:bright-black"
+# format = "[ $output ]($style)"
+# 
+# [custom.git_host]
+# command = 'getgithost'
+# when = 'git rev-parse --is-inside-work-tree 2> /dev/null'
+# shell = ["bash", "--norc", "--noprofile"]
+# style = "bright-yellow bold"
+# format = "at [$output]($style)"
+# 
+# [hostname]
+# disabled = true
 
-format = """
-$username\
-$hostname\
-$directory\
-$git_branch\
-$git_state\
-$git_status\
-$cmd_duration\
-$line_break\
-$python\
-$character"""
 
-[directory]
-style = "blue"
+# PROMPT: nerd-font
+[aws]
+symbol = "  "
 
-[character]
-success_symbol = "[❯](purple)"
-error_symbol = "[❯](red)"
-vimcmd_symbol = "[❮](green)"
+[buf]
+symbol = " "
+
+[c]
+symbol = " "
+
+[conda]
+symbol = " "
+
+[crystal]
+symbol = " "
+
+[dart]
+symbol = " "
+
+# [directory]
+# read_only = " 󰌾"
+
+[docker_context]
+symbol = " "
+
+[elixir]
+symbol = " "
+
+[elm]
+symbol = " "
+
+[fennel]
+symbol = " "
+
+[fossil_branch]
+symbol = " "
 
 [git_branch]
-format = "[$branch]($style)"
-style = "bright-black"
+symbol = " "
 
-[git_status]
-format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](218) ($ahead_behind$stashed)]($style)"
-style = "cyan"
-conflicted = "​"
-untracked = "​"
-modified = "​"
-staged = "​"
-renamed = "​"
-deleted = "​"
-stashed = "≡"
+[golang]
+symbol = " "
 
-[git_state]
-format = '\([$state( $progress_current/$progress_total)]($style)\) '
-style = "bright-black"
+[guix_shell]
+symbol = " "
 
-[cmd_duration]
-format = "[$duration]($style) "
-style = "yellow"
+[haskell]
+symbol = " "
+
+[haxe]
+symbol = " "
+
+[hg_branch]
+symbol = " "
+
+[hostname]
+ssh_symbol = " "
+
+[java]
+symbol = " "
+
+[julia]
+symbol = " "
+
+[kotlin]
+symbol = " "
+
+[lua]
+symbol = " "
+
+[memory_usage]
+symbol = "󰍛 "
+
+[meson]
+symbol = "󰔷 "
+
+[nim]
+symbol = "󰆥 "
+
+[nix_shell]
+symbol = " "
+
+[nodejs]
+symbol = " "
+
+[ocaml]
+symbol = " "
+
+[os.symbols]
+Alpaquita = " "
+Alpine = " "
+AlmaLinux = " "
+Amazon = " "
+Android = " "
+Arch = " "
+Artix = " "
+CentOS = " "
+Debian = " "
+DragonFly = " "
+Emscripten = " "
+EndeavourOS = " "
+Fedora = " "
+FreeBSD = " "
+Garuda = "󰛓 "
+Gentoo = " "
+HardenedBSD = "󰞌 "
+Illumos = "󰈸 "
+Kali = " "
+Linux = " "
+Mabox = " "
+Macos = " "
+Manjaro = " "
+Mariner = " "
+MidnightBSD = " "
+Mint = " "
+NetBSD = " "
+NixOS = " "
+OpenBSD = "󰈺 "
+openSUSE = " "
+OracleLinux = "󰌷 "
+Pop = " "
+Raspbian = " "
+Redhat = " "
+RedHatEnterprise = " "
+RockyLinux = " "
+Redox = "󰀘 "
+Solus = "󰠳 "
+SUSE = " "
+Ubuntu = " "
+Unknown = " "
+Void = " "
+Windows = "󰍲 "
+
+[package]
+symbol = "󰏗 "
+
+[perl]
+symbol = " "
+
+[php]
+symbol = " "
+
+[pijul_channel]
+symbol = " "
 
 [python]
-format = "[$virtualenv]($style) "
-style = "bright-black"
+symbol = " "
+
+[rlang]
+symbol = "󰟔 "
+
+[ruby]
+symbol = " "
+
+[rust]
+symbol = " "
+
+[scala]
+symbol = " "
+
+[swift]
+symbol = " "
+
+[zig]
+symbol = " "
+
+
+[directory]
+truncate_to_repo = true
+truncation_length = 30
+truncation_symbol = "…/"
+format = "[$path]($style)[$read_only]($read_only_style) "
+style = "bold"
+# style = "fg:white bg:black bold"
+read_only = "  "
+# read_only = " 󰌾"
+# read_only = "  "
+# read_only_style = "fg:black bg:red"
+home_symbol = "  "
+
+[directory.substitutions]
+"Desktop" = "  "
+"Documents" = "  "
+"Downloads" = "  "
+"Music" = " 󰎈 "
+"Pictures" = "  "
+"Videos" = "  "
+"hyprland" = "  "
+"GitHub" = "  "
+"dev" = "  "

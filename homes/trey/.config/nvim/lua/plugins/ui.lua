@@ -1,9 +1,14 @@
 Util = require("lazyvim.util")
 
 return {
-  { "catppuccin/nvim", enabled = false, },
-
-  { "folke/tokyonight.nvim", enabled = false, },
+  { "tribela/vim-transparent" },
+  { "catppuccin/nvim", enabled = false },
+  { "folke/tokyonight.nvim", enabled = false },
+  -- { "dracula/vim", },
+  {
+    "LazyVim/LazyVim",
+    opts = { colorscheme = "default" },
+  },
 
   {
     "akinsho/bufferline.nvim",
@@ -16,13 +21,6 @@ return {
         show_close_icon = false,
       },
     },
-  },
-
-  -- { "dracula/vim" },
-  -- { "catppuccin/nvim" },
-  {
-    "LazyVim/LazyVim",
-    opts = { colorscheme = "default" },
   },
 
   {
@@ -68,7 +66,15 @@ return {
               },
             },
             { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
-            { Util.lualine.pretty_path() },
+            {
+              function()
+                if vim.bo.filetype == "zortex" then
+                  return vim.fn["zortex#search#LightlineZortex"]()
+                else
+                  return Util.lualine.pretty_path()
+                end
+              end,
+            },
           },
           lualine_x = {
               -- stylua: ignore

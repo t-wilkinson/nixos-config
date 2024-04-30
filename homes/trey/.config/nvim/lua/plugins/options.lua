@@ -11,13 +11,8 @@ return {
   -- { "windwp/nvim-ts-autotag", enabled = false },
   { "folke/flash.nvim", enabled = false },
   { "norcalli/nvim-colorizer.lua" },
-  {
-    "echasnovski/mini.pairs",
-    enabled = false,
-  },
-  {
-    "tribela/vim-transparent",
-  },
+  { "echasnovski/mini.pairs", enabled = false },
+
   {
     "echasnovski/mini.surround",
     keys = function(_, keys)
@@ -39,15 +34,31 @@ return {
       return vim.list_extend(mappings, keys)
     end,
     opts = {
-      mappings = {
-        add = "gsa", -- Add surrounding in Normal and Visual modes
-        delete = "gsd", -- Delete surrounding
-        find = "gsf", -- Find surrounding (to the right)
-        find_left = "gsF", -- Find surrounding (to the left)
-        highlight = "gsh", -- Highlight surrounding
-        replace = "gsr", -- Replace surrounding
-        update_n_lines = "gsn", -- Update `n_lines`
+      custom_surroundings = {
+        ["("] = { output = { left = "( ", right = " )" } },
+        ["["] = { output = { left = "[ ", right = " ]" } },
+        ["{"] = { output = { left = "{ ", right = " }" } },
+        ["<"] = { output = { left = "< ", right = " >" } },
       },
+      mappings = {
+        add = "ys",
+        delete = "ds",
+        find = "",
+        find_left = "",
+        highlight = "",
+        replace = "cs",
+        update_n_lines = "",
+      },
+      search_method = "cover_or_next",
+      -- mappings = {
+      --   add = "gsa", -- Add surrounding in Normal and Visual modes
+      --   delete = "gsd", -- Delete surrounding
+      --   find = "gsf", -- Find surrounding (to the right)
+      --   find_left = "gsF", -- Find surrounding (to the left)
+      --   highlight = "gsh", -- Highlight surrounding
+      --   replace = "gsr", -- Replace surrounding
+      --   update_n_lines = "gsn", -- Update `n_lines`
+      -- },
     },
   },
 
@@ -61,7 +72,8 @@ return {
         " CTRL-T(tab) / CTRL-X(split) / CTRL-V(ver-split)
         " let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
         let $FZF_DEFAULT_COMMAND =  "fd . --type f -E node_modules"
-        let $FZF_DEFAULT_OPTS=' --cycle --exact --color=dark --color=fg:16,bg:-1,hl:1,fg+:#ffffff,bg+:-1,hl+:1 --color=info:12,prompt:0,pointer:12,marker:4,spinner:11,header:-1 --layout=reverse  --margin=1,4 --preview-window=":60%" --bind ctrl-k:preview-up,ctrl-j:preview-down,ctrl-f:preview-page-down,ctrl-b:preview-page-up'
+        " let $FZF_DEFAULT_OPTS=' --cycle --exact --color=dark --color=fg:16,bg:-1,hl:1,fg+:#ffffff,bg+:-1,hl+:1 --color=info:12,prompt:0,pointer:12,marker:4,spinner:11,header:-1 --layout=reverse  --margin=1,4 --preview-window=":60%" --bind ctrl-k:preview-up,ctrl-j:preview-down,ctrl-f:preview-page-down,ctrl-b:preview-page-up'
+        let $FZF_DEFAULT_OPTS=' --cycle --exact --layout=reverse  --margin=1,4 --preview-window=":60%" --bind ctrl-k:preview-up,ctrl-j:preview-down,ctrl-f:preview-page-down,ctrl-b:preview-page-up'
         let g:fzf_layout = { 'window': 'call FloatingFZF()' }
         let g:fzf_command_prefix = "Fzf"
 
@@ -97,9 +109,36 @@ return {
   },
 
   {
+    "pseewald/vim-anyfold",
+    config = function()
+      vim.cmd([[
+        let g:anyfold_fold_comments=1
+        let g:anyfold_fold_size_str='%s'
+        let g:anyfold_fold_level_str=''
+        " activate anyfold by default
+            augroup anyfold
+                autocmd!
+                " autocmd Filetype * AnyFoldActivate
+            augroup END
+
+        " disable anyfold for large files
+            let g:LargeFile = 1000000 " file is large if size greater than 1MB
+            autocmd BufReadPre,BufRead * let f=getfsize(expand("<afile>")) | if f > g:LargeFile || f == -2 | call LargeFile() | endif
+            function! LargeFile()
+                augroup anyfold
+                    autocmd! anyfold
+                    autocmd Filetype * setlocal foldmethod=indent " fall back to indent folding
+                    autocmd Filetype * syntax off
+                augroup END
+            endfunction
+        ]])
+    end,
+  },
+
+  {
     "t-wilkinson/zortex.nvim",
     dir = "~/dev/t-wilkinson/zortex.nvim",
-    build = "cd app && yarn install",
+    build = "(cd app && yarn install); (cd rplugin && yarn install)",
     enabled = true,
     lazy = false,
     config = function()
@@ -186,34 +225,33 @@ return {
     end,
   },
 
-  --[[
+  {
     "nvim-treesitter/nvim-treesitter",
-    enabled = false,
+    enabled = true,
     opts = {
       ensure_installed = {
-        "kdl",
-        "cmake",
-        "c",
-        "cpp",
-        "css",
-        "gitignore",
-        "go",
-        "http",
-        "php",
-        "rust",
-        "sql",
-        "python",
-        "ninja",
-        "rst",
-        "toml",
-        "typescript",
-        "tsx",
-        "javascript",
-        "markdown",
+        -- "kdl",
+        -- "cmake",
+        -- "c",
+        -- "cpp",
+        -- "css",
+        -- "gitignore",
+        -- "go",
+        -- "http",
+        -- "php",
+        -- "rust",
+        -- "sql",
+        -- "python",
+        -- "ninja",
+        -- "rst",
+        -- "toml",
+        -- "typescript",
+        -- "tsx",
+        -- "javascript",
+        -- "markdown",
       },
     },
   },
-  --]]
 
   {
     "hrsh7th/nvim-cmp",
@@ -235,14 +273,18 @@ return {
 
   {
     "rcarriga/nvim-notify",
-    enabled = false,
+    enabled = true,
     -- render style minimal/simple/co
     -- mpact/wrapped-compact
   },
 
   {
     "folke/noice.nvim",
-    enabled = false,
+    enabled = true,
+    event = "VeryLazy",
+    dependencies = {
+      "rcarriga/nvim-notify",
+    },
     opts = function(_, opts)
       table.insert(opts.routes, {
         filter = {
@@ -251,6 +293,50 @@ return {
         },
         opts = { skip = true },
       })
+      opts.lsp = {
+        -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+          ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+        },
+      }
+      opts.presets = {
+        bottom_search = true, -- use a classic bottom cmdline for search
+        command_palette = true, -- position the cmdline and popupmenu together
+        long_message_to_split = true, -- long messages will be sent to a split
+        inc_rename = false, -- enables an input dialog for inc-rename.nvim
+        lsp_doc_border = false, -- add a border to hover docs and signature help
+      }
+    end,
+  },
+
+  {
+    "lukas-reineke/headlines.nvim",
+    -- TODO: write custom treesitter parser for zortex (https://tree-sitter.github.io/tree-sitter/creating-parsers)
+    opts = function()
+      local opts = {}
+      for _, ft in ipairs({ "markdown", "norg", "rmd", "org", "zortex" }) do
+        opts[ft] = {
+          headline_highlights = {},
+          -- disable bullets for now. See https://github.com/lukas-reineke/headlines.nvim/issues/66
+          bullets = {},
+        }
+        for i = 1, 6 do
+          local hl = "Headline" .. i
+          vim.api.nvim_set_hl(0, hl, { link = "Headline", default = true })
+          table.insert(opts[ft].headline_highlights, hl)
+        end
+      end
+      return opts
+    end,
+    ft = { "markdown", "norg", "rmd", "org", "zortex" },
+    config = function(_, opts)
+      -- PERF: schedule to prevent headlines slowing down opening a file
+      vim.schedule(function()
+        require("headlines").setup(opts)
+        require("headlines").refresh()
+      end)
     end,
   },
 
@@ -264,8 +350,9 @@ return {
       end,
     },
   },
+  ]]
 
-  --[[{
+  {
     "nvim-telescope/telescope.nvim",
     dependencies = {
       "nvim-telescope/telescope.nvim",
@@ -377,18 +464,5 @@ return {
       require("telescope").load_extension("fzf")
       require("telescope").load_extension("file_browser")
     end,
-  },
-  --]]
-
-  {
-    "akinsho/bufferline.nvim",
-    event = "VeryLazy",
-    opts = {
-      options = {
-        mode = "tabs",
-        show_buffer_close_icons = false,
-        show_close_icon = false,
-      },
-    },
   },
 }

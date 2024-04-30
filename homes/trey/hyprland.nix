@@ -344,7 +344,7 @@ in
       ];
       windowrulev2 = [ 
         "tile,class:(wpsoffice)" 
-        "opacity 0.88 0.88,class:^(foot)$"
+        "opacity 0.84 0.84,class:^(foot)$"
       ];
       layerrule = [
         "xray 1, .*"

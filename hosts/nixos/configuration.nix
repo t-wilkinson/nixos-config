@@ -143,7 +143,7 @@
       vim
       neovim
       gnumake
-      # nodePackages_latest.neovim
+      nodePackages_latest.neovim
     ];
   };
 
@@ -282,6 +282,22 @@
     };
     spiceUSBRedirection.enable = true;
   };
+
+  # config = mkIf cfg.server.libvert.enable {
+  #   # https://technicalsourcery.net/posts/nixos-in-libvirt/
+  #   boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
+  #
+  #   virtualisation.libvirtd.enable = true;
+  #   virtualisation.libvirtd.allowedBridges =
+  #     [ "${cfg.libvert.bridgeInterface}" ];
+  #
+  #   networking.interfaces."${cfg.libvert.bridgeInterface}".useDHCP = true;
+  #   networking.bridges = {
+  #     "${cfg.libvert.bridgeInterface}" = {
+  #       interfaces = [ "${cfg.libvert.ethInterface}" ];
+  #     };
+  #   };
+  # };
 
   # hyprland
   programs.hyprland = {
