@@ -1,70 +1,70 @@
 hi Normal guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi CursorLineNr guifg=NONE guibg=NONE gui=NONE cterm=NONE
 hi CursorLine guifg=NONE guibg=NONE gui=NONE cterm=NONE
-hi NonText guifg=#51d7ef guibg=NONE gui=NONE cterm=NONE
+hi NonText guifg=#d2bcff guibg=NONE gui=NONE cterm=NONE
 hi EndOfBuffer guifg=NONE guibg=NONE gui=NONE cterm=NONE
-hi Whitespace guifg=#191c1d guibg=NONE gui=NONE cterm=NONE
+hi Whitespace guifg=#1d1b1f guibg=NONE gui=NONE cterm=NONE
 hi LineNr guifg=NONE guibg=NONE gui=NONE cterm=NONE
-hi FoldColumn guifg=#e1e3e4 guibg=#191c1d gui=NONE cterm=NONE
-hi Folded guifg=#e1e3e4 guibg=#191c1d gui=NONE cterm=NONE
-hi MatchParen guifg=#b1cbd1 guibg=#1c3439 gui=NONE cterm=NONE
-hi SignColumn guifg=#bfc8ca guibg=#191c1d gui=NONE cterm=NONE
-hi Pmenu guifg=#899294 guibg=#2d3132 gui=NONE cterm=NONE
-hi PmenuSbar guifg=NONE guibg=#e1e3e4 gui=NONE cterm=NONE
-hi PmenuSel guifg=#00363f guibg=#bcc5ea gui=NONE cterm=NONE
-hi PmenuThumb guifg=#bcc5ea guibg=#bcc5ea gui=NONE cterm=NONE
-hi ErrorMsg guifg=#ffb4a9 guibg=#00363f gui=reverse cterm=reverse
-hi ModeMsg guifg=#bcc5ea guibg=#00363f gui=reverse cterm=reverse
-hi MoreMsg guifg=#bcc5ea guibg=NONE gui=NONE cterm=NONE
-hi Question guifg=#bcc5ea guibg=NONE gui=NONE cterm=NONE
+hi FoldColumn guifg=#e6e1e5 guibg=#1d1b1f gui=NONE cterm=NONE
+hi Folded guifg=#e6e1e5 guibg=#1d1b1f gui=NONE cterm=NONE
+hi MatchParen guifg=#ccc2dc guibg=#332d41 gui=NONE cterm=NONE
+hi SignColumn guifg=#cac4cf guibg=#1d1b1f gui=NONE cterm=NONE
+hi Pmenu guifg=#948f99 guibg=#323033 gui=NONE cterm=NONE
+hi PmenuSbar guifg=NONE guibg=#e6e1e5 gui=NONE cterm=NONE
+hi PmenuSel guifg=#391e72 guibg=#efb8c7 gui=NONE cterm=NONE
+hi PmenuThumb guifg=#efb8c7 guibg=#efb8c7 gui=NONE cterm=NONE
+hi ErrorMsg guifg=#ffb4a9 guibg=#391e72 gui=reverse cterm=reverse
+hi ModeMsg guifg=#efb8c7 guibg=#391e72 gui=reverse cterm=reverse
+hi MoreMsg guifg=#efb8c7 guibg=NONE gui=NONE cterm=NONE
+hi Question guifg=#efb8c7 guibg=NONE gui=NONE cterm=NONE
 hi WarningMsg guifg=#ffb4a9 guibg=NONE gui=NONE cterm=NONE
-hi TabLine guifg=#334b50 guibg=#2d3132 gui=NONE cterm=NONE
-hi TabLineFill guifg=#2d3132 guibg=#2d3132 gui=NONE cterm=NONE
-hi TabLineSel guifg=#00363f guibg=#334b50 gui=NONE cterm=NONE
-hi ToolbarLine guifg=NONE guibg=#2d3132  gui=NONE cterm=NONE
-hi ToolbarButton guifg=#899294 guibg=#e1e3e4 gui=NONE cterm=NONE
-hi Cursor guifg=#00363f guibg=#899294 gui=NONE cterm=NONE
-hi CursorColumn guifg=NONE guibg=#bfc8ca gui=NONE cterm=NONE
-hi StatusLine guifg=#00363f guibg=#334b50 gui=NONE cterm=NONE
-hi StatusLineNC guifg=#334b50 guibg=#2d3132 gui=NONE cterm=NONE
-hi StatusLineTerm guifg=#00363f guibg=#334b50 gui=NONE cterm=NONE
-hi StatusLineTermNC guifg=#334b50 guibg=#2d3132 gui=NONE cterm=NONE
-hi Visual guifg=#51d7ef guibg=#00363f gui=reverse cterm=reverse
+hi TabLine guifg=#4a4358 guibg=#323033 gui=NONE cterm=NONE
+hi TabLineFill guifg=#323033 guibg=#323033 gui=NONE cterm=NONE
+hi TabLineSel guifg=#391e72 guibg=#4a4358 gui=NONE cterm=NONE
+hi ToolbarLine guifg=NONE guibg=#323033  gui=NONE cterm=NONE
+hi ToolbarButton guifg=#948f99 guibg=#e6e1e5 gui=NONE cterm=NONE
+hi Cursor guifg=#391e72 guibg=#948f99 gui=NONE cterm=NONE
+hi CursorColumn guifg=NONE guibg=#cac4cf gui=NONE cterm=NONE
+hi StatusLine guifg=#391e72 guibg=#4a4358 gui=NONE cterm=NONE
+hi StatusLineNC guifg=#4a4358 guibg=#323033 gui=NONE cterm=NONE
+hi StatusLineTerm guifg=#391e72 guibg=#4a4358 gui=NONE cterm=NONE
+hi StatusLineTermNC guifg=#4a4358 guibg=#323033 gui=NONE cterm=NONE
+hi Visual guifg=#d2bcff guibg=#391e72 gui=reverse cterm=reverse
 hi VisualNOS guifg=NONE guibg=NONE gui=underline ctermfg=NONE ctermbg=NONE cterm=underline
-hi VertSplit guifg=#2d3132 guibg=#2d3132 gui=NONE cterm=NONE
-hi WildMenu guifg=#00363f guibg=#51d7ef gui=NONE cterm=NONE
-hi DiffAdd guifg=#191c1d guibg=#bfc8ca gui=reverse cterm=reverse
-hi DiffChange guifg=#3f484a guibg=#bfc8ca gui=reverse cterm=reverse
+hi VertSplit guifg=#323033 guibg=#323033 gui=NONE cterm=NONE
+hi WildMenu guifg=#391e72 guibg=#d2bcff gui=NONE cterm=NONE
+hi DiffAdd guifg=#1d1b1f guibg=#cac4cf gui=reverse cterm=reverse
+hi DiffChange guifg=#49454f guibg=#cac4cf gui=reverse cterm=reverse
 hi DiffDelete guifg=#ffb4a9 guibg=#680003 gui=reverse cterm=reverse
-hi DiffText guifg=#e1e3e4 guibg=#bfc8ca gui=reverse cterm=reverse
-hi IncSearch guifg=#00363f guibg=#ffb4a9 gui=NONE cterm=NONE
-hi Search guifg=#00363f guibg=#3d4665 gui=NONE cterm=NONE
-hi Directory guifg=#bcc5ea guibg=NONE gui=NONE cterm=NONE
-hi debugPC guifg=NONE guibg=#b1cbd1 gui=NONE cterm=NONE
+hi DiffText guifg=#e6e1e5 guibg=#cac4cf gui=reverse cterm=reverse
+hi IncSearch guifg=#391e72 guibg=#ffb4a9 gui=NONE cterm=NONE
+hi Search guifg=#391e72 guibg=#643b48 gui=NONE cterm=NONE
+hi Directory guifg=#efb8c7 guibg=NONE gui=NONE cterm=NONE
+hi debugPC guifg=NONE guibg=#ccc2dc gui=NONE cterm=NONE
 hi debugBreakpoint guifg=NONE guibg=#ffb4a9 gui=NONE cterm=NONE
 hi SpellBad guifg=#ffb4a9 guibg=NONE guisp=#ffb4a9 gui=undercurl cterm=undercurl
-hi SpellCap guifg=#bcc5ea guibg=NONE guisp=#bcc5ea gui=undercurl cterm=undercurl
-hi SpellLocal guifg=#b1cbd1 guibg=NONE guisp=#b1cbd1 gui=undercurl cterm=undercurl
-hi SpellRare guifg=#dae1ff guibg=NONE guisp=#dae1ff gui=undercurl cterm=undercurl
-hi ColorColumn guifg=NONE guibg=#2d3132 gui=NONE cterm=NONE
+hi SpellCap guifg=#efb8c7 guibg=NONE guisp=#efb8c7 gui=undercurl cterm=undercurl
+hi SpellLocal guifg=#ccc2dc guibg=NONE guisp=#ccc2dc gui=undercurl cterm=undercurl
+hi SpellRare guifg=#ffd8e3 guibg=NONE guisp=#ffd8e3 gui=undercurl cterm=undercurl
+hi ColorColumn guifg=NONE guibg=#323033 gui=NONE cterm=NONE
 hi! link Terminal Normal
 hi! link CursorIM Cursor
 hi! link QuickFixLine Search
-hi Comment guifg=191c1d guibg=NONE gui=NONE cterm=NONE
-hi Conceal guifg=#899294 guibg=NONE gui=NONE cterm=NONE
-hi Constant guifg=#dae1ff guibg=NONE gui=NONE cterm=NONE
+hi Comment guifg=1d1b1f guibg=NONE gui=NONE cterm=NONE
+hi Conceal guifg=#948f99 guibg=NONE gui=NONE cterm=NONE
+hi Constant guifg=#ffd8e3 guibg=NONE gui=NONE cterm=NONE
 hi Error guifg=#ffb4a9 guibg=NONE gui=reverse cterm=reverse
-hi Identifier guifg=#b1cbd1 guibg=NONE gui=NONE cterm=NONE
+hi Identifier guifg=#ccc2dc guibg=NONE gui=NONE cterm=NONE
 hi Ignore guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
-hi PreProc guifg=#bcc5ea guibg=NONE gui=NONE cterm=NONE
-hi Special guifg=#b1cbd1 guibg=NONE gui=NONE cterm=NONE
-hi Statement guifg=#51d7ef guibg=NONE gui=NONE cterm=NONE
-hi String guifg=#bcc5ea guibg=NONE gui=NONE cterm=NONE
+hi PreProc guifg=#efb8c7 guibg=NONE gui=NONE cterm=NONE
+hi Special guifg=#ccc2dc guibg=NONE gui=NONE cterm=NONE
+hi Statement guifg=#d2bcff guibg=NONE gui=NONE cterm=NONE
+hi String guifg=#efb8c7 guibg=NONE gui=NONE cterm=NONE
 hi Todo guifg=NONE guibg=NONE gui=reverse ctermfg=NONE ctermbg=NONE cterm=reverse
-hi Type guifg=#b1cbd1 guibg=NONE gui=NONE cterm=NONE
-hi Underlined guifg=#bcc5ea guibg=NONE gui=underline cterm=underline
-hi Function guifg=#3d4665 guibg=NONE gui=NONE cterm=NONE
-hi SpecialKey guifg=#899294 guibg=NONE gui=NONE cterm=NONE
+hi Type guifg=#ccc2dc guibg=NONE gui=NONE cterm=NONE
+hi Underlined guifg=#efb8c7 guibg=NONE gui=underline cterm=underline
+hi Function guifg=#643b48 guibg=NONE gui=NONE cterm=NONE
+hi SpecialKey guifg=#948f99 guibg=NONE gui=NONE cterm=NONE
 hi Title guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
 hi helpLeadBlank guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
 hi helpNormal guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE

@@ -67,11 +67,11 @@ return {
             },
             { "filetype", icon_only = true, separator = "", padding = { left = 1, right = 0 } },
             {
-              function()
+              function(self)
                 if vim.bo.filetype == "zortex" then
                   return vim.fn["zortex#search#LightlineZortex"]()
                 else
-                  return Util.lualine.pretty_path()
+                  return Util.lualine.pretty_path()(self)
                 end
               end,
             },
