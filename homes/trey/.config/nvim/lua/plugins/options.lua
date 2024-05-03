@@ -274,8 +274,19 @@ return {
   {
     "rcarriga/nvim-notify",
     enabled = true,
-    -- render style minimal/simple/co
-    -- mpact/wrapped-compact
+    -- render style minimal/simple/compact/wrapped-compact
+    opts = {
+      render = "minimal",
+    },
+  },
+
+  {
+    "folke/zen-mode.nvim",
+    opts = {
+      window = {
+        width = 0.85,
+      },
+    },
   },
 
   {

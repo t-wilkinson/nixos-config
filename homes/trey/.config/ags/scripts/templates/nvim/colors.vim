@@ -52,7 +52,7 @@ hi! link CursorIM Cursor
 hi! link QuickFixLine Search
 hi Comment guifg={{ $surface }} guibg=NONE gui=NONE cterm=NONE
 hi Conceal guifg=#{{ $outline }} guibg=NONE gui=NONE cterm=NONE
-hi Constant guifg=#{{ $onTertiaryContainer }} guibg=NONE gui=NONE cterm=NONE
+hi Constant guifg=#{{ $primary }} guibg=NONE gui=NONE cterm=NONE
 hi Error guifg=#{{ $error }} guibg=NONE gui=reverse cterm=reverse
 hi Identifier guifg=#{{ $secondary }} guibg=NONE gui=NONE cterm=NONE
 hi Ignore guifg=NONE guibg=NONE gui=NONE ctermfg=NONE ctermbg=NONE cterm=NONE
@@ -128,6 +128,15 @@ hi! link asciidocQuotedEmphasized Preproc
 " tabline_sel = hl('TabLineSel').bg or hl('Visual').bg,
 " tabline = hl('TabLine').bg,
 " statusline = hl('StatusLine').bg,
+
+" hi Conceal guibg=NONE
+" execute 'hi CursorLine guibg='.g:dracula#palette.bgdark[0]
+" execute 'hi SignColumn guibg='.g:dracula#palette.bgdark[0]
+" execute 'hi CocErrorSign guifg='. g:dracula#palette.red[0] .' guibg='.g:dracula#palette.bgdark[0]
+" execute 'hi CocWarningSign guifg='. g:dracula#palette.orange[0] .' guibg='.g:dracula#palette.bgdark[0]
+" execute 'hi CocInfoSign guifg='. g:dracula#palette.yellow[0] .' guibg='.g:dracula#palette.bgdark[0]
+" execute 'hi Folded guifg=' . g:dracula#palette.comment[0] . ' guibg=NONE'
+" execute 'hi CursorLine guibg='.g:dracula#palette.bgdark[0]
 
 
 " " Dracula Theme: {{{

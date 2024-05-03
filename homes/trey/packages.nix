@@ -90,6 +90,8 @@
       # very important stuff
       # uwuify
 
+      # minecraft
+
       # node
       nodePackages_latest.neovim
       # vimPlugins.nvim-treesitter.withPlugins

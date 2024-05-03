@@ -4,6 +4,9 @@
   # nix
   documentation.nixos.enable = false; # .desktop
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.packageOverrides = pkgs: {
+    intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+  };
   nix.settings = {
     experimental-features = "nix-command flakes";
     auto-optimise-store = true;
@@ -45,6 +48,7 @@
     gvfs.enable = true;
     xserver = {
       enable = true;
+      # videoDrivers = ["nvidia"];
       # xkb.layout = "us";
       # xkb.options = "eurosign:e,caps:escape";
       displayManager.startx.enable = true;
@@ -104,8 +108,10 @@
     # zsh.enable = true;
     fish.enable = true;
     dconf.enable = true;
+    # gamemode.enable = true;
     # steam = {
     #   enable = true;
+    #   gamescopeSession.enable = true;
     #   remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     #   dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
     # };
@@ -310,14 +316,20 @@
     enable = true;
     driSupport = true;
     driSupport32Bit = true;
-    # nvidia.modesetting.enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver
+      intel-vaapi-driver
+      libvdpau-va-gl
+    ];
   };
+  # hardware.nvidia.modesetting.enable = true;
 
   environment.sessionVariables = {
     # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
     NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
     NIXPKGS_ALLOW_UNFREE = "1";
     NIXPKGS_ALLOW_INSECURE = "1";
+    LIBVA_DRIVER_NAME = "iHD";
   };
 
   fonts = {

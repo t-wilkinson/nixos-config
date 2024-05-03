@@ -367,7 +367,7 @@ in
         "noanim, sideleft"
       ];
       source = [
-        # "./colors.conf"
+        "./colors.conf"
       ];
     };
   };
