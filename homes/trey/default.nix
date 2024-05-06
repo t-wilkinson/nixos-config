@@ -3,6 +3,7 @@ let
   homeDirectory = "/home/trey";
 in
 { pkgs, impurity, ... }: {
+  home.stateVersion = "23.11"; # this must be the version at which you have started using the program
   imports = [
     # Cachix
     # ./cachix.nix
@@ -24,16 +25,57 @@ in
 
   home = {
     inherit username homeDirectory;
-    sessionVariables = {
-      NIXPKGS_ALLOW_UNFREE = "1";
-      NIXPKGS_ALLOW_INSECURE = "1";
-      FLAKE = "$HOME/dev/t-wilkinson/nixos";
-      NODE_PATH = "$HOME/.npm-packages/lib/node_modules";
-    };
+    # sessionVariables = { # doesn't seem to work
+    #   NIXPKGS_ALLOW_UNFREE = "1";
+    #   NIXPKGS_ALLOW_INSECURE = "1";
+    #   FLAKE = "$HOME/dev/t-wilkinson/nixos";
+    #   NODE_PATH = "$HOME/.npm-packages/lib/node_modules";
+    # };
     sessionPath = [
       "$HOME/.local/bin"
       "$HOME/.npm-packages/bin"
     ];
+    shellAliases = {
+      vim = "nvim";
+    };
+  };
+
+  programs = {
+    home-manager.enable = true;
+    # fish.enable = true;
+    # zsh = {
+    #   enable = true;
+    #   enableAutosuggestions = true;
+    #   enableCompletion = true;
+    # };
+    git = {
+      enable = true;
+      userName = "t-wilkinson";
+      userEmail = "winston.trey.wilkinson@gmail.com";
+      aliases = {
+        pu = "push";
+        co = "checkout";
+        cm = "commit";
+      };
+    };
+    # gpg.enable = true;
+  };
+
+  services = {
+    # gpg-agent = {
+    #   enable = true;
+    #   enableSshSupport = true;
+    #   enableExtraSocket = true;
+    #   extraConfig = ''
+    #     # enable-ssh-support
+    #     allow-preset-passphrase;
+    #   '';
+    #   pinentryPackage = pkgs.pinentry-gnome3;
+    #   defaultCacheTtl = 34560000;
+    #   defaultCacheTtlSsh = 34560000;
+    #   maxCacheTtl = 34560000;
+    #   maxCacheTtlSsh = 34560000;
+    # };
   };
 
   xdg.userDirs = {
@@ -68,14 +110,7 @@ in
       ];
     };
   };
-
-  programs = {
-    home-manager.enable = true;
-    # fish.enable = true;
-  };
-  home.stateVersion = "23.11"; # this must be the version at which you have started using the program
 }
-
 
 #  home-manager = {
 #    users.trey = { config, pkgs, ... }: {
@@ -94,27 +129,6 @@ in
 #          # ".gradle/gradle.properties".text = ''
 #          # '';
 #        };
-#        shellAliases = {
-#          vim = "nvim";
-#        };
-#        sessionVariables = {
-#          EDITOR = "nvim";
-#        };
-#      };
-#      programs.git = {
-#        enable = true;
-#        userName = "t-wilkinson";
-#        userEmail = "winston.trey.wilkinson@gmail.com";
-#        aliases = {
-#          pu = "push";
-#          co = "checkout";
-#          cm = "commit";
-#        };
-#      };
-#      programs.zsh = {
-#      	enable = true;
-#	enableAutosuggestions = true;
-#	enableCompletion = true;
 #      };
 #      xdg.mimeApps.defaultApplications = {
 #        "application/pdf" = [ "zathura.desktop" ];

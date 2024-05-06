@@ -9,6 +9,8 @@ vim.cmd([[
    execute 'source' fnameescape(s:colors_vim)
 ]])
 
+-- syntax sync fromstart
+
 -- local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
 -- --   Info  09:47:33 PM notify.info Could not load parser for zortex: "Failed to load parser for language 'zortex': uv_dlopen: /home/trey/.local/share/nvim/lazy/nvim-treesitter/parser/zortex.so: undefined symbol: tree_sitter_markdown_external_scanner_create"
 -- parser_config.zortex = {

@@ -18,6 +18,7 @@
       rubik
       lexend
       gnome.nautilus-python
+      gnome.seahorse # managing encryption keys
       twitter-color-emoji
     ];
 

@@ -26,3 +26,27 @@ vim.api.nvim_set_keymap("x", "S", [[:<C-u>lua MiniSurround.add('visual')<CR>]], 
 
 -- Make special mapping for "add surrounding for line"
 vim.api.nvim_set_keymap("n", "yss", "ys_", { noremap = false })
+
+local wk = require("which-key")
+wk.register({
+  ["<leader>Z"] = {
+    name = "+Zortex",
+    z = { "<cmd>ZortexSearch<cr>" },
+    Z = { "<cmd>ZortexSearch<cr>" },
+  },
+  ["<leader>ZS"] = {
+    name = "Server",
+    s = { "<cmd>ZortexStartServer<cr>" },
+    e = { "<cmd>ZortexStopServer<cr>" },
+  },
+  ["<leader>ZRF"] = { "<cmd>ZortexReloadFolds<cr>", "Reload Zortex folds" },
+  ["<leader>Zp"] = { "<cmd>ZortexPreview<cr>" },
+  ["<leader>ZRs"] = { "<cmd>ZortexStartRemoteServer<cr>" },
+  ["<leader>ZRr"] = { "<cmd>ZortexRestartRemoteServer<cr>" },
+  ["<leader>ZRS"] = { "<cmd>ZortexSyncRemoteServer<cr>" },
+  ["<leader>Zw"] = { "<cmd>ZortexSearchWikipedia<Space>" },
+  ["<leader>Zg"] = { "<cmd>ZortexSearchGoogle<Space>" },
+  ["<leader>Zr"] = { "<cmd>ZortexResourceToZettel<cr>" },
+  ["<leader>Zi"] = { "<cmd>ZortexListitemToZettel<cr>" },
+  ["<leader>Zs"] = { "<cmd>ZortexOpenStructure<cr>" },
+})

@@ -141,6 +141,7 @@ return {
     build = "(cd app && yarn install); (cd rplugin && yarn install)",
     enabled = true,
     lazy = false,
+    opts = {},
     config = function()
       vim.cmd([[
             let g:zortex_remote_wiki_port = 8081
@@ -170,39 +171,10 @@ return {
                 \ }
             let g:zortex_port = '8080'
 
-            " map Zo o0␄Z<Tab>
-            " vmap Z- :g/^-/norm 2clZ<Tab><CR>
-            " vmap Z^ :g/^/norm iZ<Tab><CR>
-            " vmap <silent>Zc :s/- \(.*\)/\='- ' . tolower(substitute(submatch(1), " ", "-", "g"))<CR>
-            " map <silent>Zu :ZortexSearchUnique<CR>
-            " map <silent>Za :ZortexBranchToArticle<CR>
-            " map <silent>ZO :ZortexBranchToOutline<CR>
-            " map <silent>Zy :ZortexCopyZettelId<CR>
-            " map <silent>ZY :ZortexCopyZettel<CR>
-            " map <silent>Zl :ZortexCreateLink<CR>
-
             nmap Z <Nop>
             nmap ZZ <Nop>
-
             autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
             autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
-            map <silent>Zz :ZortexSearch<CR>
-            map <silent>ZZ :ZortexSearch<CR>
-
-            map <silent>Zr :ZortexResourceToZettel<CR>
-            map <silent>Zi :ZortexListitemToZettel<CR>
-            map <silent>Zs :ZortexOpenStructure<CR>
-
-            map Zw  :ZortexSearchWikipedia<Space>
-            map Zg  :ZortexSearchGoogle<Space>
-
-            map Zp  :ZortexPreview<CR>
-            map ZSs :ZortexStartServer<CR>
-            map ZSe :ZortexStopServer<CR>
-            map ZRs :ZortexStartRemoteServer<CR>
-            map ZRr :ZortexRestartRemoteServer<CR>
-            map ZRS :ZortexSyncRemoteServer<CR>
-            map ZRF :ZortexReloadFolds<CR>
       ]])
     end,
   },

@@ -22,6 +22,14 @@
       yad
       tor-browser-bundle-bin
 
+      vscode
+      lf
+      tmux
+      zellij
+      foot
+      kitty
+      tmux
+
       # tools
       bat
       eza
@@ -46,13 +54,12 @@
       nix-output-monitor
       nh
       zoxide
+      feh
 
-      vscode
-      lf
-      tmux
-      zellij
-      foot
-      kitty
+      # security
+      pass
+      gnupg
+      pinentry
 
       # theming tools
       gradience
@@ -90,7 +97,9 @@
       # very important stuff
       # uwuify
 
-      # minecraft
+      # games
+      minecraft
+      prismlauncher
 
       # node
       nodePackages_latest.neovim

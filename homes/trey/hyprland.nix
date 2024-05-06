@@ -53,7 +53,7 @@ in
         "swww kill; swww init"
         "fcitx5"
         ''
-          swayidle -w timeout 300 '${swaylockCmd}' timeout 600 'pidof java || systemctl suspend' before-sleep '${swaylockCmd}'
+          swayidle -w timeout 600 '${swaylockCmd}' timeout 900 'pidof java || systemctl suspend' before-sleep '${swaylockCmd}'
         ''
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
@@ -160,6 +160,7 @@ in
         focus_on_activate = true;
         animate_manual_resizes = false;
         animate_mouse_windowdragging = false;
+        hide_cursor_on_key_press = true;
         enable_swallow = false;
         swallow_regex = "(foot|kitty|allacritty|Alacritty)";
 
@@ -187,7 +188,7 @@ in
           "Control+Shift, Escape, exec, gnome-system-monitor"
           "Super, Period, exec, pkill fuzzel || ~/.local/bin/fuzzel-emoji"
           "Super, Q, killactive, "
-          "Super+Alt, Space, togglefloating, "
+          "Control+Super, Space, togglefloating, "
           "Shift+Super+Alt, Q, exec, hyprctl kill"
           "Control+Shift+Alt, Delete, exec, pkill wlogout || wlogout -p layer-shell"
           "Control+Shift+Alt+Super, Delete, exec, systemctl poweroff"
@@ -222,22 +223,22 @@ in
           "Control+Alt, Delete, exec, ags -t 'session'"
           "Super+Alt, f12, exec, notify-send 'Test notification' 'This is a really long message to test truncation and wrapping\\nYou can middle click or flick this notification to dismiss it!' -a 'Shell' -A 'Test1=I got it!' -A 'Test2=Another action'"
           "Super+Alt, Equal, exec, notify-send 'Urgent notification' 'Ah hell no' -u critical -a 'Hyprland keybind'"
-          "Super+Shift, left, movewindow, l"
-          "Super+Shift, right, movewindow, r"
-          "Super+Shift, up, movewindow, u"
-          "Super+Shift, down, movewindow, d"
-          "Super, left, movefocus, l"
-          "Super, right, movefocus, r"
-          "Super, up, movefocus, u"
-          "Super, down, movefocus, d"
+          "Super+Shift, h, movewindow, l"
+          "Super+Shift, l, movewindow, r"
+          "Super+Shift, k, movewindow, u"
+          "Super+Shift, j, movewindow, d"
+          "Super, h, movefocus, l"
+          "Super, l, movefocus, r"
+          "Super, k, movefocus, u"
+          "Super, j, movefocus, d"
           "Super, BracketLeft, movefocus, l"
           "Super, BracketRight, movefocus, r"
-          "Control+Super, right, workspace, +1"
-          "Control+Super, left, workspace, -1"
+          "Control+Super, h, workspace, +1"
+          "Control+Super, l, workspace, -1"
           "Control+Super, BracketLeft, workspace, -1"
           "Control+Super, BracketRight, workspace, +1"
-          "Control+Super, up, workspace, -5"
-          "Control+Super, down, workspace, +5"
+          "Control+Super, k, workspace, -5"
+          "Control+Super, j, workspace, +5"
           "Super, Page_Down, workspace, +1"
           "Super, Page_Up, workspace, -1"
           "Control+Super, Page_Down, workspace, +1"

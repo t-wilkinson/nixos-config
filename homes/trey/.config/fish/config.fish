@@ -31,6 +31,8 @@ set -gx NIXPKGS_ALLOW_UNFREE 1
 set -gx NIXPKGS_ALLOW_INSECURE 1
 set -gx FLAKE $HOME/dev/t-wilkinson/nixos
 set -gx NODE_PATH $HOME/.npm-packages/lib/node_modules
+set -gx EDITOR nvim
+set -gx VISUAL nvim
 
 # The following snippet is meant to be used like this in your fish config:
 #
@@ -52,8 +54,6 @@ if not set -q ZELLIJ
     end
 end
 
-starship init fish | source
-enable_transience
 ### key-bindings.fish ###
 #     ____      ____
 #    / __/___  / __/
@@ -233,3 +233,7 @@ function fzf_key_bindings
 end
 ### end: key-bindings.fish ###
 fzf_key_bindings
+
+starship init fish | source
+enable_transience
+zoxide init fish | source

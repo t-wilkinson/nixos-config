@@ -31,6 +31,29 @@
     ];
   };
 
+  systemd = {
+    user.services.polkit-gnome-authentication-agent-1 = {
+      description = "polkit-gnome-authentication-agent-1";
+      wantedBy = [ "graphical-session.target" ];
+      wants = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        Restart = "on-failure";
+        RestartSec = 1;
+        TimeoutStopSec = 10;
+      };
+    };
+  };
+
+  security = {
+    rtkit.enable = true;
+    polkit.enable = true;
+    pam.services.swaylock = { };
+    # pam.services.swaylock-effects = {};
+  };
+
   services = {
     # spice-vdagentd.enable = true;
     # printing.enable = true;
@@ -70,6 +93,9 @@
               capslock = "overload(control, esc)";
               esc = "`";
             };
+            # "[:C" = {
+            #   "[" = "esc";
+            # };
             # Make esc work on small fn keyboard, modularize this
             "esc:S" = {
               esc = "~";
@@ -80,30 +106,6 @@
     };
   };
 
-  systemd = {
-    user.services.polkit-gnome-authentication-agent-1 = {
-      description = "polkit-gnome-authentication-agent-1";
-      wantedBy = [ "graphical-session.target" ];
-      wants = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-        Restart = "on-failure";
-        RestartSec = 1;
-        TimeoutStopSec = 10;
-      };
-    };
-  };
-
-  security = {
-    rtkit.enable = true;
-    polkit.enable = true;
-    pam.services.swaylock = { };
-    # pam.services.swaylock-effects = {};
-  };
-
-  # dconf
   programs = {
     # zsh.enable = true;
     fish.enable = true;
@@ -127,10 +129,10 @@
         # here, NOT in environment.systemPackages
       ];
     };
-    # gnupg.agent = {
-    #   enable = true;
-    #   enableSSHSupport = true;
-    # };
+    gnupg.agent = {
+      enable = true;
+      enableSSHSupport = true;
+    };
   };
 
   # Packages
