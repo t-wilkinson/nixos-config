@@ -111,12 +111,6 @@
     fish.enable = true;
     dconf.enable = true;
     # gamemode.enable = true;
-    # steam = {
-    #   enable = true;
-    #   gamescopeSession.enable = true;
-    #   remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-    #   dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
-    # };
     firefox = {
       enable = true;
       nativeMessagingHosts.packages = [ pkgs.plasma5Packages.plasma-browser-integration ];
@@ -132,6 +126,12 @@
     gnupg.agent = {
       enable = true;
       enableSSHSupport = true;
+    };
+    steam = {
+      enable = true;
+      # gamescopeSession.enable = true;
+      # remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+      # dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
     };
   };
 

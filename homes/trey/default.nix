@@ -58,7 +58,6 @@ in
         cm = "commit";
       };
     };
-    # gpg.enable = true;
   };
 
   services = {

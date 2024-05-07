@@ -1,4 +1,5 @@
 # EXAMPLES: https://github.com/starship/starship/discussions/1252
+command_timeout = 100
 
 # # Don't print a new line at the start of the prompt
 # add_newline = false
