@@ -2,6 +2,7 @@ let
   browser = "firefox.desktop";
   editor = "nvim.desktop";
   file-manager = "org.gnome.Nautilus.desktop";
+  document-viewer = "okular.desktop";
   image-viewer = "org.gnome.Loupe.desktop";
   image-editor = "org.kde.kolourpaint";
   torrent = "transmission-gtk.desktop";

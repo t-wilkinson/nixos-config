@@ -3,10 +3,10 @@
 
   home = {
     packages = with pkgs; with nodePackages_latest; with gnome; with libsForQt5; [
-      i3 # gaming
+      i3 # GAMING
       sway
 
-      # gui
+      # GUI
       blueberry
       (mpv.override { scripts = [ mpvScripts.mpris ]; })
       d-spy
@@ -21,16 +21,20 @@
       vlc
       yad
       tor-browser-bundle-bin
+      inkscape
+      gimp
+      zathura
+      okular
 
       vscode
-      lf
       tmux
       zellij
       foot
       kitty
       tmux
+      neovide
 
-      # tools
+      # TOOLS
       bat
       eza
       fd
@@ -55,17 +59,18 @@
       nh
       zoxide
       feh
+      lf
 
-      # security
+      # SECURITY
       pass
       gnupg
       pinentry
 
-      # theming tools
+      # THEMING TOOLS
       gradience
       gnome-tweaks
 
-      # hyprland
+      # HYPRLAND
       brightnessctl
       cliphist
       fuzzel
@@ -85,7 +90,7 @@
       wl-clipboard
       wf-recorder
 
-      # langs
+      # LANGS
       nodejs
       gjs
       bun
@@ -94,27 +99,25 @@
       gcc
       typescript
       eslint
-      # very important stuff
-      # uwuify
 
-      # games
+      # GAMES
       minecraft
       prismlauncher
+      steam
 
-      # node
+      # NODE
       nodePackages_latest.neovim
       # vimPlugins.nvim-treesitter.withPlugins
       # neovimUtils.makeNeovim
 
-      # virtualisation
-      # kvm
-      # virt-manager
-      # virt-viewer
-      # spice
-      # spice-gtk
-      # spice-protocol
-      # win-virtio
-      # win-spice
-      ];
+      # VIRTUALISATION
+      virt-manager
+      virt-viewer
+      spice
+      spice-gtk
+      spice-protocol
+      win-virtio
+      win-spice
+    ];
   };
 }
