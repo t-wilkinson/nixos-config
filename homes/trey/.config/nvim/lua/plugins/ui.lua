@@ -24,6 +24,11 @@ return {
   },
 
   {
+    "lewis6991/gitsigns.nvim",
+    enabled = true,
+  },
+
+  {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
     init = function()

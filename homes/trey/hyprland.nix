@@ -58,6 +58,7 @@ in
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
         "hyprctl setcursor Bibata-Modern-Classic 24"
+        "foot --title dropdown --override shell=fish zellij --layout config --session config"
       ];
       general = {
         gaps_in = 4;
@@ -110,7 +111,7 @@ in
           xray = true;
           special = false;
           new_optimizations = true;
-          size = 5;
+          size = 8;
           passes = 4;
           brightness = 1;
           noise = 1.0e-2;
@@ -175,7 +176,6 @@ in
       bind =
         let SLURP_COMMAND = "$(slurp -d -c eedcf5BB -b 4f425644 -s 00000000)";
         in [
-          "Super, C, exec, code --password-store=gnome"
           "Super, T, exec, foot --override shell=fish"
           "Super, E, exec, nautilus --new-window"
           "Super+Alt, E, exec, thunar"
@@ -188,8 +188,8 @@ in
           "Control+Shift, Escape, exec, gnome-system-monitor"
           "Super, Period, exec, pkill fuzzel || ~/.local/bin/fuzzel-emoji"
           "Super, Q, killactive, "
-          "Control+Super, Space, togglefloating, "
           "Shift+Super+Alt, Q, exec, hyprctl kill"
+          "Super, Space, togglefloating, "
           "Control+Shift+Alt, Delete, exec, pkill wlogout || wlogout -p layer-shell"
           "Control+Shift+Alt+Super, Delete, exec, systemctl poweroff"
           ''
@@ -266,8 +266,7 @@ in
           "Super, 8, workspace, 8"
           "Super, 9, workspace, 9"
           "Super, 0, workspace, 10"
-          "Super, S, togglespecialworkspace,"
-          "Control+Super, S, togglespecialworkspace,"
+          "Super, S, togglespecialworkspace, dropdown"
           "Alt, Tab, cyclenext"
           "Alt, Tab, bringactivetotop,"
           "Super+Shift, 1, movetoworkspacesilent, 1"
@@ -345,8 +344,14 @@ in
         "float,title:^(Sign In - Google Accounts)(.*)$"
       ];
       windowrulev2 = [ 
-        "tile,class:(wpsoffice)" 
+        "tile, class:(wpsoffice)" 
         "opacity 0.84 0.84,class:^(foot)$"
+
+        # special dropdown workspace
+        "float, title:^dropdown$"
+        "workspace special:dropdown, title:^dropdown$"
+        "size 70% 80%, title:^dropdown$"
+        "move 15% 10%, title:^dropdown$"
       ];
       layerrule = [
         "xray 1, .*"

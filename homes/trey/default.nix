@@ -38,6 +38,11 @@ in
     shellAliases = {
       vim = "nvim";
     };
+    # file = {
+    #   ".screenrc".source = dotfiles/screenrc;
+    #   ".gradle/gradle.properties".text = ''
+    #   '';
+    # };
   };
 
   programs = {
@@ -58,23 +63,6 @@ in
         cm = "commit";
       };
     };
-  };
-
-  services = {
-    # gpg-agent = {
-    #   enable = true;
-    #   enableSshSupport = true;
-    #   enableExtraSocket = true;
-    #   extraConfig = ''
-    #     # enable-ssh-support
-    #     allow-preset-passphrase;
-    #   '';
-    #   pinentryPackage = pkgs.pinentry-gnome3;
-    #   defaultCacheTtl = 34560000;
-    #   defaultCacheTtlSsh = 34560000;
-    #   maxCacheTtl = 34560000;
-    #   maxCacheTtlSsh = 34560000;
-    # };
   };
 
   xdg.userDirs = {
@@ -110,29 +98,3 @@ in
     };
   };
 }
-
-#  home-manager = {
-#    users.trey = { config, pkgs, ... }: {
-#      home = {
-#        stateVersion = "23.11"; # Touch this and Covid 2.0 is released
-#        username = "trey";
-#        homeDirectory = "/home/trey";
-#        packages = with pkgs; [
-#          firefox
-#          (writeShellScriptBin "hello-bro" ''
-#            echo "Hello, ${config.home.username}!"
-#          '')
-#        ];
-#        file = {
-#          # ".screenrc".source = dotfiles/screenrc;
-#          # ".gradle/gradle.properties".text = ''
-#          # '';
-#        };
-#      };
-#      xdg.mimeApps.defaultApplications = {
-#        "application/pdf" = [ "zathura.desktop" ];
-#        "image/*" = [ "sxiv.desktop" ];
-#      };
-#      programs.home-manager.enable = true;
-#    };
-#  };

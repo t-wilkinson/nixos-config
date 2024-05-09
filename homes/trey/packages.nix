@@ -25,6 +25,7 @@
       gimp
       zathura
       okular
+      blender
 
       vscode
       tmux
@@ -60,6 +61,7 @@
       zoxide
       feh
       lf
+      inxi
 
       # SECURITY
       pass
@@ -100,8 +102,14 @@
       typescript
       eslint
 
+      # DEVELOPMENT
+      awscli2
+      docker
+      docker-compose
+
       # GAMES
       minecraft
+      lunar-client
       prismlauncher
       steam
 
@@ -118,6 +126,14 @@
       spice-protocol
       win-virtio
       win-spice
+
+      # MISC
+      appimage-run
+      texliveFull
+
+      # (writeShellScriptBin "hello-bro" ''
+      #   echo "Hello, ${config.home.username}!"
     ];
+# '')
   };
 }

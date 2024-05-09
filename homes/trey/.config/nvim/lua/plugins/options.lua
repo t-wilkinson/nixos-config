@@ -175,11 +175,17 @@ return {
             nmap ZZ <Nop>
             autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
             autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+            autocmd FileType zortex setlocal norelativenumber nonumber
+            " autocmd FileType zortex if exists(':Gitsigns') | Gitsigns toggle_signs | endif
 
             map <silent>Zz :ZortexSearch<CR>
             map <silent>ZZ :ZortexSearch<CR>
       ]])
     end,
+  },
+
+  {
+    "imsnif/kdl.vim",
   },
 
   {

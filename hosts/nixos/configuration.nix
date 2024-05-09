@@ -93,10 +93,11 @@
               capslock = "overload(control, esc)";
               esc = "`";
             };
+            # Ctrl + [ = esc; adds lag to 'esc' though
             # "[:C" = {
             #   "[" = "esc";
             # };
-            # Make esc work on small fn keyboard, modularize this
+            # Make esc work on small fn keyboard. modularize this?
             "esc:S" = {
               esc = "~";
             };
@@ -126,6 +127,16 @@
     gnupg.agent = {
       enable = true;
       enableSSHSupport = true;
+      # enableExtraSocket = true;
+      # extraConfig = ''
+      #   # enable-ssh-support
+      #   allow-preset-passphrase;
+      # '';
+      # pinentryPackage = pkgs.pinentry-gnome3;
+      # defaultCacheTtl = 34560000;
+      # defaultCacheTtlSsh = 34560000;
+      # maxCacheTtl = 34560000;
+      # maxCacheTtlSsh = 34560000;
     };
     steam = {
       enable = true;
@@ -151,7 +162,6 @@
       vim
       neovim
       gnumake
-      nodePackages_latest.neovim
     ];
   };
 
@@ -161,7 +171,7 @@
 
   # logind
   services.logind.extraConfig = ''
-    HandlePowerKey=ignore
+    HandlePowerKey=suspend
     HandleLidSwitch=suspend
     HandleLidSwitchExternalPower=ignore
   '';
@@ -172,7 +182,7 @@
     users.${username} = {
       isNormalUser = true;
       shell = pkgs.fish;
-      extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" "libvirtd" "lxd" ];
+      extraGroups = [ "docker" "networkmanager" "wheel" "video" "input" "uinput" "libvirtd" "lxd" ];
     };
   };
 
@@ -211,7 +221,6 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   # boot.loader.grub.device = "/dev/nvme1n1p1";
-
   # boot = {
   #   tmp.cleanOnBoot = true;
   #   supportedFilesystems = [ "btrfs" "ext4" "fat32" "ntfs" ];
@@ -279,6 +288,7 @@
 
   # Virtualisation
   virtualisation = {
+    docker.enable = true;
     lxd.enable = false;
     libvirtd = {
       enable = false;
