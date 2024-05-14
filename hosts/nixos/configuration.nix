@@ -289,12 +289,12 @@
   # Virtualisation
   virtualisation = {
     docker.enable = true;
-    lxd.enable = false;
+    lxd.enable = true;
     libvirtd = {
-      enable = false;
+      enable = true;
       qemu = {
-        swtpm.enable = false;
-        ovmf.enable = false;
+        swtpm.enable = true;
+        ovmf.enable = true;
         ovmf.packages = [ pkgs.OVMFFull.fd ];
       };
     };

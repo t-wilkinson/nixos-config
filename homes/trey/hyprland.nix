@@ -53,7 +53,7 @@ in
         "swww kill; swww init"
         "fcitx5"
         ''
-          swayidle -w timeout 600 '${swaylockCmd}' timeout 900 'pidof java || systemctl suspend' before-sleep '${swaylockCmd}'
+          swayidle -w timeout 1200 '${swaylockCmd}' timeout 1800 'pidof java || systemctl suspend' before-sleep '${swaylockCmd}'
         ''
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
@@ -206,8 +206,8 @@ in
           ''
             Control+Super+Shift,S,exec,grim -g "${SLURP_COMMAND}" "tmp.png" && tesseract "tmp.png" - | wl-copy && rm "tmp.png"
           ''
-          "Super, L, exec, swaylock"
-          "Super+Shift, L, exec, swaylock"
+          "Super, L, exec, ${swaylockCmd}"
+          "Super+Shift, L, exec, ${swaylockCmd}"
           "Control+Super, Slash, exec, pkill anyrun || anyrun"
           "Control+Super, T, exec, ~/.config/ags/scripts/color_generation/switchwall.sh"
           "Control+Super, R, exec, killall ags ydotool; ags -b hypr"

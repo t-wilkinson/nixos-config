@@ -12,7 +12,6 @@
       d-spy
       dolphin
       figma-linux
-      kolourpaint
       github-desktop
       gnome.nautilus
       icon-library
@@ -21,11 +20,13 @@
       vlc
       yad
       tor-browser-bundle-bin
-      inkscape
-      gimp
       zathura
       okular
+
+      inkscape
+      gimp
       blender
+      kolourpaint
 
       vscode
       tmux
@@ -62,6 +63,7 @@
       feh
       lf
       inxi
+      clac
 
       # SECURITY
       pass
@@ -106,6 +108,14 @@
       awscli2
       docker
       docker-compose
+      kubernetes
+      # k3s
+      minikube
+      terraform
+      vsh # HashiCorp Vault Shell
+      vault # HashiCorp Vault 
+      azure-cli
+      direnv
 
       # GAMES
       minecraft
