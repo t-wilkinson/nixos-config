@@ -230,6 +230,7 @@ return {
         "tsx",
         "javascript",
         "markdown",
+        "r",
       },
     },
   },

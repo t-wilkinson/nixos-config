@@ -11,7 +11,6 @@
       (mpv.override { scripts = [ mpvScripts.mpris ]; })
       d-spy
       dolphin
-      figma-linux
       github-desktop
       gnome.nautilus
       icon-library
@@ -22,13 +21,17 @@
       tor-browser-bundle-bin
       zathura
       okular
+      vscode
+      reaper
 
+      # DESIGN
+      figma-linux
       inkscape
       gimp
       blender
       kolourpaint
 
-      vscode
+      # TERMINAL EMULATORS
       tmux
       zellij
       foot
@@ -37,33 +40,33 @@
       neovide
 
       # TOOLS
+      acpi
       bat
+      clac
       eza
       fd
-      ripgrep
-      fzf
-      socat
-      jq
-      gojq
-      acpi
-      ffmpeg
-      libnotify
-      killall
-      zip
-      unzip
-      glib
-      starship
-      showmethekey
-      ydotool
-      tree
-      nvd
-      nix-output-monitor
-      nh
-      zoxide
       feh
-      lf
+      ffmpeg
+      fzf
+      glib
+      gojq
       inxi
-      clac
+      jq
+      killall
+      lf
+      libnotify
+      nh
+      nix-output-monitor
+      nvd
+      ripgrep
+      showmethekey
+      socat
+      starship
+      tree
+      unzip
+      ydotool
+      zip
+      zoxide
 
       # SECURITY
       pass
@@ -103,6 +106,7 @@
       gcc
       typescript
       eslint
+      R
 
       # DEVELOPMENT
       awscli2
@@ -117,12 +121,6 @@
       azure-cli
       direnv
 
-      # GAMES
-      minecraft
-      lunar-client
-      prismlauncher
-      steam
-
       # NODE
       nodePackages_latest.neovim
       # vimPlugins.nvim-treesitter.withPlugins
@@ -136,6 +134,12 @@
       spice-protocol
       win-virtio
       win-spice
+
+      # GAMES
+      minecraft
+      lunar-client
+      prismlauncher
+      steam
 
       # MISC
       appimage-run

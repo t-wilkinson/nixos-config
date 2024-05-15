@@ -238,3 +238,4 @@ fzf_key_bindings
 starship init fish | source
 enable_transience
 zoxide init fish | source
+direnv hook fish | source

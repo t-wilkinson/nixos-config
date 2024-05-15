@@ -297,6 +297,8 @@
         ovmf.enable = true;
         ovmf.packages = [ pkgs.OVMFFull.fd ];
       };
+      # allowedBridges = [ "${cfg.libvert.bridgeInterface}" ];
+
     };
     spiceUSBRedirection.enable = true;
   };
