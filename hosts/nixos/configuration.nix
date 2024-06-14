@@ -55,7 +55,7 @@
   };
 
   services = {
-    # spice-vdagentd.enable = true;
+    spice-vdagentd.enable = true;
     # printing.enable = true;
     # openssh.enable = true;
     envfs.enable = true;
@@ -89,7 +89,7 @@
           ids = ["*"];
           settings = {
             main = {
-              control = "oneshot(control)";
+              # control = "oneshot(control)";
               capslock = "overload(control, esc)";
               esc = "`";
             };
@@ -105,6 +105,65 @@
         };
       };
     };
+
+    mysql = {
+      enable = true;
+      package = pkgs.mariadb;
+      #configFile = pkgs.writeText "mysql.conf" ''
+      ## [mariadb]
+      ## unix_socket=OFF
+      ## unix_socket=OFF
+      ## [client]
+      ## user=pdns
+      ##  password=teleport
+      #[mysql]
+      ## unix_socket=OFF
+      #database = pdns
+      #port = 3306
+      #socket = /run/mysqld/mysqld.sock
+      #'';
+      #initialDatabases = [
+      #  {
+      #  name = "pdns";
+      #  schema = "${pkgs.powerdns}/share/pdns-mysql/schema.mysql.sql";
+      #  }
+      #];
+      #services.mysql.replication.role = "master";
+      #services.mysql = {
+      #replication.role = "master";
+      #replication.slaveHost = "127.0.0.1";
+      #replication.masterUser = "pdns";
+      #replication.masterPassword = "teleport";
+      #};
+      #services.mysql.ensureDatabases = ["pdns"];
+      #services.mysql.ensureUsers = [
+      #  {
+      #    name = "pdns";
+      #    ensurePermissions = {
+      #      "pdns" = "ALL PRIVILEGES";  
+      #    };
+      #  }  
+      #]; 
+    };
+    postgresql = {
+      enable = true;
+      ensureDatabases = [ "mydatabase" ];
+      authentication = pkgs.lib.mkOverride 10 ''
+        #type database  DBuser  auth-method
+        local all       all     trust
+      '';
+    };
+    # nfs.server = {
+    #   enable = true;
+    #   exports = ''
+    #     /nix  192.168.0.114(rw,nohide,insecure,no_subtree_check)
+    #   '';
+    #     # /export         192.168.1.10(rw,fsid=0,no_subtree_check) 192.168.1.15(rw,fsid=0,no_subtree_check)
+    #     # /export/kotomi  192.168.1.10(rw,nohide,insecure,no_subtree_check) 192.168.1.15(rw,nohide,insecure,no_subtree_check)
+    #     # /export/mafuyu  192.168.1.10(rw,nohide,insecure,no_subtree_check) 192.168.1.15(rw,nohide,insecure,no_subtree_check)
+    #     # /export/sen     192.168.1.10(rw,nohide,insecure,no_subtree_check) 192.168.1.15(rw,nohide,insecure,no_subtree_check)
+    #     # /export/tomoyo  192.168.1.10(rw,nohide,insecure,no_subtree_check) 192.168.1.15(rw,nohide,insecure,no_subtree_check)
+    # }
   };
 
   programs = {
@@ -182,7 +241,7 @@
     users.${username} = {
       isNormalUser = true;
       shell = pkgs.fish;
-      extraGroups = [ "docker" "networkmanager" "wheel" "video" "input" "uinput" "libvirtd" "lxd" ];
+      extraGroups = [ "docker" "networkmanager" "wheel" "video" "input" "uinput" "libvirtd" "lxd" "incus" ];
     };
   };
 
@@ -190,6 +249,8 @@
   networking = {
     hostName = "nixos";
     networkmanager.enable = true;
+    nftables.enable = true;
+    # firewall.allowedTCPPorts = [ 2049 ];
   };
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];
@@ -289,7 +350,8 @@
   # Virtualisation
   virtualisation = {
     docker.enable = true;
-    lxd.enable = true;
+    lxd.enable = false;
+    incus.enable = true; # make sure to run `incus admin init`
     libvirtd = {
       enable = true;
       qemu = {

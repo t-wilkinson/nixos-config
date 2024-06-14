@@ -6,6 +6,45 @@
       i3 # GAMING
       sway
 
+      # TERMINAL EMULATORS
+      tmux
+      zellij
+      foot
+      kitty
+      tmux
+      neovide
+
+      # LANGS
+      R
+      bun
+      eslint
+      gcc
+      gjs
+      go
+      nodejs
+      php
+      typescript
+      rustup
+      elixir
+      # jdk # has compatibility issues
+      dart
+
+      # DEVELOPMENT
+      awscli2
+      docker
+      docker-compose
+      kubernetes
+      # k3s
+      minikube
+      terraform
+      vsh # HashiCorp Vault Shell
+      vault # HashiCorp Vault 
+      azure-cli
+      direnv
+      sqlite
+      ollama
+      maven
+
       # GUI
       blueberry
       (mpv.override { scripts = [ mpvScripts.mpris ]; })
@@ -22,7 +61,15 @@
       zathura
       okular
       vscode
-      reaper
+      # reaper # conflicts with `jdk`
+      (google-chrome.override {
+       commandLineArgs = [
+        "--enable-features=UseOzonePlatform"
+        "--ozone-platform=wayland"
+       ];
+      })
+      # kdePackages.dolphin
+      pinta
 
       # DESIGN
       figma-linux
@@ -30,14 +77,6 @@
       gimp
       blender
       kolourpaint
-
-      # TERMINAL EMULATORS
-      tmux
-      zellij
-      foot
-      kitty
-      tmux
-      neovide
 
       # TOOLS
       acpi
@@ -50,23 +89,31 @@
       fzf
       glib
       gojq
+      htop
       inxi
       jq
       killall
       lf
       libnotify
       nh
+      nix-ld
       nix-output-monitor
       nvd
+      openssl
+      psmisc
       ripgrep
       showmethekey
       socat
       starship
+      transmission
       tree
       unzip
+      usbutils
+      ventoy
       ydotool
       zip
       zoxide
+      go-mtpfs
 
       # SECURITY
       pass
@@ -96,30 +143,7 @@
       wlsunset
       wl-clipboard
       wf-recorder
-
-      # LANGS
-      nodejs
-      gjs
-      bun
-      cargo
-      go
-      gcc
-      typescript
-      eslint
-      R
-
-      # DEVELOPMENT
-      awscli2
-      docker
-      docker-compose
-      kubernetes
-      # k3s
-      minikube
-      terraform
-      vsh # HashiCorp Vault Shell
-      vault # HashiCorp Vault 
-      azure-cli
-      direnv
+      wayvnc
 
       # NODE
       nodePackages_latest.neovim
@@ -134,6 +158,10 @@
       spice-protocol
       win-virtio
       win-spice
+      # lxc
+      # lxd-lts
+      distrobuilder
+      incus
 
       # GAMES
       minecraft
@@ -142,12 +170,13 @@
       steam
 
       # MISC
+      android-file-transfer
       appimage-run
       texliveFull
 
       # (writeShellScriptBin "hello-bro" ''
       #   echo "Hello, ${config.home.username}!"
+      # '')
     ];
-# '')
   };
 }

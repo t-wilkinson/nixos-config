@@ -136,6 +136,15 @@ return {
   },
 
   {
+    "t-wilkinson/calendar-sync.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    dir = "~/dev/t-wilkinson/calendar-sync.nvim",
+    install = [[bash -c "python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt"]],
+    cmd = "SyncSchedule",
+    config = function() end,
+  },
+
+  {
     "t-wilkinson/zortex.nvim",
     dir = "~/dev/t-wilkinson/zortex.nvim",
     build = "(cd app && yarn install); (cd rplugin && yarn install)",

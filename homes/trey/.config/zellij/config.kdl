@@ -11,6 +11,7 @@ keybinds clear-defaults=true {
 		unbind "Ctrl q"
 		unbind "Ctrl h"
 		unbind "Ctrl n"
+		unbind "Ctrl g"
 		// uncomment this and adjust key if using copy_on_select=false
 		// bind "Alt c" { Copy; }
 	}
@@ -145,7 +146,7 @@ keybinds clear-defaults=true {
 		bind "x" { CloseFocus; SwitchToMode "Normal"; }
 	}
 	shared_except "locked" {
-		bind "Ctrl g" { SwitchToMode "Locked"; }
+		bind "Alt g" { SwitchToMode "Locked"; }
 		bind "Alt n" { NewPane; }
 		bind "Alt h" "Alt Left" { MoveFocusOrTab "Left"; }
 		bind "Alt l" "Alt Right" { MoveFocusOrTab "Right"; }

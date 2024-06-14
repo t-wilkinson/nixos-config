@@ -29,6 +29,42 @@ return {
   },
 
   {
+    "echasnovski/mini.animate",
+    recommended = true,
+    enabled = false,
+    event = "VeryLazy",
+    opts = function()
+      local mouse_scrolled = false
+      for _, scroll in ipairs({ "Up", "Down" }) do
+        local key = "<ScrollWheel" .. scroll .. ">"
+        vim.keymap.set({ "", "i" }, key, function()
+          mouse_scrolled = true
+          return key
+        end, { expr = true })
+      end
+
+      local animate = require("mini.animate")
+      return {
+        resize = {
+          timing = animate.gen_timing.linear({ duration = 40, unit = "total" }),
+        },
+        scroll = {
+          timing = animate.gen_timing.linear({ duration = 40, unit = "total" }),
+          subscroll = animate.gen_subscroll.equal({
+            predicate = function(total_scroll)
+              if mouse_scrolled then
+                mouse_scrolled = false
+                return false
+              end
+              return total_scroll > 1
+            end,
+          }),
+        },
+      }
+    end,
+  },
+
+  {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
     init = function()

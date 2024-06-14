@@ -47,7 +47,7 @@ in
         "QT_STYLE_OVERRIDE,kvantum"
         "WLR_NO_HARDWARE_CURSORS, 1"
       ];
-      monitor = [ ",preferred,auto,1" ];
+      monitor = [ ",preferred,auto,1" "HDMI-A-3,preferred,auto-left,1"];
       "exec-once" = [
         "ags"
         "swww kill; swww init"
@@ -195,9 +195,9 @@ in
           ''
             Super+Shift+Alt, S, exec, grim -g "${SLURP_COMMAND}" - | swappy -f -
           ''
-          ''
-            Super+Shift, S, exec, grim -g "${SLURP_COMMAND}" - | wl-copy
-          ''
+          # ''
+          #   Super+Shift, S, exec, grim -g "${SLURP_COMMAND}" - | wl-copy
+          # ''
           "Super+Alt, R, exec, ~/.config/ags/scripts/record-script.sh"
           "Control+Alt, R, exec, ~/.config/ags/scripts/record-script.sh --fullscreen"
           "Super+Shift+Alt, R, exec, ~/.config/ags/scripts/record-script.sh --fullscreen-sound"
@@ -266,7 +266,6 @@ in
           "Super, 8, workspace, 8"
           "Super, 9, workspace, 9"
           "Super, 0, workspace, 10"
-          "Super, S, togglespecialworkspace, dropdown"
           "Alt, Tab, cyclenext"
           "Alt, Tab, bringactivetotop,"
           "Super+Shift, 1, movetoworkspacesilent, 1"
@@ -279,8 +278,10 @@ in
           "Super+Shift, 8, movetoworkspacesilent, 8"
           "Super+Shift, 9, movetoworkspacesilent, 9"
           "Super+Shift, 0, movetoworkspacesilent, 10"
-          "Control+Shift+Super, Up, movetoworkspacesilent, special"
-          "Super+Alt, S, movetoworkspacesilent, special"
+          # "Control+Shift+Super, Up, movetoworkspacesilent, special"
+          # "Super+Alt, S, workspace, special"
+          "Super, S, togglespecialworkspace, dropdown"
+          "Super+Shift, S, movetoworkspace, dropdown"
           "Super, mouse_up, workspace, +1"
           "Super, mouse_down, workspace, -1"
           "Control+Super, mouse_up, workspace, +1"

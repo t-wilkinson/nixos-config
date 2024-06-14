@@ -24,17 +24,6 @@ if test -f ~/.cache/ags/user/colorschemes/sequences
     cat ~/.cache/ags/user/colorschemes/sequences
 end
 
-alias ls='eza --icons -F -H --group-directories-first --git -1'
-alias vim='nvim'
-alias z="zoxide"
-
-set -gx NIXPKGS_ALLOW_UNFREE 1
-set -gx NIXPKGS_ALLOW_INSECURE 1
-set -gx FLAKE $HOME/dev/t-wilkinson/nixos
-set -gx NODE_PATH $HOME/.npm-packages/lib/node_modules
-set -gx EDITOR nvim
-set -gx VISUAL nvim
-
 # The following snippet is meant to be used like this in your fish config:
 #
 # if status is-interactive
@@ -234,6 +223,18 @@ function fzf_key_bindings
 end
 ### end: key-bindings.fish ###
 fzf_key_bindings
+
+alias ls='eza --icons -F -H --group-directories-first --git -1'
+alias vim='nvim'
+alias z="zoxide"
+
+set -gx NIXPKGS_ALLOW_UNFREE 1
+set -gx NIXPKGS_ALLOW_INSECURE 1
+set -gx FLAKE $HOME/dev/t-wilkinson/nixos
+set -gx NODE_PATH $HOME/.npm-packages/lib/node_modules
+set -gx EDITOR nvim
+set -gx VISUAL nvim
+set -gx GOPATH $HOME/dev
 
 starship init fish | source
 enable_transience
