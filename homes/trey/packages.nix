@@ -7,43 +7,50 @@
       sway
 
       # TERMINAL EMULATORS
-      tmux
-      zellij
       foot
       kitty
-      tmux
       neovide
+      tmux
+      tmux
+      zellij
 
       # LANGS
+      # jdk # has compatibility issues
       R
       bun
+      dart
+      elixir
       eslint
       gcc
       gjs
       go
+      mono5 # C#
       nodejs
       php
-      typescript
       rustup
-      elixir
-      # jdk # has compatibility issues
-      dart
+      typescript
+      nuget # C#
+      boost
 
       # DEVELOPMENT
-      awscli2
+      # k3s
+      awscli
+      azure-cli
+      direnv
       docker
       docker-compose
       kubernetes
-      # k3s
-      minikube
-      terraform
-      vsh # HashiCorp Vault Shell
-      vault # HashiCorp Vault 
-      azure-cli
-      direnv
-      sqlite
-      ollama
       maven
+      minikube
+      ollama
+      sqlcl
+      sqldeveloper
+      sqlite
+      terraform
+      vault # HashiCorp Vault 
+      vsh # HashiCorp Vault Shell
+      asio # c++
+      cmake
 
       # GUI
       blueberry
@@ -69,14 +76,14 @@
        ];
       })
       # kdePackages.dolphin
-      pinta
 
       # DESIGN
-      figma-linux
-      inkscape
-      gimp
       blender
+      figma-linux
+      gimp
+      inkscape
       kolourpaint
+      pinta
 
       # TOOLS
       acpi
@@ -114,6 +121,7 @@
       zip
       zoxide
       go-mtpfs
+      nmap
 
       # SECURITY
       pass

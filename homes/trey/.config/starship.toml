@@ -822,7 +822,6 @@ $vagrant\
 $zig\
 $nix_shell\
 $conda\
-$aws\
 $gcloud\
 $openstack\
 $env_var\

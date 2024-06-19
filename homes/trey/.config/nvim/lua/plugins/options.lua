@@ -13,6 +13,7 @@ return {
   { "norcalli/nvim-colorizer.lua" },
   { "echasnovski/mini.pairs", enabled = false },
 
+  { "windwp/nvim-autopairs" },
   {
     "echasnovski/mini.surround",
     keys = function(_, keys)
