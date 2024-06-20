@@ -594,6 +594,7 @@ command_timeout = 100
 # PROMPT: nerd-font
 [aws]
 symbol = "  "
+disabled = true
 
 [buf]
 symbol = " "
