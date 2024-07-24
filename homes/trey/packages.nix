@@ -65,8 +65,8 @@
       vlc
       yad
       tor-browser-bundle-bin
-      zathura
-      okular
+      zathura # document viewer
+      okular # document viewer
       vscode
       # reaper # conflicts with `jdk`
       (google-chrome.override {
@@ -102,6 +102,7 @@
       killall
       lf
       libnotify
+      lsof
       nh
       nix-ld
       nix-output-monitor
@@ -122,6 +123,7 @@
       zoxide
       go-mtpfs
       nmap
+      dig
 
       # SECURITY
       pass

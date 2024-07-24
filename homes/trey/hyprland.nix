@@ -58,7 +58,7 @@ in
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
         "hyprctl setcursor Bibata-Modern-Classic 24"
-        "foot --title dropdown --override shell=fish zellij --layout config --session config"
+        # "foot --title dropdown --override shell=fish zellij --layout config --session config"
       ];
       general = {
         gaps_in = 4;

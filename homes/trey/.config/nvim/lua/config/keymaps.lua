@@ -50,3 +50,22 @@ wk.register({
   ["<leader>Zi"] = { "<cmd>ZortexListitemToZettel<cr>" },
   ["<leader>Zs"] = { "<cmd>ZortexOpenStructure<cr>" },
 })
+
+-- wk.register({
+--   { "<leader>Z", group = "Zortex" },
+--   { "<leader>ZRF", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
+--   { "<leader>ZRS", desc = "<cmd>ZortexSyncRemoteServer<cr>" },
+--   { "<leader>ZRr", desc = "<cmd>ZortexRestartRemoteServer<cr>" },
+--   { "<leader>ZRs", desc = "<cmd>ZortexStartRemoteServer<cr>" },
+--   { "<leader>ZS", group = "Server" },
+--   { "<leader>ZSe", desc = "<cmd>ZortexStopServer<cr>" },
+--   { "<leader>ZSs", desc = "<cmd>ZortexStartServer<cr>" },
+--   { "<leader>ZZ", desc = "<cmd>ZortexSearch<cr>" },
+--   { "<leader>Zg", desc = "<cmd>ZortexSearchGoogle<Space>" },
+--   { "<leader>Zi", desc = "<cmd>ZortexListitemToZettel<cr>" },
+--   { "<leader>Zp", desc = "<cmd>ZortexPreview<cr>" },
+--   { "<leader>Zr", desc = "<cmd>ZortexResourceToZettel<cr>" },
+--   { "<leader>Zs", desc = "<cmd>ZortexOpenStructure<cr>" },
+--   { "<leader>Zw", desc = "<cmd>ZortexSearchWikipedia<Space>" },
+--   { "<leader>Zz", desc = "<cmd>ZortexSearch<cr>" },
+-- })

@@ -250,7 +250,7 @@
     hostName = "nixos";
     networkmanager.enable = true;
     nftables.enable = true;
-    # firewall.allowedTCPPorts = [ 2049 ];
+    firewall.allowedTCPPorts = [ 5900 ];
   };
   # Open ports in the firewall.
   # networking.firewall.allowedTCPPorts = [ ... ];

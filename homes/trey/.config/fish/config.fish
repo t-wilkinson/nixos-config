@@ -33,11 +33,13 @@ end
 #     eval (zellij setup --generate-auto-start fish | string collect)
 # end
 if not set -q ZELLIJ
-    if test "$ZELLIJ_AUTO_ATTACH" = true
-        zellij attach -c
-    else
-        zellij
-    end
+    zellij attach --create main
+
+    # if test "$ZELLIJ_AUTO_ATTACH" = true
+    #     zellij attach -c
+    # else
+    #     zellij
+    # end
 
     if test "$ZELLIJ_AUTO_EXIT" = true
         kill $fish_pid
