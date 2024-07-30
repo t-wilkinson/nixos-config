@@ -3,18 +3,18 @@ let
   homeDirectory = "/home/trey";
 in
 { pkgs, impurity, ... }: {
-  home.stateVersion = "23.11"; # this must be the version at which you have started using the program
+  home.stateVersion = "23.11"; # Touch this and Covid 2.0 will be released
   imports = [
     # Cachix
     # ./cachix.nix
     ## Dotfiles (manual)
     ./dotfiles.nix
     # Stuff
-    ./ags.nix
-    ./anyrun.nix
+    # ./ags.nix
+    # ./anyrun.nix
     ./browser.nix
     ./dconf.nix
-    ./hyprland.nix
+    # ./hyprland.nix
     ./mimelist.nix
     ./packages.nix
     # ./starship.nix
