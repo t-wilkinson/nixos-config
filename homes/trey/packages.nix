@@ -124,6 +124,7 @@
       go-mtpfs
       nmap
       dig
+      colordiff
 
       # SECURITY
       pass
