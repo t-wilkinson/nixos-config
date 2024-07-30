@@ -173,6 +173,9 @@
     # gamemode.enable = true;
     firefox = {
       enable = true;
+      preferences = {
+        "widget.use-xdg-desktop-portal.file-picker" = 1;
+      };
       nativeMessagingHosts.packages = [ pkgs.plasma5Packages.plasma-browser-integration ];
     };
     # Run dynamically linked stuff
