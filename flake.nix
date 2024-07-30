@@ -1,12 +1,18 @@
 {
   description = "Nixos config flake";
 
-  outputs = { self, impurity, ... }: {
+  outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
+  {
+    system = "x86_64-linux";
+    username = "trey";
+    hostname = "nixos";
+    overlays = import ./overlays { inherit inputs; };
     nixosConfigurations = import ./hosts { inherit self; };
   };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

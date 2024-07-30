@@ -1,11 +1,23 @@
-{ pkgs, hostname, username, config, ... }: 
+{ config, pkgs, inputs, outputs, ... }: 
 
+let
+  inherit (outputs) hostname username;
+in
 {
   # nix
   documentation.nixos.enable = false; # .desktop
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.packageOverrides = pkgs: {
-    intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+  nixpkgs = {
+    overlays = [
+      outputs.overlays.additions
+      outputs.overlays.unstable-packages
+    ];
+    config = {
+      allowUnfree = true;
+      allowBroken = true;
+      packageOverrides = pkgs: {
+        intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+      };
+    };
   };
   nix.settings = {
     experimental-features = "nix-command flakes";
@@ -173,6 +185,9 @@
     # gamemode.enable = true;
     firefox = {
       enable = true;
+      preferences = {
+        "widget.use-xdg-desktop-portal.file-picker" = 1;
+      };
       nativeMessagingHosts.packages = [ pkgs.plasma5Packages.plasma-browser-integration ];
     };
     # Run dynamically linked stuff
