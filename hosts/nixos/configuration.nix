@@ -1,12 +1,22 @@
-{ pkgs, hostname, username, config, ... }: 
+{ inputs, outputs, pkgs, pkgs-unstable, hostname, username, config, ... }: 
 
 {
+  imports = [];
+
   # nix
   documentation.nixos.enable = false; # .desktop
-  nixpkgs.config.allowUnfree = true;
-  nixpkgs.config.allowBroken = true;
-  nixpkgs.config.packageOverrides = pkgs: {
-    intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+  nixpkgs = {
+    overlays = [
+      outputs.overlays.additions
+      outputs.overlays.unstable-packages
+    ];
+    config = {
+      allowUnfree = true;
+      allowBroken = true;
+      packageOverrides = pkgs: {
+        intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+      };
+    };
   };
   nix.settings = {
     experimental-features = "nix-command flakes";

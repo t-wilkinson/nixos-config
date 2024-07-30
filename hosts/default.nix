@@ -1,6 +1,6 @@
-{ self, ... }:
+{ self, system, ... }:
 let
-  inherit (self) inputs;
+  inherit (self) inputs outputs;
   inherit (inputs) nixpkgs home-manager zjstatus;
 
   username = "trey";
@@ -17,7 +17,7 @@ let
 in
 {
   ${hostname} = nixpkgs.lib.nixosSystem {
-    specialArgs = { inherit inputs; };
+    specialArgs = { inherit inputs outputs; };
     modules =
       [
         {
@@ -26,8 +26,6 @@ in
           impurity.configRoot = self;
           impurity.enable = true;
         }
-
-        (import ./overlays.nix)
 
         ./nixos
 

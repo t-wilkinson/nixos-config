@@ -1,8 +1,20 @@
 {
   description = "Nixos config flake";
 
-  outputs = { self, impurity, ... }: {
-    nixosConfigurations = import ./hosts { inherit self; };
+  outputs = { self, nixpkgs, nixpkgs-unstable, impurity, ... }@inputs: 
+  let
+    inherit (self) outputs;
+    system = "x86_64-linux";
+    pkgs = import nixpkgs { inherit system; };
+    pkgs-unstable = import nixpkgs-unstable {
+      inherit system;
+      config.allowUnfree = true;
+    };
+    overlays = import ./overlays { inherit inputs; };
+  in
+  {
+    overlays = overlays;
+    nixosConfigurations = import ./hosts { inherit self system; };
   };
 
   inputs = {
