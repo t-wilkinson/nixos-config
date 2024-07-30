@@ -51,6 +51,8 @@ handle_conflict() {
         # There are deletions or conflicting changes
         echo "Conflict detected for file: $relative_path"
         $DIFF_CMD -u "$dest" "$src"
+        echo ""
+        echo "\`${src}\`"
         echo "Choose an action:"
         echo "  [1] Use dots-hyprland version (overwrite local)"
         echo "  [2] Keep local version (ignore dots-hyprland changes)"
