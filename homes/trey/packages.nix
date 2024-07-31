@@ -161,19 +161,6 @@
       # vimPlugins.nvim-treesitter.withPlugins
       # neovimUtils.makeNeovim
 
-      # VIRTUALISATION
-      virt-manager
-      virt-viewer
-      spice
-      spice-gtk
-      spice-protocol
-      win-virtio
-      win-spice
-      # lxc
-      # lxd-lts
-      distrobuilder
-      incus
-
       # GAMES
       minecraft
       lunar-client

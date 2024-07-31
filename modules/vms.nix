@@ -1,4 +1,26 @@
-{ pkgs, ... }: {
+{ outputs, pkgs, ... }: 
+let
+  inherit (outputs) username;
+in
+{
+  home-manager.users.${username} = {
+    home.packages = with pkgs; [
+      virt-manager
+      virt-viewer
+      spice
+      spice-gtk
+      spice-protocol
+      win-virtio
+      win-spice
+      # lxc
+      # lxd-lts
+      distrobuilder
+      incus
+      qemu
+      OVMF
+    ];
+  };
+
   virtualisation = {
     docker.enable = true;
     lxd.enable = false;
@@ -17,8 +39,7 @@
   };
 
   environment.systemPackages = with pkgs; [
-    virt-manager
-    qemu
-    OVMF
   ];
+
+  users.users.${username}.extraGroups = [ "docker" "libvirtd" "lxd" "incus" ];
 }

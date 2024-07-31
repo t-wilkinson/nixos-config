@@ -256,7 +256,7 @@ in
     users.${username} = {
       isNormalUser = true;
       shell = pkgs.fish;
-      extraGroups = [ "docker" "networkmanager" "wheel" "video" "input" "uinput" "libvirtd" "lxd" "incus" ];
+      extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
     };
   };
 

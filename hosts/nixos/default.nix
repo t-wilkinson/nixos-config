@@ -13,6 +13,7 @@ in
     modules =
       [
         {
+          # TODO: write an overlay for impurity?
           # Impurity
           imports = [ impurity.nixosModules.impurity ];
           impurity.configRoot = self;
@@ -29,6 +30,8 @@ in
         }
 
         (import "${self}/modules/hosts/home-manager.nix" { inherit self; })
+
+        "${self}/modules/vms.nix"
       ];
   };
   ${impureHostname} = self.nixosConfigurations.${hostname}.extendModules { modules = [{ impurity.enable = true; }]; };
