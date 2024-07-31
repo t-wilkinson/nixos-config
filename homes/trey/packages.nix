@@ -14,44 +14,6 @@
       tmux
       zellij
 
-      # LANGS
-      # jdk # has compatibility issues
-      R
-      bun
-      dart
-      elixir
-      eslint
-      gcc
-      gjs
-      go
-      mono5 # C#
-      nodejs
-      php
-      rustup
-      typescript
-      nuget # C#
-      boost
-
-      # DEVELOPMENT
-      # k3s
-      awscli
-      azure-cli
-      direnv
-      docker
-      docker-compose
-      kubernetes
-      maven
-      minikube
-      ollama
-      sqlcl
-      sqldeveloper
-      sqlite
-      terraform
-      vault # HashiCorp Vault 
-      vsh # HashiCorp Vault Shell
-      asio # c++
-      cmake
-
       # GUI
       blueberry
       (mpv.override { scripts = [ mpvScripts.mpris ]; })

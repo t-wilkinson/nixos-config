@@ -23,8 +23,13 @@ in
 
   virtualisation = {
     docker.enable = true;
+    podman = {
+      enable = true;
+      # dockerCompat = true;
+      defaultNetwork.settings.dns_enabled = true;
+    };
     lxd.enable = false;
-    incus.enable = true; # make sure to run `incus admin init`
+    incus.enable = false; # make sure to run `incus admin init`
     libvirtd = {
       enable = true;
       qemu = {
@@ -41,5 +46,5 @@ in
   environment.systemPackages = with pkgs; [
   ];
 
-  users.users.${username}.extraGroups = [ "docker" "libvirtd" "lxd" "incus" ];
+  users.users.${username}.extraGroups = [ "docker" "podman" "libvirtd" "lxd" "incus" ];
 }

@@ -32,6 +32,7 @@ in
         (import "${self}/modules/hosts/home-manager.nix" { inherit self; })
 
         "${self}/modules/vms.nix"
+        "${self}/modules/development.nix"
       ];
   };
   ${impureHostname} = self.nixosConfigurations.${hostname}.extendModules { modules = [{ impurity.enable = true; }]; };

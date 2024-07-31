@@ -1,6 +1,7 @@
 { config, impurity, inputs, pkgs, ... }: {
   xdg.configFile = let link = impurity.link; in {
     "ags".source = link ./.config/ags;
+    # "colors.conf".source = link ./.config/hypr/colors.conf;
     "fish".source = link ./.config/fish;
     "foot".source = link ./.config/foot;
     "fuzzel".source = link ./.config/fuzzel;
