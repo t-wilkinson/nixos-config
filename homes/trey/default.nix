@@ -1,9 +1,9 @@
+{ pkgs, impurity, ... }:
 let
   username = "trey";
   homeDirectory = "/home/trey";
 in
-{ pkgs, impurity, ... }: {
-  home.stateVersion = "23.11"; # this must be the version at which you have started using the program
+{
   imports = [
     # Cachix
     # ./cachix.nix
@@ -20,7 +20,7 @@ in
     # ./starship.nix
     ./sway.nix
     ./theme.nix
-    ../../modules/lf.nix
+    ../../modules/homes/lf.nix
   ];
 
   home = {
@@ -97,4 +97,6 @@ in
       ];
     };
   };
+
+  home.stateVersion = "23.11"; # this must be the version at which you have started using the program
 }

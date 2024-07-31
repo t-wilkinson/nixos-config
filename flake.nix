@@ -2,12 +2,15 @@
   description = "Nixos config flake";
 
   outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
+  let
+    hostname = "nixos";
+  in
   {
+    inherit hostname;
     system = "x86_64-linux";
     username = "trey";
-    hostname = "nixos";
     overlays = import ./overlays { inherit inputs; };
-    nixosConfigurations = import ./hosts { inherit self; };
+    nixosConfigurations = import ./hosts/${hostname} { inherit self; };
   };
 
   inputs = {

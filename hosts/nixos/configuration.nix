@@ -362,24 +362,6 @@ in
     wireplumber.enable = true;
   };
 
-  # Virtualisation
-  virtualisation = {
-    docker.enable = true;
-    lxd.enable = false;
-    incus.enable = true; # make sure to run `incus admin init`
-    libvirtd = {
-      enable = true;
-      qemu = {
-        swtpm.enable = true;
-        ovmf.enable = true;
-        ovmf.packages = [ pkgs.OVMFFull.fd ];
-      };
-      # allowedBridges = [ "${cfg.libvert.bridgeInterface}" ];
-
-    };
-    spiceUSBRedirection.enable = true;
-  };
-
   # config = mkIf cfg.server.libvert.enable {
   #   # https://technicalsourcery.net/posts/nixos-in-libvirt/
   #   boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
