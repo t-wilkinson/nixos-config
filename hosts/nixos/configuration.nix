@@ -236,6 +236,8 @@ in
       vim
       neovim
       gnumake
+      gtk3
+      gnome.nautilus
     ];
   };
 
