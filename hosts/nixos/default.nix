@@ -1,7 +1,7 @@
 { self, ... }:
 let
   inherit (self) inputs outputs;
-  inherit (inputs) nixpkgs;
+  inherit (inputs) nixpkgs NixVirt;
   inherit (outputs) username hostname;
 
   impureHostname = "nixos-impure";
@@ -31,7 +31,9 @@ in
 
         (import "${self}/modules/hosts/home-manager.nix" { inherit self; })
 
-        "${self}/modules/vms.nix"
+        "${self}/modules/virtualisation.nix"
+        NixVirt.nixosModules.default
+
         "${self}/modules/development.nix"
       ];
   };

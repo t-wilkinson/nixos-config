@@ -117,70 +117,11 @@ in
         };
       };
     };
-
-    mysql = {
-      enable = true;
-      package = pkgs.mariadb;
-      #configFile = pkgs.writeText "mysql.conf" ''
-      ## [mariadb]
-      ## unix_socket=OFF
-      ## unix_socket=OFF
-      ## [client]
-      ## user=pdns
-      ##  password=teleport
-      #[mysql]
-      ## unix_socket=OFF
-      #database = pdns
-      #port = 3306
-      #socket = /run/mysqld/mysqld.sock
-      #'';
-      #initialDatabases = [
-      #  {
-      #  name = "pdns";
-      #  schema = "${pkgs.powerdns}/share/pdns-mysql/schema.mysql.sql";
-      #  }
-      #];
-      #services.mysql.replication.role = "master";
-      #services.mysql = {
-      #replication.role = "master";
-      #replication.slaveHost = "127.0.0.1";
-      #replication.masterUser = "pdns";
-      #replication.masterPassword = "teleport";
-      #};
-      #services.mysql.ensureDatabases = ["pdns"];
-      #services.mysql.ensureUsers = [
-      #  {
-      #    name = "pdns";
-      #    ensurePermissions = {
-      #      "pdns" = "ALL PRIVILEGES";  
-      #    };
-      #  }  
-      #]; 
-    };
-    postgresql = {
-      enable = true;
-      ensureDatabases = [ "mydatabase" ];
-      authentication = pkgs.lib.mkOverride 10 ''
-        #type database  DBuser  auth-method
-        local all       all     trust
-      '';
-    };
-    # nfs.server = {
-    #   enable = true;
-    #   exports = ''
-    #     /nix  192.168.0.114(rw,nohide,insecure,no_subtree_check)
-    #   '';
-    #     # /export         192.168.1.10(rw,fsid=0,no_subtree_check) 192.168.1.15(rw,fsid=0,no_subtree_check)
-    #     # /export/kotomi  192.168.1.10(rw,nohide,insecure,no_subtree_check) 192.168.1.15(rw,nohide,insecure,no_subtree_check)
-    #     # /export/mafuyu  192.168.1.10(rw,nohide,insecure,no_subtree_check) 192.168.1.15(rw,nohide,insecure,no_subtree_check)
-    #     # /export/sen     192.168.1.10(rw,nohide,insecure,no_subtree_check) 192.168.1.15(rw,nohide,insecure,no_subtree_check)
-    #     # /export/tomoyo  192.168.1.10(rw,nohide,insecure,no_subtree_check) 192.168.1.15(rw,nohide,insecure,no_subtree_check)
-    # }
   };
 
   programs = {
-    # zsh.enable = true;
     fish.enable = true;
+    zsh.enable = true;
     dconf.enable = true;
     # gamemode.enable = true;
     firefox = {
@@ -224,6 +165,13 @@ in
   # $ nix search <package>
   environment = {
     localBinInPath = true;
+    sessionVariables = {
+      # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
+      NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
+      NIXPKGS_ALLOW_UNFREE = "1";
+      NIXPKGS_ALLOW_INSECURE = "1";
+      LIBVA_DRIVER_NAME = "iHD";
+    };
     systemPackages = with pkgs; [
       curl
       zsh
@@ -255,7 +203,12 @@ in
   # user
   users = {
     defaultUserShell = pkgs.fish;
-    users.${username} = {
+    users.peter = {
+      isNormalUser = true;
+      shell = pkgs.zsh;
+      extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
+    };
+    users.trey = {
       isNormalUser = true;
       shell = pkgs.fish;
       extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
@@ -398,14 +351,6 @@ in
     ];
   };
   # hardware.nvidia.modesetting.enable = true;
-
-  environment.sessionVariables = {
-    # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
-    NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
-    NIXPKGS_ALLOW_UNFREE = "1";
-    NIXPKGS_ALLOW_INSECURE = "1";
-    LIBVA_DRIVER_NAME = "iHD";
-  };
 
   fonts = {
     packages = with pkgs; [
