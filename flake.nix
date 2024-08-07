@@ -1,16 +1,50 @@
 {
   description = "Nixos config flake";
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, ... }@inputs:
+  outputs = { self, nixpkgs, microvm, ... }@inputs:
   let
     hostname = "nixos";
-  in
-  {
-    inherit hostname;
     system = "x86_64-linux";
     username = "trey";
+  in
+  {
+    inherit username hostname system;
     overlays = import ./overlays { inherit inputs; };
-    nixosConfigurations = import ./hosts/${hostname} { inherit self; };
+    nixosConfigurations = {
+      my-microvm = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          microvm.nixosModules.microvm
+          { 
+            systemd.network = {
+              netdevs."10-microvm".netdevConfig = {
+                Kind = "bridge";
+                Name = "microvm";
+              };
+              networks."10-microvm" = {
+                matchConfig.Name = "microvm";
+                networkConfig = {
+                  DHCPServer = true;
+                  IPv6SendRA = true;
+                };
+                addresses = [ {
+                  addressConfig.Address = "10.0.0.1/24";
+                } {
+                  addressConfig.Address = "fd12:3456:789a::1/64";
+                } ];
+                ipv6Prefixes = [ {
+                  ipv6PrefixConfig.Prefix = "fd12:3456:789a::/64";
+                } ];
+              };
+            };
+
+            # Allow inbound traffic for the DHCP server
+            networking.firewall.allowedUDPPorts = [ 67 ];
+            microvm.hypervisor = "cloud-hypervisor";
+          }
+        ];
+      };
+    } // import ./hosts/${hostname} { inherit self; };
   };
 
   inputs = {
@@ -55,8 +89,18 @@
       url = "github:Kirottu/anyrun";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     NixVirt = {
       url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    microvm = {
+      url = "github:astro/microvm.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    agenix = {
+      url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

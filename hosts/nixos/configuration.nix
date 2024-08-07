@@ -1,7 +1,7 @@
 { config, pkgs, inputs, outputs, ... }: 
 
 let
-  inherit (outputs) hostname username;
+  inherit (outputs) hostname username system;
 in
 {
   # nix
@@ -69,7 +69,12 @@ in
   services = {
     spice-vdagentd.enable = true;
     # printing.enable = true;
-    # openssh.enable = true;
+    openssh = {
+      # enable = true;
+      hostKeys = [
+        { path = "/etc/ssh/ssh_host_rsa_key"; bits = 4096; type = "rsa"; }
+      ];
+    };
     envfs.enable = true;
     greetd = {
       enable = true;
@@ -186,6 +191,13 @@ in
       gnumake
       gtk3
       gnome.nautilus
+      inputs.agenix.packages."${system}".default
+
+      # need the following for file uploads to work
+      dbus 
+      nss
+      gnutls
+      libglvnd
     ];
   };
 

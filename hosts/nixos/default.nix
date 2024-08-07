@@ -1,11 +1,10 @@
 { self, ... }:
 let
   inherit (self) inputs outputs;
-  inherit (inputs) nixpkgs NixVirt;
+  inherit (inputs) nixpkgs NixVirt impurity agenix microvm;
   inherit (outputs) username hostname;
 
   impureHostname = "nixos-impure";
-  impurity = inputs.impurity;
 in
 {
   ${hostname} = nixpkgs.lib.nixosSystem {
@@ -20,9 +19,19 @@ in
           impurity.enable = true;
         }
 
+        microvm.nixosModules.host
+        {
+          microvm.autostart = [
+            "my-microvm"
+          ];
+        }
+
         ./hardware-configuration.nix
         ./configuration.nix
         "${self}/modules/hosts/gnome.nix"
+
+        # agenix.nixosModules.default
+        # "${self}/modules/vpn.nix"
 
         {
           networking.hostName = hostname;
