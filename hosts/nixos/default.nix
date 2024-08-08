@@ -30,8 +30,8 @@ in
         ./configuration.nix
         "${self}/modules/hosts/gnome.nix"
 
-        # agenix.nixosModules.default
-        # "${self}/modules/vpn.nix"
+        agenix.nixosModules.default
+        "${self}/modules/vpn.nix"
 
         {
           networking.hostName = hostname;

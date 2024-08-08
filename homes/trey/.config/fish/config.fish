@@ -13,7 +13,7 @@ end
 function nrb
     if test -n "$argv[1]"
         cd "$argv[1]"
-        env IMPURITY_PATH="$argv[1]" sudo --preserve-env=IMPURITY_PATH nixos-rebuild switch --flake . --impure $argv
+        env IMPURITY_PATH="$argv[1]" sudo --preserve-env=IMPURITY_PATH nixos-rebuild switch --flake . --impure $argv[2..-1]
         cd -
     else
         env IMPURITY_PATH="$(pwd)" sudo --preserve-env=IMPURITY_PATH nixos-rebuild switch --flake . --impure $argv
