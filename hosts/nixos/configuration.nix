@@ -227,42 +227,39 @@ in
     };
   };
 
-  # network
-  networking = {
-    hostName = "nixos";
-    networkmanager.enable = true;
-    nftables.enable = true;
-    firewall.allowedTCPPorts = [ 5900 ];
-  };
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-  # networking.interfaces.wlan0.ipv4.addresses = [ {
-  #   address = "192.168.0.100";
-  #   prefixLength = 24;
-  # } ];
-  # networking.defaultGateway = "192.168.0.1";
-  # networking.nameservers = [ "8.8.8.8" ];
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-  # systemd.network.links."10-wan" = {
-  #   matchConfig.PermanentMACAddress = "";
-  #   linkConfig.Name = "wan";
+  # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
+  # networking = {
+  #   hostName = hostname;
+  #   # nftables.enable = true;
+  #   # networkmanager.enable = false;
+  #   firewall.allowedTCPPorts = [ 22 5900 ];
+  #   # localCommands =
+  #   #   ''
+  #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
+  #   #   '';
   # };
 
-  # bluetooth
   # hardware.bluetooth = {
   #   enable = true;
   #   powerOnBoot = false;
   # };
 
+  # networking.usePredictableInterfaceNames = true;
+
   # Boot
-  # Use the systemd-boot EFI boot loader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
+  boot = {
+    # Use the systemd-boot EFI boot loader.
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+    # doesn't work, mac addresses are randomized
+    # initrd.services.udev.rules = ''
+    #   SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", \
+    #   ATTR{address}=="52:54:00:12:01:01", KERNEL=="enp*", NAME="eth0"
+    #   SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", \
+    #   ATTR{address}=="8e:10:ab:93:d5:31", KERNEL=="enp*", NAME="wlan0"
+    # '';
+  };
+
   # boot.loader.grub.device = "/dev/nvme1n1p1";
   # boot = {
   #   tmp.cleanOnBoot = true;

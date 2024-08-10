@@ -3,6 +3,54 @@ let
   inherit (outputs) username;
 in
 {
+  # TODO: use foldl' or similar to map users to same package list
+  home-manager.users.${username} = {
+    home.packages = with pkgs; with nodePackages_latest; with gnome; with libsForQt5; [
+      openvpn
+
+      # LANGS
+      # jdk # has compatibility issues
+      R
+      bun
+      dart
+      elixir
+      eslint
+      gcc
+      gjs
+      go
+      mono5 # C#
+      nodejs
+      php
+      rustup
+      typescript
+      nuget # C#
+      boost
+
+      # DEVELOPMENT
+      # k3s
+      awscli
+      azure-cli
+      direnv
+      docker
+      docker-compose
+      kubernetes
+      maven
+      minikube
+      ollama
+      sqlcl
+      # sqldeveloper # download here https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html#license-lightbox
+      sqlite
+      terraform
+      vault # HashiCorp Vault 
+      vsh # HashiCorp Vault Shell
+      asio # c++
+      cmake
+
+      # LIBRARIES
+      stdenv.cc.cc.lib
+    ];
+  };
+
   services = {
     mysql = {
       enable = true;
@@ -64,48 +112,4 @@ in
     # }
   };
 
-  home-manager.users.${username} = {
-    home.packages = with pkgs; with nodePackages_latest; with gnome; with libsForQt5; [
-      # LANGS
-      # jdk # has compatibility issues
-      R
-      bun
-      dart
-      elixir
-      eslint
-      gcc
-      gjs
-      go
-      mono5 # C#
-      nodejs
-      php
-      rustup
-      typescript
-      nuget # C#
-      boost
-
-      # DEVELOPMENT
-      # k3s
-      awscli
-      azure-cli
-      direnv
-      docker
-      docker-compose
-      kubernetes
-      maven
-      minikube
-      ollama
-      sqlcl
-      # sqldeveloper # download here https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html#license-lightbox
-      sqlite
-      terraform
-      vault # HashiCorp Vault 
-      vsh # HashiCorp Vault Shell
-      asio # c++
-      cmake
-
-      # LIBRARIES
-      stdenv.cc.cc.lib
-    ];
-  };
 }

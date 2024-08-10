@@ -1,6 +1,5 @@
 { pkgs, ... }:
 {
-
   home = {
     packages = with pkgs; with nodePackages_latest; with gnome; with libsForQt5; [
       i3 # GAMING
@@ -15,7 +14,7 @@
       zellij
 
       # GUI
-      blueberry
+      # blueberry # bluetooth
       (mpv.override { scripts = [ mpvScripts.mpris ]; })
       d-spy
       dolphin
