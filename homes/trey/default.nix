@@ -1,15 +1,22 @@
-{ pkgs, impurity, ... }:
+{ config, pkgs, lib, impurity, ... }:
 let
   username = "trey";
   homeDirectory = "/home/trey";
+  git-credential-pass = pkgs.writeShellScriptBin "git-credential-pass" ''
+    #!/bin/bash
+    echo "protocol=https"
+    token=$(${pkgs.pass}/bin/pass git/token)
+    echo "username=t-wilkinson"
+    echo "password=$token"
+  '';
 in
 {
   imports = [
-    # Cachix
     # ./cachix.nix
-    ## Dotfiles (manual)
     ./dotfiles.nix
-    # Stuff
+    ../../modules/homes/lf.nix
+
+    # CONFIG
     ./ags.nix
     ./anyrun.nix
     ./browser.nix
@@ -20,7 +27,6 @@ in
     # ./starship.nix
     ./sway.nix
     ./theme.nix
-    ../../modules/homes/lf.nix
   ];
 
   home = {
@@ -43,6 +49,10 @@ in
     #   ".gradle/gradle.properties".text = ''
     #   '';
     # };
+    packages = [
+      git-credential-pass
+    ];
+    file."my".source = config.lib.file.mkOutOfStoreSymlink "${homeDirectory}/dev/t-wilkinson";
   };
 
   programs = {
@@ -57,6 +67,12 @@ in
       enable = true;
       userName = "t-wilkinson";
       userEmail = "winston.trey.wilkinson@gmail.com";
+      extraConfig = {
+        init = {
+          defaultBranch = "main";
+        };
+        credential.helper = "${git-credential-pass}/bin/git-credential-pass";
+      };
       aliases = {
         pu = "push";
         co = "checkout";
@@ -69,12 +85,12 @@ in
     createDirectories = true;
   };
 
-  dconf.settings = {
-    "org/virt-manager/virt-manager/connections" = {
-      autoconnect = ["qemu:///system"];
-      uris = ["qemu:///system"];
-    };
-  };
+  # dconf.settings = {
+  #   "org/virt-manager/virt-manager/connections" = {
+  #     autoconnect = ["qemu:///system"];
+  #     uris = ["qemu:///system"];
+  #   };
+  # };
 
   gtk = {
     font = {
@@ -84,19 +100,14 @@ in
     };
     gtk3 = {
       bookmarks = [
+        "file://${homeDirectory}/dev"
+        "file://${homeDirectory}/dev/t-wilkinson"
         "file://${homeDirectory}/Downloads"
         "file://${homeDirectory}/Documents"
-        "file://${homeDirectory}/Pictures"
-        "file://${homeDirectory}/Music"
-        "file://${homeDirectory}/Videos"
         "file://${homeDirectory}/.config"
-        "file://${homeDirectory}/.config/ags"
-        "file://${homeDirectory}/.config/hypr"
-        "file://${homeDirectory}/GitHub"
-        "file:///mnt/Windows"
       ];
     };
   };
 
-  home.stateVersion = "23.11"; # this must be the version at which you have started using the program
+  home.stateVersion = "24.05"; # this must be the version at which you have started using the program
 }

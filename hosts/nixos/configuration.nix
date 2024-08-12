@@ -71,9 +71,9 @@ in
     # printing.enable = true;
     openssh = {
       # enable = true;
-      hostKeys = [
-        { path = "/etc/ssh/ssh_host_rsa_key"; bits = 4096; type = "rsa"; }
-      ];
+      # hostKeys = [
+      #   { path = "/etc/ssh/ssh_host_rsa_key"; bits = 4096; type = "rsa"; }
+      # ];
     };
     envfs.enable = true;
     greetd = {
@@ -122,6 +122,18 @@ in
         };
       };
     };
+  };
+
+  swapDevices = [ {
+    device = "/var/lib/swapfile";
+    size = 16*1024;
+  } ];
+
+  # ZRAM
+  zramSwap = {
+    enable = true;
+    # memoryPercent = 50;
+    # priority = 5;
   };
 
   programs = {
@@ -190,7 +202,7 @@ in
       neovim
       gnumake
       gtk3
-      gnome.nautilus
+      efibootmgr
       inputs.agenix.packages."${system}".default
 
       # need the following for file uploads to work
@@ -200,10 +212,6 @@ in
       libglvnd
     ];
   };
-
-  # ZRAM
-  zramSwap.enable = false;
-  zramSwap.memoryPercent = 100;
 
   # logind
   services.logind.extraConfig = ''
@@ -215,17 +223,19 @@ in
   # user
   users = {
     defaultUserShell = pkgs.fish;
-    users.peter = {
-      isNormalUser = true;
-      shell = pkgs.zsh;
-      extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
-    };
+    # users.peter = {
+    #   isNormalUser = true;
+    #   shell = pkgs.zsh;
+    #   extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
+    # };
     users.trey = {
       isNormalUser = true;
       shell = pkgs.fish;
       extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
     };
   };
+
+  # networking.networkmanager.enable = lib.mkForce false;
 
   # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
   # networking = {
@@ -378,5 +388,5 @@ in
     };
   };
 
-  system.stateVersion = "23.11"; # If you touch this, Covid 2.0 will be released
+  system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
 }

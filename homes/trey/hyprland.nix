@@ -154,6 +154,9 @@ in
           "specialWorkspace, 1, 3, md3_decel, slidevert"
         ];
       };
+      cursor = {
+        hide_on_key_press = true;
+      };
       misc = {
         vfr = 1;
         vrr = 1;
@@ -161,7 +164,6 @@ in
         focus_on_activate = true;
         animate_manual_resizes = false;
         animate_mouse_windowdragging = false;
-        hide_cursor_on_key_press = true;
         enable_swallow = false;
         swallow_regex = "(foot|kitty|allacritty|Alacritty)";
 
@@ -375,7 +377,7 @@ in
         "noanim, sideleft"
       ];
       source = [
-        "./colors.conf"
+        # "./colors.conf"
       ];
     };
   };
