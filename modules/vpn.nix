@@ -8,7 +8,7 @@ let
 
   vpnConfig1 = pkgs.writeText "vpn-config-1" ''
     client
-    dev tun1
+    dev tun0
     proto udp
     remote us-newyorkcity.privacy.network 1198
     resolv-retry infinite
@@ -19,8 +19,7 @@ let
     auth sha1
     tls-client
     remote-cert-tls server
-    route-nopull
-    route 10.0.1.0 255.255.255.0
+    ; route-nopull
 
     compress
     verb 1
@@ -85,7 +84,7 @@ let
 
   vpnConfig2 = pkgs.writeText "vpn-config-2" ''
     client
-    dev tun2
+    dev tun1
     proto udp
     remote al.privacy.network 1198
     resolv-retry infinite
@@ -96,8 +95,7 @@ let
     auth sha1
     tls-client
     remote-cert-tls server
-    route-nopull
-    route 10.0.2.0 255.255.255.0
+    ; route-nopull
 
     compress
     verb 1
@@ -195,10 +193,10 @@ in
       autoStart = true;
       config = "config /run/openvpn-config-1";
     };
-    two = {
-      autoStart = true;
-      config = "config /run/openvpn-config-2";
-    };
+    # two = {
+    #   autoStart = true;
+    #   config = "config /run/openvpn-config-2";
+    # };
   };
 
   systemd.services."openvpn-one" = {
@@ -206,15 +204,15 @@ in
     after = [ "openvpn-pia.service" ];
   };
 
-  systemd.services."openvpn-two" = {
-    requires = [ "openvpn-pia.service" ];
-    after = [ "openvpn-pia.service" ];
-  };
+  # systemd.services."openvpn-two" = {
+  #   requires = [ "openvpn-pia.service" ];
+  #   after = [ "openvpn-pia.service" ];
+  # };
 
   systemd.services."openvpn-pia" = {
     description = "OpenVPN PIA setup";
     wantedBy = [ "multi-user.target" ];
-    before = [ "openvpn-one.service" "openvpn-two.service" ];
+    before = [ "openvpn-one.service" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;

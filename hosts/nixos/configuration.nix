@@ -233,76 +233,12 @@ in
       shell = pkgs.fish;
       extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
     };
+    users.end-4 = {
+      isNormalUser = true;
+      shell = pkgs.fish;
+      extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
+    };
   };
-
-  # networking.networkmanager.enable = lib.mkForce false;
-
-  # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
-  # networking = {
-  #   hostName = hostname;
-  #   # nftables.enable = true;
-  #   # networkmanager.enable = false;
-  #   firewall.allowedTCPPorts = [ 22 5900 ];
-  #   # localCommands =
-  #   #   ''
-  #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
-  #   #   '';
-  # };
-
-  # hardware.bluetooth = {
-  #   enable = true;
-  #   powerOnBoot = false;
-  # };
-
-  # networking.usePredictableInterfaceNames = true;
-
-  # Boot
-  boot = {
-    # Use the systemd-boot EFI boot loader.
-    loader.systemd-boot.enable = true;
-    loader.efi.canTouchEfiVariables = true;
-    # doesn't work, mac addresses are randomized
-    # initrd.services.udev.rules = ''
-    #   SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", \
-    #   ATTR{address}=="52:54:00:12:01:01", KERNEL=="enp*", NAME="eth0"
-    #   SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", \
-    #   ATTR{address}=="8e:10:ab:93:d5:31", KERNEL=="enp*", NAME="wlan0"
-    # '';
-  };
-
-  # boot.loader.grub.device = "/dev/nvme1n1p1";
-  # boot = {
-  #   tmp.cleanOnBoot = true;
-  #   supportedFilesystems = [ "btrfs" "ext4" "fat32" "ntfs" ];
-  #   loader = {
-  #     grub = {
-  #       enable = true;
-  #       device = "nodev";
-  #       efiSupport = true;
-  #       useOSProber = true;
-  #     };
-  #     efi.canTouchEfiVariables = true;
-  #   };
-  #   # kernelPackages = pkgs.linuxPackages_xanmod_latest;
-  #   # kernelPatches = [{
-  #   #   name = "enable RT_FULL";
-  #   #   patch = null;
-  #   #   # TODO: add realtime patch: PREEMPT_RT y
-  #   #   extraConfig = ''
-  #   #     PREEMPT y
-  #   #     PREEMPT_BUILD y
-  #   #     PREEMPT_VOLUNTARY n
-  #   #     PREEMPT_COUNT y
-  #   #     PREEMPTION y
-  #   #   '';
-  #   # }];
-  #   # extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
-  #   # kernelModules = [ "acpi_call" ];
-  #   # make 3.5mm jack work
-  #   # extraModprobeConfig = ''
-  #   #   options snd_hda_intel model=headset-mode
-  #   # '';
-  # };
 
   # Locale
   time.timeZone = "America/New_York";
@@ -318,11 +254,12 @@ in
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-  # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   # useXkbConfig = true; # use xkb.options in tty.
-  # };
+
+  boot = {
+    # Use the systemd-boot EFI boot loader.
+    loader.systemd-boot.enable = true;
+    loader.efi.canTouchEfiVariables = true;
+  };
 
   # Audio
   sound.enable = true;
@@ -335,22 +272,6 @@ in
     # jack.enable = true;
     wireplumber.enable = true;
   };
-
-  # config = mkIf cfg.server.libvert.enable {
-  #   # https://technicalsourcery.net/posts/nixos-in-libvirt/
-  #   boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
-  #
-  #   virtualisation.libvirtd.enable = true;
-  #   virtualisation.libvirtd.allowedBridges =
-  #     [ "${cfg.libvert.bridgeInterface}" ];
-  #
-  #   networking.interfaces."${cfg.libvert.bridgeInterface}".useDHCP = true;
-  #   networking.bridges = {
-  #     "${cfg.libvert.bridgeInterface}" = {
-  #       interfaces = [ "${cfg.libvert.ethInterface}" ];
-  #     };
-  #   };
-  # };
 
   # hyprland
   programs.hyprland = {
@@ -389,4 +310,85 @@ in
   };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
+
+  # config = mkIf cfg.server.libvert.enable {
+  #   # https://technicalsourcery.net/posts/nixos-in-libvirt/
+  #   boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
+  #
+  #   virtualisation.libvirtd.enable = true;
+  #   virtualisation.libvirtd.allowedBridges =
+  #     [ "${cfg.libvert.bridgeInterface}" ];
+  #
+  #   networking.interfaces."${cfg.libvert.bridgeInterface}".useDHCP = true;
+  #   networking.bridges = {
+  #     "${cfg.libvert.bridgeInterface}" = {
+  #       interfaces = [ "${cfg.libvert.ethInterface}" ];
+  #     };
+  #   };
+  # };
+
+  # boot.loader.grub.device = "/dev/nvme1n1p1";
+  # boot = {
+  #   tmp.cleanOnBoot = true;
+  #   supportedFilesystems = [ "btrfs" "ext4" "fat32" "ntfs" ];
+  #   loader = {
+  #     grub = {
+  #       enable = true;
+  #       device = "nodev";
+  #       efiSupport = true;
+  #       useOSProber = true;
+  #     };
+  #     efi.canTouchEfiVariables = true;
+  #   };
+  #   # kernelPackages = pkgs.linuxPackages_xanmod_latest;
+  #   # kernelPatches = [{
+  #   #   name = "enable RT_FULL";
+  #   #   patch = null;
+  #   #   # TODO: add realtime patch: PREEMPT_RT y
+  #   #   extraConfig = ''
+  #   #     PREEMPT y
+  #   #     PREEMPT_BUILD y
+  #   #     PREEMPT_VOLUNTARY n
+  #   #     PREEMPT_COUNT y
+  #   #     PREEMPTION y
+  #   #   '';
+  #   # }];
+  #   # extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
+  #   # kernelModules = [ "acpi_call" ];
+  #   # make 3.5mm jack work
+  #   # extraModprobeConfig = ''
+  #   #   options snd_hda_intel model=headset-mode
+  #   # '';
+  # };
+
+  # networking.networkmanager.enable = lib.mkForce false;
+  # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
+  # networking = {
+  #   hostName = hostname;
+  #   # nftables.enable = true;
+  #   # networkmanager.enable = false;
+  #   firewall.allowedTCPPorts = [ 22 5900 ];
+  #   # localCommands =
+  #   #   ''
+  #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
+  #   #   '';
+  # };
+
+  # hardware.bluetooth = {
+  #   enable = true;
+  #   powerOnBoot = false;
+  # };
+
+  # Boot
+  # boot = {
+  #   doesn't work, mac addresses are randomized because of networkmanager
+  #   initrd.services.udev.rules = ''
+  #     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", \
+  #     ATTR{address}=="52:54:00:12:01:01", KERNEL=="enp*", NAME="eth0"
+  #     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", \
+  #     ATTR{address}=="8e:10:ab:93:d5:31", KERNEL=="enp*", NAME="wlan0"
+  #   '';
+  # };
+
+  # networking.usePredictableInterfaceNames = true;
 }

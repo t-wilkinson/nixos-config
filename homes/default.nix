@@ -25,6 +25,8 @@
     # per-user Home Manager configuration
     users = {
       trey = ./trey;
+      # end-4 = ./end-4;
+      # peter = ./peter;
     };
   };
 }

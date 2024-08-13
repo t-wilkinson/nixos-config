@@ -32,12 +32,12 @@ in
     incus.enable = false; # make sure to run `incus admin init`
     docker.enable = true;
     podman = {
-      enable = true;
+      enable = false;
       # dockerCompat = true;
       defaultNetwork.settings.dns_enabled = true;
     };
     libvirtd = {
-      enable = true;
+      enable = false;
       # onBoot = "ignore";
       # onShutdown = "shutdown";
       qemu = {

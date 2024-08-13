@@ -15,11 +15,11 @@ nixpkgs.lib.nixosSystem {
       "${self}/modules/hosts/gnome.nix"
       "${self}/modules/development.nix"
 
-      # agenix.nixosModules.default
-      # "${self}/modules/vpn.nix"
+      NixVirt.nixosModules.default
+      "${self}/modules/virtualisation.nix"
 
-      # "${self}/modules/virtualisation.nix"
-      # NixVirt.nixosModules.default
+      agenix.nixosModules.default
+      "${self}/modules/vpn.nix"
 
       # microvm.nixosModules.host
       # "${self}/modules/dev-microvm.nix"
