@@ -1,6 +1,6 @@
 { inputs, outputs, pkgs, ... }: 
 let
-  inherit (outputs) username;
+  username = "trey";
   inherit (inputs) NixVirt;
 in
 {

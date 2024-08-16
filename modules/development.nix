@@ -1,6 +1,6 @@
-{ outputs, pkgs, ... }:
+{ pkgs, ... }:
 let
-  inherit (outputs) username;
+  username = "trey";
 in
 {
   # TODO: use foldl' or similar to map users to same package list

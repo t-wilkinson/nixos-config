@@ -1,8 +1,4 @@
-{ config, pkgs, inputs, outputs, ... }: 
-
-let
-  inherit (outputs) hostname username system;
-in
+{ lib, config, pkgs, inputs, outputs, ... }: 
 {
   # nix
   documentation.nixos.enable = false; # .desktop
@@ -203,7 +199,8 @@ in
       gnumake
       gtk3
       efibootmgr
-      inputs.agenix.packages."${system}".default
+      # inputs.agenix.packages."${config.system}".default
+      inputs.agenix.packages."x86_64-linux".default
 
       # need the following for file uploads to work
       dbus 
@@ -231,7 +228,13 @@ in
     users.trey = {
       isNormalUser = true;
       shell = pkgs.fish;
-      extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
+      extraGroups = [ 
+        "wheel" "video" "input" "uinput" 
+        (lib.mkIf config.networking.networkmanager.enable "networkmanager")
+      ];
+      openssh.authorizedKeys.keys = [
+        # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
+      ];
     };
     users.end-4 = {
       isNormalUser = true;

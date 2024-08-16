@@ -5,10 +5,9 @@
   let
     hostname = "nixos";
     system = "x86_64-linux";
-    username = "trey";
   in
   {
-    inherit username hostname system;
+    inherit hostname system;
     overlays = import ./overlays { inherit inputs; };
     nixosConfigurations = {
       ${hostname} = import ./hosts/${hostname} { inherit self; };
@@ -70,6 +69,12 @@
 
     agenix = {
       url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # maps directory of nix files into attribute set
+    haumea = {
+      url = "github:nix-community/haumea";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
