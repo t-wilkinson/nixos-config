@@ -105,6 +105,7 @@ in
         "file://${homeDirectory}/Downloads"
         "file://${homeDirectory}/Documents"
         "file://${homeDirectory}/.config"
+        "file://${homeDirectory}/dev/t-wilkinson/personal/resume"
       ];
     };
   };
