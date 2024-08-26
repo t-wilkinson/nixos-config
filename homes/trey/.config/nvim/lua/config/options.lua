@@ -5,3 +5,4 @@
 vim.opt.linebreak = true
 vim.opt.gdefault = true
 vim.opt.modeline = true
+vim.g.lazyvim_picker = "fzf"

@@ -1,13 +1,20 @@
 { self, ... }:
 let
   inherit (self) inputs outputs;
-  inherit (inputs) nixpkgs NixVirt impurity agenix microvm;
+  inherit (inputs) nixpkgs nixpkgs-unstable NixVirt impurity agenix microvm;
+  # pkgs-unstable = import nixpkgs-unstable {};
 in
 nixpkgs.lib.nixosSystem {
   specialArgs = { inherit inputs outputs; };
   modules =
     [
       (import "${self}/modules/impure.nix" { inherit impurity self; })
+    # add nixpkgs-unstable
+      {
+        nixpkgs.overlays = [ (final: prev: { 
+          unstable = import nixpkgs-unstable { inherit (final) system; }; 
+        }) ];
+      }
 
       ./hardware-configuration.nix
       ./configuration.nix

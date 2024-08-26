@@ -14,7 +14,7 @@
       zellij
 
       # GUI
-      # blueberry # bluetooth
+      blueberry # bluetooth
       (mpv.override { scripts = [ mpvScripts.mpris ]; })
       d-spy
       dolphin

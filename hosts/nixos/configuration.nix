@@ -1,4 +1,4 @@
-{ lib, config, pkgs, inputs, outputs, ... }: 
+{ lib, config, pkgs, pkgs-unstable, inputs, outputs, ... }: 
 {
   # nix
   documentation.nixos.enable = false; # .desktop
@@ -62,7 +62,13 @@
     # pam.services.swaylock-effects = {};
   };
 
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = false;
+  };
+
   services = {
+    # blueman.enable = true;
     spice-vdagentd.enable = true;
     # printing.enable = true;
     openssh = {
@@ -195,7 +201,7 @@
       nixpkgs-fmt
       nixfmt-classic
       vim
-      neovim
+      unstable.neovim
       gnumake
       gtk3
       efibootmgr
@@ -238,8 +244,9 @@
     };
     users.end-4 = {
       isNormalUser = true;
-      shell = pkgs.fish;
+      shell = pkgs.zsh;
       extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
+      initialPassword = "password";
     };
   };
 
@@ -375,11 +382,6 @@
   #   #   ''
   #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
   #   #   '';
-  # };
-
-  # hardware.bluetooth = {
-  #   enable = true;
-  #   powerOnBoot = false;
   # };
 
   # Boot

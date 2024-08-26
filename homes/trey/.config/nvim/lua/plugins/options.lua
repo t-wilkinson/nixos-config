@@ -188,8 +188,8 @@ return {
             autocmd FileType zortex setlocal norelativenumber nonumber
             " autocmd FileType zortex if exists(':Gitsigns') | Gitsigns toggle_signs | endif
 
-            map <silent>Zz :ZortexSearch<CR>
-            map <silent>ZZ :ZortexSearch<CR>
+            " map <silent>Zz :ZortexSearch<CR>
+            " map <silent>ZZ :ZortexSearch<CR>
       ]])
     end,
   },
