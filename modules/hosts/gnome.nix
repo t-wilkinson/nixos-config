@@ -17,8 +17,8 @@
       bibata-cursors
       rubik
       lexend
-      gnome.nautilus-python
-      gnome.seahorse # managing encryption keys
+      nautilus-python
+      seahorse # managing encryption keys
       twitter-color-emoji
     ];
 
@@ -29,8 +29,6 @@
         gnome-tour
         gnome-connections
         snapshot
-      ])
-      ++ (with pkgs.gnome; [
         cheese # webcam tool
         gnome-music
         epiphany # web browser
@@ -48,6 +46,8 @@
         gnome-shell-extensions
         gnome-maps
         # gnome-font-viewer
+      ])
+      ++ (with pkgs.gnome; [
       ]);
   };
 }

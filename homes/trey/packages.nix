@@ -19,9 +19,9 @@
       d-spy
       dolphin
       github-desktop
-      gnome.nautilus
+      pkgs.nautilus
       icon-library
-      dconf-editor
+      pkgs.dconf-editor
       qt5.qtimageformats
       vlc
       yad
@@ -74,7 +74,7 @@
       showmethekey
       socat
       starship
-      transmission
+      transmission_4
       tree
       unzip
       usbutils
@@ -94,7 +94,7 @@
 
       # THEMING TOOLS
       gradience
-      gnome-tweaks
+      pkgs.gnome-tweaks
 
       # HYPRLAND
       brightnessctl
@@ -118,7 +118,7 @@
       wayvnc
 
       # NODE
-      nodePackages_latest.neovim
+      # nodePackages_latest.neovim # error: Alais neovim is still in node-packages.nix
       # vimPlugins.nvim-treesitter.withPlugins
       # neovimUtils.makeNeovim
 

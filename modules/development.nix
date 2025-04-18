@@ -7,6 +7,7 @@ in
   home-manager.users.${username} = {
     home.packages = with pkgs; with nodePackages_latest; with gnome; with libsForQt5; [
       openvpn
+      chromedriver
 
       # LANGS
       # jdk # has compatibility issues
