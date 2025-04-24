@@ -1,141 +1,142 @@
-{ pkgs, ... }:
-{
+{ pkgs, ... }: {
   home = {
-    packages = with pkgs; with nodePackages_latest; with gnome; with libsForQt5; [
-      i3 # GAMING
-      sway
+    packages = with pkgs;
+      with nodePackages_latest;
+      with gnome;
+      with libsForQt5; [
+        i3 # GAMING
+        sway
 
-      # TERMINAL EMULATORS
-      foot
-      kitty
-      neovide
-      tmux
-      tmux
-      zellij
+        # TERMINAL EMULATORS
+        foot
+        kitty
+        neovide
+        tmux
+        tmux
+        zellij
 
-      # GUI
-      blueberry # bluetooth
-      (mpv.override { scripts = [ mpvScripts.mpris ]; })
-      d-spy
-      dolphin
-      github-desktop
-      pkgs.nautilus
-      icon-library
-      pkgs.dconf-editor
-      qt5.qtimageformats
-      vlc
-      yad
-      tor-browser-bundle-bin
-      zathura # document viewer
-      okular # document viewer
-      vscode
-      # reaper # conflicts with `jdk`
-      (google-chrome.override {
-       commandLineArgs = [
-        "--enable-features=UseOzonePlatform"
-        "--ozone-platform=wayland"
-       ];
-      })
-      # kdePackages.dolphin
+        # GUI
+        blueberry # bluetooth
+        (mpv.override { scripts = [ mpvScripts.mpris ]; })
+        d-spy
+        dolphin
+        github-desktop
+        pkgs.nautilus
+        icon-library
+        pkgs.dconf-editor
+        qt5.qtimageformats
+        vlc
+        yad
+        tor-browser-bundle-bin
+        # zathura # document viewer
+        okular # document viewer
+        vscode
+        # reaper # conflicts with `jdk`
+        (google-chrome.override {
+          commandLineArgs =
+            [ "--enable-features=UseOzonePlatform" "--ozone-platform=wayland" ];
+        })
+        # kdePackages.dolphin
 
-      # DESIGN
-      blender
-      figma-linux
-      gimp
-      inkscape
-      kolourpaint
-      pinta
+        # DESIGN
+        # blender
+        figma-linux
+        gimp
+        inkscape
+        # kolourpaint
+        # pinta
+        # krinta
 
-      # TOOLS
-      acpi
-      bat
-      clac
-      eza
-      fd
-      feh
-      ffmpeg
-      fzf
-      glib
-      gojq
-      htop
-      inxi
-      jq
-      killall
-      lf
-      libnotify
-      lsof
-      nh
-      nix-ld
-      nix-output-monitor
-      nvd
-      openssl
-      psmisc
-      ripgrep
-      showmethekey
-      socat
-      starship
-      transmission_4
-      tree
-      unzip
-      usbutils
-      ventoy
-      ydotool
-      zip
-      zoxide
-      go-mtpfs
-      nmap
-      dig
-      colordiff
+        # TOOLS
+        acpi
+        bat
+        clac
+        eza
+        fd
+        feh
+        ffmpeg
+        fzf
+        glib
+        gojq
+        htop
+        inxi
+        jq
+        killall
+        lf
+        libnotify
+        lsof
+        nh
+        nix-ld
+        nix-output-monitor
+        nvd
+        openssl
+        psmisc
+        ripgrep
+        showmethekey
+        socat
+        starship
+        transmission_4
+        tree
+        unzip
+        usbutils
+        ventoy
+        ydotool
+        zip
+        zoxide
+        go-mtpfs
+        nmap
+        dig
+        colordiff
 
-      # SECURITY
-      pass
-      gnupg
-      pinentry
+        # SECURITY
+        pass
+        gnupg
+        pinentry
 
-      # THEMING TOOLS
-      gradience
-      pkgs.gnome-tweaks
+        # THEMING TOOLS
+        gradience
+        pkgs.gnome-tweaks
 
-      # HYPRLAND
-      brightnessctl
-      cliphist
-      fuzzel
-      grim
-      hyprpicker
-      tesseract
-      imagemagick
-      pavucontrol
-      playerctl
-      swappy
-      swaylock-effects
-      swayidle
-      slurp
-      swww
-      wayshot
-      wlsunset
-      wl-clipboard
-      wf-recorder
-      wayvnc
+        # HYPRLAND
+        brightnessctl
+        cliphist
+        fuzzel
+        grim
+        hyprpicker
+        tesseract
+        imagemagick
+        pavucontrol
+        playerctl
+        swappy
+        swaylock-effects
+        swayidle
+        slurp
+        swww
+        wayshot
+        wlsunset
+        wl-clipboard
+        wf-recorder
+        wayvnc
 
-      # NODE
-      # nodePackages_latest.neovim # error: Alais neovim is still in node-packages.nix
-      # vimPlugins.nvim-treesitter.withPlugins
-      # neovimUtils.makeNeovim
+        # NODE
+        # nodePackages_latest.neovim # error: Alais neovim is still in node-packages.nix
+        # vimPlugins.nvim-treesitter.withPlugins
+        # neovimUtils.makeNeovim
 
-      # GAMES
-      minecraft
-      lunar-client
-      prismlauncher
-      steam
+        # GAMES
+        minecraft
+        unstable.lunar-client
+        prismlauncher
+        steam
 
-      # MISC
-      android-file-transfer
-      appimage-run
-      texliveFull
+        # MISC
+        android-file-transfer
+        appimage-run
+        texliveFull
 
-      # (writeShellScriptBin "hello-bro" ''
-      #   echo "Hello, ${config.home.username}!"
-      # '')
-    ];
+        # (writeShellScriptBin "hello-bro" ''
+        #   echo "Hello, ${config.home.username}!"
+        # '')
+      ];
   };
 }

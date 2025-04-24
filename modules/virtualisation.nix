@@ -1,9 +1,8 @@
-{ inputs, outputs, pkgs, ... }: 
+{ inputs, outputs, pkgs, ... }:
 let
   username = "trey";
   inherit (inputs) NixVirt;
-in
-{
+in {
   home-manager.users.${username} = {
     home.packages = with pkgs; [
       virt-manager
@@ -135,8 +134,8 @@ in
   # networking.firewall.trustedInterfaces = [ "virbr0" ];
   # networking.bridges.virbr0.interfaces = [];
 
-  environment.systemPackages = with pkgs; [
-  ];
+  environment.systemPackages = with pkgs; [ ];
 
-  users.users.${username}.extraGroups = [ "docker" "podman" "libvirtd" "lxd" "incus" "kvm" ];
+  users.users.${username}.extraGroups =
+    [ "docker" "podman" "libvirtd" "lxd" "incus" "kvm" ];
 }

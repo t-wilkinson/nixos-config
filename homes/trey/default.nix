@@ -9,10 +9,9 @@ let
     echo "username=t-wilkinson"
     echo "password=$token"
   '';
-in
-{
+in {
   imports = [
-    # ./cachix.nix
+    ./cachix.nix
     ./dotfiles.nix
     ../../modules/homes/lf.nix
 
@@ -37,22 +36,16 @@ in
     #   FLAKE = "$HOME/dev/t-wilkinson/nixos";
     #   NODE_PATH = "$HOME/.npm-packages/lib/node_modules";
     # };
-    sessionPath = [
-      "$HOME/.local/bin"
-      "$HOME/.npm-packages/bin"
-    ];
-    shellAliases = {
-      vim = "nvim";
-    };
+    sessionPath = [ "$HOME/.local/bin" "$HOME/.npm-packages/bin" ];
+    shellAliases = { vim = "nvim"; };
     # file = {
     #   ".screenrc".source = dotfiles/screenrc;
     #   ".gradle/gradle.properties".text = ''
     #   '';
     # };
-    packages = [
-      git-credential-pass
-    ];
-    file."my".source = config.lib.file.mkOutOfStoreSymlink "${homeDirectory}/dev/t-wilkinson";
+    packages = [ git-credential-pass ];
+    file."my".source =
+      config.lib.file.mkOutOfStoreSymlink "${homeDirectory}/dev/t-wilkinson";
   };
 
   programs = {
@@ -68,9 +61,7 @@ in
       userName = "t-wilkinson";
       userEmail = "winston.trey.wilkinson@gmail.com";
       extraConfig = {
-        init = {
-          defaultBranch = "main";
-        };
+        init = { defaultBranch = "main"; };
         credential.helper = "${git-credential-pass}/bin/git-credential-pass";
       };
       aliases = {
@@ -81,9 +72,7 @@ in
     };
   };
 
-  xdg.userDirs = {
-    createDirectories = true;
-  };
+  xdg.userDirs = { createDirectories = true; };
 
   # dconf.settings = {
   #   "org/virt-manager/virt-manager/connections" = {
@@ -110,5 +99,6 @@ in
     };
   };
 
-  home.stateVersion = "24.05"; # this must be the version at which you have started using the program
+  home.stateVersion =
+    "24.05"; # this must be the version at which you have started using the program
 }

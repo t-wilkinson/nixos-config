@@ -2,7 +2,8 @@
 let
   hyprland = inputs.hyprland.packages.${pkgs.system}.hyprland;
   plugins = inputs.hyprland-plugins.packages.${pkgs.system};
-  swaylockCmd = "swaylock -f --screenshots --clock --indicator --indicator-radius 100 --indicator-thickness 7 --effect-blur 7x5 --effect-vignette 0.5:0.5 --grace 180 --fade-in 5";
+  swaylockCmd =
+    "swaylock -f --screenshots --clock --indicator --indicator-radius 100 --indicator-thickness 7 --effect-blur 7x5 --effect-vignette 0.5:0.5 --grace 180 --fade-in 5";
 
   launcher = pkgs.writeShellScriptBin "hypr" ''
     #!/${pkgs.bash}/bin/bash
@@ -12,18 +13,19 @@ let
 
     exec ${hyprland}/bin/Hyprland
   '';
-in
-{
-  home.packages = with pkgs; [
-    launcher
-    # adoptopenjdk-jre-bin
-  ];
+in {
+  home.packages = with pkgs;
+    [
+      launcher
+      # adoptopenjdk-jre-bin
+    ];
 
   xdg.desktopEntries."org.gnome.Settings" = {
     name = "Settings";
     comment = "Gnome Control Center";
     icon = "org.gnome.Settings";
-    exec = "env XDG_CURRENT_DESKTOP=gnome ${pkgs.gnome-control-center}/bin/gnome-control-center";
+    exec =
+      "env XDG_CURRENT_DESKTOP=gnome ${pkgs.gnome-control-center}/bin/gnome-control-center";
     categories = [ "X-Preferences" ];
     terminal = false;
   };
@@ -47,14 +49,15 @@ in
         "QT_STYLE_OVERRIDE,kvantum"
         "WLR_NO_HARDWARE_CURSORS, 1"
       ];
-      monitor = [ ",preferred,auto,1" "HDMI-A-3,preferred,auto-left,1"];
+      monitor = [ ",preferred,auto,1" "HDMI-A-3,preferred,auto-left,1" ];
       "exec-once" = [
         "ags"
         "swww kill; swww init"
         "fcitx5"
         ''
-          swayidle -w timeout 1200 '${swaylockCmd}' timeout 1800 'pidof java || systemctl suspend' before-sleep '${swaylockCmd}'
+          swayidle -w timeout 1200 '${swaylockCmd}' timeout 1800 'pidof java || systemctl suspend'
         ''
+        # swayidle -w timeout 1200 '${swaylockCmd}' timeout 1800 'pidof java || systemctl suspend' before-sleep '${swaylockCmd}'
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
         "hyprctl setcursor Bibata-Modern-Classic 24"
@@ -154,9 +157,7 @@ in
           "specialWorkspace, 1, 3, md3_decel, slidevert"
         ];
       };
-      cursor = {
-        hide_on_key_press = true;
-      };
+      cursor = { hide_on_key_press = true; };
       misc = {
         vfr = 1;
         vrr = 1;
@@ -346,8 +347,8 @@ in
         "float,title:^(Library)(.*)$"
         "float,title:^(Sign In - Google Accounts)(.*)$"
       ];
-      windowrulev2 = [ 
-        "tile, class:(wpsoffice)" 
+      windowrulev2 = [
+        "tile, class:(wpsoffice)"
         "opacity 0.84 0.84,class:^(foot)$"
 
         # special dropdown workspace

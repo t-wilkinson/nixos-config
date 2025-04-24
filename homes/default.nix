@@ -18,15 +18,9 @@
     # extra specialArgs passed to Home Manager
     # for reference, the config argument in nixos can be accessed
     # in home-manager through osConfig without us passing it
-    extraSpecialArgs = {
-      inherit inputs self impurity;
-    };
+    extraSpecialArgs = { inherit inputs self impurity; };
 
     # per-user Home Manager configuration
-    users = {
-      trey = ./trey;
-      # end-4 = ./end-4;
-      # peter = ./peter;
-    };
+    users = { trey = ./trey; };
   };
 }

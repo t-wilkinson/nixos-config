@@ -1,17 +1,17 @@
-{ lib, config, pkgs, pkgs-unstable, inputs, outputs, ... }: 
-{
+{ lib, config, pkgs, inputs, outputs, ... }: {
   # nix
   documentation.nixos.enable = false; # .desktop
   nixpkgs = {
     overlays = [
       outputs.overlays.additions
-      outputs.overlays.unstable-packages
+      # outputs.overlays.unstable-packages 
     ];
     config = {
       allowUnfree = true;
       allowBroken = true;
       packageOverrides = pkgs: {
-        intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+        intel-vaapi-driver =
+          pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
       };
     };
   };
@@ -47,7 +47,8 @@
       after = [ "graphical-session.target" ];
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        ExecStart =
+          "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
         Restart = "on-failure";
         RestartSec = 1;
         TimeoutStopSec = 10;
@@ -82,7 +83,8 @@
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
+          command =
+            "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
           user = "greeter";
         };
       };
@@ -96,16 +98,14 @@
       displayManager.startx.enable = true;
       desktopManager.gnome = {
         enable = true;
-        extraGSettingsOverridePackages = [
-          pkgs.nautilus-open-any-terminal
-        ];
+        extraGSettingsOverridePackages = [ pkgs.nautilus-open-any-terminal ];
       };
     };
     keyd = {
       enable = true;
       keyboards = {
         default = {
-          ids = ["*"];
+          ids = [ "*" ];
           settings = {
             main = {
               # control = "oneshot(control)";
@@ -117,19 +117,17 @@
             #   "[" = "esc";
             # };
             # Make esc work on small fn keyboard. modularize this?
-            "esc:S" = {
-              esc = "~";
-            };
+            "esc:S" = { esc = "~"; };
           };
         };
       };
     };
   };
 
-  swapDevices = [ {
+  swapDevices = [{
     device = "/var/lib/swapfile";
-    size = 16*1024;
-  } ];
+    size = 16 * 1024;
+  }];
 
   # ZRAM
   zramSwap = {
@@ -145,18 +143,18 @@
     # gamemode.enable = true;
     firefox = {
       enable = true;
-      preferences = {
-        "widget.use-xdg-desktop-portal.file-picker" = 1;
-      };
-      nativeMessagingHosts.packages = [ pkgs.plasma5Packages.plasma-browser-integration ];
+      preferences = { "widget.use-xdg-desktop-portal.file-picker" = 1; };
+      nativeMessagingHosts.packages =
+        [ pkgs.plasma5Packages.plasma-browser-integration ];
     };
     # Run dynamically linked stuff
     nix-ld = {
       enable = true;
-      libraries = with pkgs; [
-        # Add any missing dynamic libraries for unpackaged programs
-        # here, NOT in environment.systemPackages
-      ];
+      libraries = with pkgs;
+        [
+          # Add any missing dynamic libraries for unpackaged programs
+          # here, NOT in environment.systemPackages
+        ];
     };
     gnupg.agent = {
       enable = true;
@@ -209,7 +207,7 @@
       inputs.agenix.packages."x86_64-linux".default
 
       # need the following for file uploads to work
-      dbus 
+      dbus
       nss
       gnutls
       libglvnd
@@ -234,8 +232,11 @@
     users.trey = {
       isNormalUser = true;
       shell = pkgs.fish;
-      extraGroups = [ 
-        "wheel" "video" "input" "uinput" 
+      extraGroups = [
+        "wheel"
+        "video"
+        "input"
+        "uinput"
         (lib.mkIf config.networking.networkmanager.enable "networkmanager")
       ];
       openssh.authorizedKeys.keys = [
@@ -287,7 +288,7 @@
   programs.hyprland = {
     enable = true;
     # nvidiaPatches = true;
-    xwayland.enable = true; 
+    xwayland.enable = true;
   };
 
   hardware.graphics = {
