@@ -121,12 +121,12 @@ in {
           contrast = 1;
         };
         # Shadow
-        drop_shadow = false;
-        shadow_ignore_window = true;
-        shadow_range = 20;
-        shadow_offset = "0 2";
-        shadow_render_power = 2;
-        "col.shadow" = "rgba(0000001A)";
+        # drop_shadow = false;
+        # shadow_ignore_window = true;
+        # shadow_range = 20;
+        # shadow_offset = "0 2";
+        # shadow_render_power = 2;
+        # "col.shadow" = "rgba(0000001A)";
 
         # Dim
         dim_inactive = false;
@@ -258,7 +258,7 @@ in {
           "Super+Alt, mouse_up, movetoworkspace, +1"
           "Super, F, fullscreen, 0"
           "Super, D, fullscreen, 1"
-          "Super_Alt, F, fakefullscreen, 0"
+          # "Super_Alt, F, fakefullscreen, 0"
           "Super, 1, workspace, 1"
           "Super, 2, workspace, 2"
           "Super, 3, workspace, 3"
