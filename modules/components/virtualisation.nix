@@ -3,50 +3,55 @@ let
   username = "trey";
   inherit (inputs) NixVirt;
 in {
-  home-manager.users.${username} = {
-    home.packages = with pkgs; [
-      virt-manager
-      virt-viewer
-      libguestfs
+  # home-manager.users.${username} = {
+  #   home.packages = with pkgs; [
+  #     virt-manager
+  #     virt-viewer
+  #     libguestfs
 
-      # lxc
-      # lxd-lts
-      # distrobuilder
-      # incus
-      qemu
-      OVMF
+  #     # lxc
+  #     # lxd-lts
+  #     # distrobuilder
+  #     # incus
+  #     qemu
+  #     OVMF
 
-      spice
-      spice-gtk
-      spice-protocol
-      win-virtio
-      win-spice
-    ];
-  };
+  #     spice
+  #     spice-gtk
+  #     spice-protocol
+  #     win-virtio
+  #     win-spice
+  #   ];
+  # };
+
+  environment.systemPackages = with pkgs; [
+    docker
+    docker-compose
+  ];
 
   boot.kernelModules = [ "kvm-intel" ];
   virtualisation = {
-    spiceUSBRedirection.enable = true;
-    lxd.enable = false;
-    incus.enable = false; # make sure to run `incus admin init`
     docker.enable = true;
-    podman = {
-      enable = false;
-      # dockerCompat = true;
-      defaultNetwork.settings.dns_enabled = true;
-    };
-    libvirtd = {
-      enable = false;
-      # onBoot = "ignore";
-      # onShutdown = "shutdown";
-      qemu = {
-        package = pkgs.qemu_kvm;
-        runAsRoot = true;
-        swtpm.enable = true;
-        ovmf.enable = true;
-        ovmf.packages = [ pkgs.OVMFFull.fd ];
-      };
-    };
+    # spiceUSBRedirection.enable = true;
+    # lxd.enable = false;
+    # incus.enable = false; # make sure to run `incus admin init`
+    # podman = {
+    #   enable = false;
+    #   # dockerCompat = true;
+    #   defaultNetwork.settings.dns_enabled = true;
+    # };
+    # libvirtd = {
+    #   enable = false;
+    #   # onBoot = "ignore";
+    #   # onShutdown = "shutdown";
+    #   qemu = {
+    #     package = pkgs.qemu_kvm;
+    #     runAsRoot = true;
+    #     swtpm.enable = true;
+    #     ovmf.enable = true;
+    #     ovmf.packages = [ pkgs.OVMFFull.fd ];
+    #   };
+    # };
   };
 
   # virtualisation.libvirt = {

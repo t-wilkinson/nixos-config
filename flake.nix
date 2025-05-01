@@ -2,18 +2,86 @@
   description = "Nixos config flake";
 
   outputs = { self, nix-darwin, nix-homebrew, homebrew-bundle, homebrew-core
-    , homebrew-cask, home-manager, nixpkgs, disko, agenix, secrets }@inputs:
+    , homebrew-cask, home-manager, nixpkgs, nixpkgs-unstable, disko, agenix, secrets }@inputs:
     let
       user = "trey";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
       darwinSystems = [ "aarch64-darwin" "x86_64-darwin" ];
       # forAllSystems = f: nixpkgs.lib.genAttrs (linuxSystems ++ darwinSystems) f;
-    in {
+      # devShell = system: let pkgs = nixpkgs.legacyPackages.${system}; in {
+      #   default = with pkgs; mkShell {
+      #     nativeBuildInputs = with pkgs; [ bashInteractive git age age-plugin-yubikey ];
+      #     shellHook = with pkgs; ''
+      #       export EDITOR=vim
+      #     '';
+      #   };
+      # };
+      # mkApp = scriptName: system: {
+      #   type = "app";
+      #   program = "${(nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
+      #     #!/usr/bin/env bash
+      #     PATH=${nixpkgs.legacyPackages.${system}.git}/bin:$PATH
+      #     echo "Running ${scriptName} for ${system}"
+      #     exec ${self}/apps/${system}/${scriptName}
+      #   '')}/bin/${scriptName}";
+      # };
+      # mkLinuxApps = system: {
+      #   "apply" = mkApp "apply" system;
+      #   "build-switch" = mkApp "build-switch" system;
+      #   "copy-keys" = mkApp "copy-keys" system;
+      #   "create-keys" = mkApp "create-keys" system;
+      #   "check-keys" = mkApp "check-keys" system;
+      #   "install" = mkApp "install" system;
+      #   "install-with-secrets" = mkApp "install-with-secrets" system;
+      # };
+      # mkDarwinApps = system: {
+      #   "apply" = mkApp "apply" system;
+      #   "build" = mkApp "build" system;
+      #   "build-switch" = mkApp "build-switch" system;
+      #   "copy-keys" = mkApp "copy-keys" system;
+      #   "create-keys" = mkApp "create-keys" system;
+      #   "check-keys" = mkApp "check-keys" system;
+      #   "rollback" = mkApp "rollback" system;
+      # };
+
+      nixpkgs-unstable-overlay = system: { nixpkgs-unstable, ... }: {
+        nixpkgs.overlays = [
+	  final: prev: {
+	    unstable = import nixpkgs-unstable {
+	      inherit system;
+	      config.allowUnfree = true;
+	      config.allowBroken = true;
+	    };
+	  }
+	];
+      };
+    in
+    {
+      # templates = {
+      #   starter = {
+      #     path = ./templates/starter;
+      #     description = "Starter configuration";
+      #   };
+      #   starter-with-secrets = {
+      #     path = ./templates/starter-with-secrets;
+      #     description = "Starter configuration with secrets";
+      #   };
+      # };
+      # devShells = forAllSystems devShell;
+      # apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
+
       darwinConfigurations = nixpkgs.lib.genAttrs darwinSystems (system:
         nix-darwin.lib.darwinSystem {
           inherit system;
-          specialArgs = inputs;
+          specialArgs = inputs // {
+	    pkgs-unstable = import nixpkgs-unstable {
+	      inherit system;
+	      config.allowUnfree = true;
+	      config.allowBroken = true;
+	    };
+	  };
           modules = [
+	    # (nixpkgs-unstable-overlay system)
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
             {

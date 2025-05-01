@@ -2,14 +2,19 @@
 
 let name = "Trey Wilkinson";
     user = "trey";
-    email = "winston.trey.wilkinson@gmail.com"; in
+    email = "winston.trey.wilkinson@gmail.com";
+in
 {
+  home.packages = [] ++
+    import ./packages.nix { inherit pkgs; }
+    import ./development.nix { inherit pkgs; }
+    ;
 
-  # direnv = {
-  #     enable = true;
-  #     enableZshIntegration = true;
-  #     nix-direnv.enable = true;
-  #   };
+  direnv = {
+      enable = true;
+      enableZshIntegration = true;
+      nix-direnv.enable = true;
+  };
 
   # zsh = {
   #   enable = true;
