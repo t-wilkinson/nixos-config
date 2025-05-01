@@ -10,7 +10,8 @@ let
     echo "password=$token"
   '';
 in {
-  imports = [
+  imports = 
+  builtins.map (p: ../../${p}) [
     ./cachix.nix
     ./dotfiles.nix
     ../../modules/homes/lf.nix

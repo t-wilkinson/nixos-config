@@ -6,15 +6,7 @@
       with libsForQt5; [
         i3 # GAMING
         sway
-
-        # TERMINAL EMULATORS
-        foot
-        kitty
-        neovide
-        tmux
-        tmux
-        zellij
-
+  
         # GUI
         blueberry # bluetooth
         (mpv.override { scripts = [ mpvScripts.mpris ]; })
@@ -37,61 +29,6 @@
             [ "--enable-features=UseOzonePlatform" "--ozone-platform=wayland" ];
         })
         # kdePackages.dolphin
-
-        # DESIGN
-        # blender
-        figma-linux
-        gimp
-        inkscape
-        # kolourpaint
-        # pinta
-        # krinta
-
-        # TOOLS
-        acpi
-        bat
-        clac
-        eza
-        fd
-        feh
-        ffmpeg
-        fzf
-        glib
-        gojq
-        htop
-        inxi
-        jq
-        killall
-        lf
-        libnotify
-        lsof
-        nh
-        nix-ld
-        nix-output-monitor
-        nvd
-        openssl
-        psmisc
-        ripgrep
-        showmethekey
-        socat
-        starship
-        transmission_4
-        tree
-        unzip
-        usbutils
-        ventoy
-        ydotool
-        zip
-        zoxide
-        go-mtpfs
-        nmap
-        dig
-        colordiff
-
-        # SECURITY
-        pass
-        gnupg
-        pinentry
 
         # THEMING TOOLS
         gradience
@@ -122,12 +59,6 @@
         # nodePackages_latest.neovim # error: Alais neovim is still in node-packages.nix
         # vimPlugins.nvim-treesitter.withPlugins
         # neovimUtils.makeNeovim
-
-        # GAMES
-        minecraft
-        unstable.lunar-client
-        prismlauncher
-        steam
 
         # MISC
         android-file-transfer
