@@ -1,4 +1,6 @@
-{ lib, config, pkgs, inputs, outputs, ... }: {
+{ lib, config, pkgs, inputs, outputs, ... }:
+let user = "trey";
+in {
   # nix
   documentation.nixos.enable = false; # .desktop
   nixpkgs = {
@@ -73,9 +75,29 @@
     spice-vdagentd.enable = true;
     # printing.enable = true;
     openssh = {
-      # enable = true;
+      enable = true;
+      ports = [ 22 ];
+      settings = {
+        PermitRootLogin = "prohibit-password";
+        UseDns = true;
+        PasswordAuthentication = true;
+      };
+      # authorizedKeys = [
+      #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
+      #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ trey@Treys-MacBook-Air.local"
+      # ];
       # hostKeys = [
-      #   { path = "/etc/ssh/ssh_host_rsa_key"; bits = 4096; type = "rsa"; }
+      #   {
+      #     path = "/home/${user}/.ssh/id_ed25519";
+      #     rounds = 100;
+      #     type = "ed25519";
+      #   }
+
+      #   {
+      #     path = "/home/${user}/.ssh/id_rsa";
+      #     bits = 4096;
+      #     type = "rsa";
+      #   }
       # ];
     };
     envfs.enable = true;
@@ -229,7 +251,7 @@
     #   shell = pkgs.zsh;
     #   extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
     # };
-    users.trey = {
+    users.${user} = {
       isNormalUser = true;
       shell = pkgs.fish;
       extraGroups = [
@@ -243,12 +265,12 @@
         # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
       ];
     };
-    users.end-4 = {
-      isNormalUser = true;
-      shell = pkgs.zsh;
-      extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
-      initialPassword = "password";
-    };
+    # users.end-4 = {
+    #   isNormalUser = true;
+    #   shell = pkgs.zsh;
+    #   extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
+    #   initialPassword = "password";
+    # };
   };
 
   # Locale
@@ -373,16 +395,16 @@
 
   # networking.networkmanager.enable = lib.mkForce false;
   # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
-  # networking = {
-  #   hostName = hostname;
-  #   # nftables.enable = true;
-  #   # networkmanager.enable = false;
-  #   firewall.allowedTCPPorts = [ 22 5900 ];
-  #   # localCommands =
-  #   #   ''
-  #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
-  #   #   '';
-  # };
+  networking = {
+    # hostName = hostname;
+    # nftables.enable = true;
+    # networkmanager.enable = false;
+    firewall.allowedTCPPorts = [ 22 ];
+    # localCommands =
+    #   ''
+    #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
+    #   '';
+  };
 
   # Boot
   # boot = {
