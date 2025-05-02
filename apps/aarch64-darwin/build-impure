@@ -5,13 +5,14 @@ YELLOW='\033[1;33m'
 RED='\033[1;31m'
 NC='\033[0m'
 
-SYSTEM_TYPE="aarch64-darwin"
+SYSTEM_TYPE="aarch64-darwin-impure"
 FLAKE_SYSTEM="darwinConfigurations.${SYSTEM_TYPE}.system"
 
 export NIXPKGS_ALLOW_UNFREE=1
+export IMPURITY_PATH=$(pwd)
 
 echo "${YELLOW}Starting build...${NC}"
-nix --extra-experimental-features 'nix-command flakes' build .#$FLAKE_SYSTEM --show-trace $@
+nix --extra-experimental-features 'nix-command flakes' build --impure .#$FLAKE_SYSTEM --show-trace $@
 
 echo "${YELLOW}Cleaning up...${NC}"
 unlink ./result

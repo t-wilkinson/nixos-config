@@ -18,17 +18,18 @@
     lsof
 
     # SYSTEM TOOLS & CORE UTILITIES
+    cmake
     coreutils
     bash-completion
     killall
     zip
     unzip
     unrar
-    psmisc # tools that use /proc
+    # psmisc # tools that use /proc
     openssh
-    usbutils
-    libnotify
-    stdenv.cc.cc.lib
+    # usbutils
+    # libnotify
+    # stdenv.cc.cc.lib
     icu # unicode and globalization support library
 
     # DEVELOPMENT/BUILD ESSENTIALS
@@ -45,17 +46,17 @@
 
     # PACKAGE MANAGEMENT/NIX
     nh
-    nix-ld
+    # nix-ld
     nix-output-monitor
     nvd
 
     # ENCRYPTION AND SECURITY TOOLS
-    _1password
+    _1password-cli
     age
     age-plugin-yubikey
     gnupg
     pass
-    pinentry # library for GUI password entry
+    # pinentry # library for GUI password entry
 
     # GENERAL PACKAGES FOR DEVELOPMENT AND SYSTEM MANAGEMENT
     act
@@ -90,10 +91,10 @@
     aspell
     aspellDicts.en
     hunspell
+    jq
+    # slack
     # jetbrains-mono
     # jetbrains.phpstorm
-    jq
-    slack
     # zsh-powerlevel10k
 
     # TOOLS

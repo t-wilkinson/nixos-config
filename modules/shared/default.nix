@@ -7,6 +7,7 @@ in
   imports = [
     ../components
     ../home-manager
+    ./cachix.nix
   ];
 
   nixpkgs = {

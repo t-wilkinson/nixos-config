@@ -4,15 +4,21 @@ let user = "trey";
 in {
   imports = [
     # "${self}/modules/darwin/secrets.nix"
+    ./home-manager.nix
     ../../shared
-    ./home-manager
     # agenix.darwinModules.default
   ];
 
-  environment.systemPackages = with pkgs; [
-    # agenix.packages."${pkgs.system}".default
-  ] ++ (import ../../shared/packages.nix { inherit pkgs; });
+  # impurity = {
+  #   enable = true;
+  #   config = ../../..;
+  # };
 
+  # environment.systemPackages = with pkgs; [
+  #   # agenix.packages."${pkgs.system}".default
+  # ];
+
+  # TODO: similarly defined in modules/shared/cachix.nix?
   nix = {
     package = pkgs.nix;
 
@@ -56,50 +62,50 @@ in {
   # };
 
   system = {
-    stateVersion = 4;
+    stateVersion = 5;
 
-    defaults = {
-      LaunchServices = {
-        # LSQuarantine = false;
-      };
+    # defaults = {
+    #   LaunchServices = {
+    #     # LSQuarantine = false;
+    #   };
 
-      NSGlobalDomain = {
-        AppleShowAllExtensions = true;
-        # ApplePressAndHoldEnabled = false;
+    #   NSGlobalDomain = {
+    #     AppleShowAllExtensions = true;
+    #     # ApplePressAndHoldEnabled = false;
 
-        # 120, 90, 60, 30, 12, 6, 2
-        KeyRepeat = 2;
+    #     # 120, 90, 60, 30, 12, 6, 2
+    #     KeyRepeat = 2;
 
-        # 120, 94, 68, 35, 25, 15
-        InitialKeyRepeat = 15;
+    #     # 120, 94, 68, 35, 25, 15
+    #     InitialKeyRepeat = 15;
 
-        # "com.apple.mouse.tapBehavior" = 1;
-        # "com.apple.sound.beep.volume" = 0.0;
-        # "com.apple.sound.beep.feedback" = 0;
-      };
+    #     # "com.apple.mouse.tapBehavior" = 1;
+    #     # "com.apple.sound.beep.volume" = 0.0;
+    #     # "com.apple.sound.beep.feedback" = 0;
+    #   };
 
-      dock = {
-        autohide = true;
-        # show-recents = false;
-        launchanim = true;
-        # mouse-over-hilite-stack = true;
-        orientation = "bottom";
-        tilesize = 48;
-      };
+    #   dock = {
+    #     autohide = true;
+    #     # show-recents = false;
+    #     launchanim = true;
+    #     # mouse-over-hilite-stack = true;
+    #     orientation = "bottom";
+    #     tilesize = 48;
+    #   };
 
-      finder = {
-        # _FXShowPosixPathInTitle = false;
-      };
+    #   finder = {
+    #     # _FXShowPosixPathInTitle = false;
+    #   };
 
-      trackpad = {
-        # Clicking = true;
-        # TrackpadThreeFingerDrag = true;
-      };
-    };
+    #   trackpad = {
+    #     # Clicking = true;
+    #     # TrackpadThreeFingerDrag = true;
+    #   };
+    # };
 
-    keyboard = {
-      enableKeyMapping = true;
-      remapCapsLockToControl = true;
-    };
+    # keyboard = {
+    #   enableKeyMapping = true;
+    #   remapCapsLockToControl = true;
+    # };
   };
 }

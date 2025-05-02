@@ -2,11 +2,12 @@
   description = "Nixos config flake";
 
   outputs = { self, nix-darwin, nix-homebrew, homebrew-bundle, homebrew-core
-    , homebrew-cask, home-manager, nixpkgs, nixpkgs-unstable, disko, agenix }@inputs:
+    , homebrew-cask, home-manager, nixpkgs, nixpkgs-unstable, disko, agenix, impurity_ }@inputs:
     let
       user = "trey";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
       darwinSystems = [ "aarch64-darwin" "x86_64-darwin" ];
+
       # forAllSystems = f: nixpkgs.lib.genAttrs (linuxSystems ++ darwinSystems) f;
       # devShell = system: let pkgs = nixpkgs.legacyPackages.${system}; in {
       #   default = with pkgs; mkShell {
@@ -36,8 +37,12 @@
       };
       mkDarwinApps = system: {
         "apply" = mkApp "apply" system;
+        "b" = mkApp "build-impure" system;
+        "bs" = mkApp "build-switch-impure" system;
         "build" = mkApp "build" system;
+        "build-impure" = mkApp "build-impure" system;
         "build-switch" = mkApp "build-switch" system;
+        "build-switch-impure" = mkApp "build-switch-impure" system;
         "copy-keys" = mkApp "copy-keys" system;
         "create-keys" = mkApp "create-keys" system;
         "check-keys" = mkApp "check-keys" system;
@@ -46,45 +51,36 @@
 
       nixpkgs-unstable-overlay = system: { nixpkgs-unstable, ... }: {
         nixpkgs.overlays = [
-	  (final: prev: {
-	    unstable = import nixpkgs-unstable {
-	      inherit system;
-	      config.allowUnfree = true;
-	      config.allowBroken = true;
-	    };
-	  })
-	];
+          (final: prev: {
+            unstable = import nixpkgs-unstable {
+              inherit system;
+              config.allowUnfree = true;
+              config.allowBroken = true;
+            };
+          })
+        ];
       };
-    in
-    {
-      # templates = {
-      #   starter = {
-      #     path = ./templates/starter;
-      #     description = "Starter configuration";
-      #   };
-      #   starter-with-secrets = {
-      #     path = ./templates/starter-with-secrets;
-      #     description = "Starter configuration with secrets";
-      #   };
-      # };
-      # devShells = forAllSystems devShell;
 
-      apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
-
-      darwinConfigurations = nixpkgs.lib.genAttrs darwinSystems (system:
+      mkDarwinConfiguration = system: extraModules:
         nix-darwin.lib.darwinSystem {
           inherit system;
           specialArgs = inputs // {
-	    pkgs-unstable = import nixpkgs-unstable {
-	      inherit system;
-	      config.allowUnfree = true;
-	      config.allowBroken = true;
-	    };
-	  };
+            pkgs-unstable = import nixpkgs-unstable {
+              inherit system;
+              config.allowUnfree = true;
+              config.allowBroken = true;
+            };
+          };
           modules = [
-	    # (nixpkgs-unstable-overlay system)
+            # (nixpkgs-unstable-overlay system)
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
+            # ./modules/distributed-build.nix
+            {
+              imports = [ impurity_.nixosModules.impurity ];
+              impurity.configRoot = self;
+              impurity.enable = true;
+            }
             {
               nix-homebrew = {
                 inherit user;
@@ -99,8 +95,31 @@
               };
             }
             ./modules/hosts/darwin
-          ];
-        });
+          ] ++ extraModules;
+        };
+
+      allDarwinConfigurations = builtins.listToAttrs (
+        builtins.concatMap (system: [
+          {
+            name = system;
+            value = mkDarwinConfiguration system [ ];
+          }
+          {
+            name = "${system}-impure";
+            value = mkDarwinConfiguration system [ ]; # [ { impurity.enable = true; } ];
+          }
+        ])
+        darwinSystems
+      );
+
+    in
+    {
+      # devShells = forAllSystems devShell;
+
+      apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
+
+      darwinConfigurations = allDarwinConfigurations;
+
       # nixosConfigurations = nixpkgs.lib.genAttrs linuxSystems (system:
       #   nixpkgs.lib.nixosSystem {
       #     inherit system;
@@ -121,25 +140,17 @@
     };
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
-    nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
       url =
         "github:nix-community/home-manager/release-24.11"; # "follows" doesn't seem to work?
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # secrets = {
-    #   url = "git+ssh://git@github.com/dustinlyons/nix-secrets.git";
-    #   flake = false;
-    # };
 
     # macOS
     nix-darwin = {
-      url = "github:LnL7/nix-darwin/master";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-homebrew = { url = "github:zhaofengli-wip/nix-homebrew"; };
@@ -156,6 +167,17 @@
       flake = false;
     };
 
+    impurity_.url = "github:outfoxxed/impurity.nix";
+
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # secrets = {
+    #   url = "git+ssh://git@github.com/dustinlyons/nix-secrets.git";
+    #   flake = false;
+    # };
+
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -166,7 +188,6 @@
     #   url = "github:hyprwm/hyprland-plugins";
     #   # inputs.nixpkgs.follows = "hyprland";
     # };
-    # impurity.url = "github:outfoxxed/impurity.nix";
     # thorium.url = "github:end-4/nix-thorium";
 
     # ags.url = "github:Aylur/ags";
