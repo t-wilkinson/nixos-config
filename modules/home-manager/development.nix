@@ -1,9 +1,7 @@
 { pkgs, pkgs-unstable, ... }:
-# let
-#   mynodePackages23 = pkgs.nodePackages.override {
-#     nodejs = pkgs.nodejs-23_x;
-#   };
-# in 
+let
+  uns = pkgs-unstable;
+in 
 with pkgs; [
   # LANGUAGES
   # jdk # has compatibility issues
@@ -18,12 +16,18 @@ with pkgs; [
   # mono5 # C#
   # php
   rustup
-  # typescript
   # nuget # C#
   # boost
-  pkgs-unstable.nodejs
+
+  # NODE.JS DEVELOPMENT TOOLS
+  # fzf
+  uns.nodejs
+  uns.typescript
+  uns.nodePackages.live-server
+  uns.nodePackages.nodemon
+  uns.nodePackages.prettier
+  uns.nodePackages.npm
   # mypkgs.npm
-  pkgs-unstable.nodePackages.npm
 
   # openvpn
   # chromedriver
@@ -34,7 +38,7 @@ with pkgs; [
   # azure-cli
   # direnv
   # kubernetes
-  # maven
+  maven
   # minikube
   # ollama
   # sqlcl
@@ -53,18 +57,11 @@ with pkgs; [
   # php82Packages.deployer
   # phpunit
 
-  # NODE.JS DEVELOPMENT TOOLS
-  # fzf
-  # nodePackages.live-server
-  # nodePackages.nodemon
-  # nodePackages.prettier
-  # nodePackages.npm
-
   # PYTHON PACKAGES
   # black
   python3
   python3Packages.pip
-  # virtualenv
+  virtualenv
 
   # CLOUD/DEVOPS
   # docker
@@ -80,4 +77,3 @@ with pkgs; [
   # terraform-ls
   # tflint
 ]
- 

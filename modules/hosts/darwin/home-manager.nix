@@ -1,4 +1,4 @@
-{ config, pkgs, pkgs-unstable, lib, home-manager, ... }:
+{ config, pkgs, lib, home-manager, ... }:
 
 let
   user = "trey";
@@ -45,7 +45,7 @@ in
     verbose = true;
     # useUserPackages = true;
     # backupFileExtension = "old";
-    extraSpecialArgs = { inherit pkgs-unstable; }; # { inherit inputs self impurity; };
+    # extraSpecialArgs = { inherit pkgs-unstable; }; # { inherit inputs self impurity; };
     useGlobalPkgs = true;
     users.${user} = { pkgs, config, lib, ... }:{
       home = {
