@@ -15,7 +15,7 @@ with pkgs; [
   go
   # mono5 # C#
   # php
-  rustup
+  rustup # rust version manager
   # nuget # C#
   # boost
 
@@ -39,14 +39,14 @@ with pkgs; [
   # direnv
   # kubernetes
   maven
-  # minikube
+  minikube
   # ollama
   # sqlcl
   # sqldeveloper # download here https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html#license-lightbox
-  # sqlite
-  # terraform
-  # vault # HashiCorp Vault
-  # vsh # HashiCorp Vault Shell
+  sqlite
+  terraform
+  vault # HashiCorp Vault
+  vsh # HashiCorp Vault Shell
   # asio # c++
 
   # PHP
@@ -73,7 +73,7 @@ with pkgs; [
   # gopls
   # ngrok
   # ssm-session-manager-plugin
-  # terraform
+  terraform
   # terraform-ls
   # tflint
 ]
