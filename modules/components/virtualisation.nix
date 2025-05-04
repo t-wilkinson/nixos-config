@@ -1,7 +1,7 @@
 { inputs, outputs, pkgs, ... }:
 let
   username = "trey";
-  inherit (inputs) NixVirt;
+  # inherit (inputs) NixVirt;
 in {
   # home-manager.users.${username} = {
   #   home.packages = with pkgs; [
@@ -25,13 +25,17 @@ in {
   # };
 
   environment.systemPackages = with pkgs; [
+    colima # lima with contains (docker, containerd, kubernetes, incus)
+    lima # linux (virtual)machines
     docker
     docker-compose
+    kubectl
+    # incus
   ];
 
-  boot.kernelModules = [ "kvm-intel" ];
+  # boot.kernelModules = [ "kvm-intel" ];
   virtualisation = {
-    docker.enable = true;
+    # docker.enable = true;
     # spiceUSBRedirection.enable = true;
     # lxd.enable = false;
     # incus.enable = false; # make sure to run `incus admin init`
@@ -139,8 +143,6 @@ in {
   # networking.firewall.trustedInterfaces = [ "virbr0" ];
   # networking.bridges.virbr0.interfaces = [];
 
-  environment.systemPackages = with pkgs; [ ];
-
-  users.users.${username}.extraGroups =
-    [ "docker" "podman" "libvirtd" "lxd" "incus" "kvm" ];
+    # users.users.${username}.extraGroups =
+    #   [ "docker" "podman" "libvirtd" "lxd" "incus" "kvm" ];
 }

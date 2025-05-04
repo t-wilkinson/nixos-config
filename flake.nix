@@ -2,7 +2,9 @@
   description = "Nixos config flake";
 
   outputs = { self, nix-darwin, nix-homebrew, homebrew-bundle, homebrew-core
-    , homebrew-cask, home-manager, nixpkgs, nixpkgs-unstable, disko, agenix, impurity_ }@inputs:
+    , homebrew-cask, home-manager, nixpkgs, nixpkgs-unstable, disko, agenix, impurity_
+    , darwin-docker
+    }@inputs:
     let
       user = "trey";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
@@ -75,11 +77,11 @@
             # (nixpkgs-unstable-overlay system)
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
+            darwin-docker.darwinModules.docker
             # ./modules/distributed-build.nix
             {
               imports = [ impurity_.nixosModules.impurity ];
               impurity.configRoot = self;
-              impurity.enable = true;
             }
             {
               nix-homebrew = {
@@ -106,7 +108,7 @@
           }
           {
             name = "${system}-impure";
-            value = mkDarwinConfiguration system [ ]; # [ { impurity.enable = true; } ];
+            value = mkDarwinConfiguration system [ { impurity.enable = true; } ];
           }
         ])
         darwinSystems
@@ -167,6 +169,7 @@
       flake = false;
     };
 
+    # impurity adds custom module arg named "impurity" which gets overriden when merging @inputs in specialArgs
     impurity_.url = "github:outfoxxed/impurity.nix";
 
     agenix = {
@@ -183,6 +186,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    darwin-docker.url = "github:konradmalik/darwin-docker";
     # hyprland.url = "github:hyprwm/Hyprland/v0.40.0";
     # hyprland-plugins = {
     #   url = "github:hyprwm/hyprland-plugins";

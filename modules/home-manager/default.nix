@@ -1,4 +1,4 @@
-{ config, pkgs, impurity, lib, ... }:
+{ config, pkgs, pkgs-unstable, impurity, lib, ... }:
 
 let name = "Trey Wilkinson";
     user = "trey";
@@ -9,84 +9,96 @@ in
       # xdg.configFile.".config/nvim".source = impurity.link ./config/nvim;
       home = {
         packages = []
-          ++ (import ./packages.nix { inherit pkgs; })
-          ++ (import ./development.nix { inherit pkgs; })
+          ++ (import ./packages.nix { inherit pkgs pkgs-unstable; })
+          ++ (import ./development.nix { inherit pkgs pkgs-unstable; })
           ;
         file.".config/nvim".source = impurity.link ./config/nvim;
         file.".config/zellij".source = impurity.link ./config/zellij;
+        file.".config/kitty".source = impurity.link ./config/kitty;
       };
 
-      # direnv = {
-      #     enable = true;
-      #     enableZshIntegration = true;
-      #     nix-direnv.enable = true;
-      # };
+    programs = {
+    # kitty = {
+    #    enable = true;
+    #     extraConfig = ''
+    #     '';
+    #   };
 
-      # zsh = {
-      #   enable = true;
-      #   autocd = false;
-      #   cdpath = [ "~/.local/share/src" ];
-      #   plugins = [
-      #     {
-      #         name = "powerlevel10k";
-      #         src = pkgs.zsh-powerlevel10k;
-      #         file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-      #     }
-      #     {
-      #         name = "powerlevel10k-config";
-      #         src = lib.cleanSource ./config;
-      #         file = "p10k.zsh";
-      #     }
-      #   ];
-      #   initExtraFirst = ''
-      #     if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
-      #       . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
-      #       . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
-      #     fi
+      direnv = {
+          enable = true;
+          enableZshIntegration = true;
+          nix-direnv.enable = true;
+      };
 
-      #     if [[ "$(uname)" == "Linux" ]]; then
-      #       alias pbcopy='xclip -selection clipboard'
-      #     fi
+      zsh = {
+        enable = true;
+      # autocd = false;
+      # cdpath = [ "~/.local/share/src" ];
+      # plugins = [
+      #    {
+      #        name = "powerlevel10k";
+      #        src = pkgs.zsh-powerlevel10k;
+      #        file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+      #    }
+      #    {
+      #        name = "powerlevel10k-config";
+      #        src = lib.cleanSource ./config;
+      #        file = "p10k.zsh";
+      #    }
+      #  ];
+        initExtraFirst = ''
+          export KITTY_CONFIG_DIRECTORY="/Users/${user}/.config/kitty"
+          export PROMPT="%~ λ "
+          [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh 
+          alias vim=nvim
+          # if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
+          #   . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
+          #   . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+          # fi
 
-      #     # Define variables for directories
-      #     export PATH=$HOME/.pnpm-packages/bin:$HOME/.pnpm-packages:$PATH
-      #     export PATH=$HOME/.npm-packages/bin:$HOME/bin:$PATH
-      #     export PATH=$HOME/.composer/vendor/bin:$PATH
-      #     export PATH=$HOME/.local/share/bin:$PATH
+          # if [[ "$(uname)" == "Linux" ]]; then
+          #   alias pbcopy='xclip -selection clipboard'
+          # fi
 
-      #     # Remove history data we don't want to see
-      #     export HISTIGNORE="pwd:ls:cd"
+          # # Define variables for directories
+          # export PATH=$HOME/.pnpm-packages/bin:$HOME/.pnpm-packages:$PATH
+          # export PATH=$HOME/.npm-packages/bin:$HOME/bin:$PATH
+          # export PATH=$HOME/.composer/vendor/bin:$PATH
+          # export PATH=$HOME/.local/share/bin:$PATH
 
-      #     # Ripgrep alias
-      #     alias search='rg -p --glob "!node_modules/*" --glob "!vendor/*" "$@"'
+          # # Remove history data we don't want to see
+          # export HISTIGNORE="pwd:ls:cd"
 
-      #     # Emacs is my editor
-      #     export ALTERNATE_EDITOR=""
-      #     export EDITOR="emacsclient -t"
-      #     export VISUAL="emacsclient -c -a emacs"
-      #     e() {
-      #         emacsclient -t "$@"
-      #     }
+          # # Ripgrep alias
+          # alias search='rg -p --glob "!node_modules/*" --glob "!vendor/*" "$@"'
 
-      #     # Laravel Artisan
-      #     alias art='php artisan'
+          # # Emacs is my editor
+          # export ALTERNATE_EDITOR=""
+          # export EDITOR="emacsclient -t"
+          # export VISUAL="emacsclient -c -a emacs"
+          # e() {
+          #     emacsclient -t "$@"
+          # }
 
-      #     # PHP Deployer
-      #     alias deploy='dep deploy'
+          # # Laravel Artisan
+          # alias art='php artisan'
 
-      #     # Easy alias to trim whitespace from files on macOS
-      #     alias trimwhitespace="find . -type f \( -name '*.jsx' -o -name '*.php' -o -name '*.js' \) -exec sed -i \"\" 's/[[:space:]]*\$//' {} +"
+          # # PHP Deployer
+          # alias deploy='dep deploy'
 
-      #     # Use difftastic, syntax-aware diffing
-      #     alias diff=difft
+          # # Easy alias to trim whitespace from files on macOS
+          # alias trimwhitespace="find . -type f \( -name '*.jsx' -o -name '*.php' -o -name '*.js' \) -exec sed -i \"\" 's/[[:space:]]*\$//' {} +"
 
-      #     # Always color ls and group directories
-      #     alias ls='ls --color=auto'
+          # # Use difftastic, syntax-aware diffing
+          # alias diff=difft
 
-      #     # Reboot into my dual boot Windows partition
-      #     alias windows='systemctl reboot --boot-loader-entry=auto-windows'
-      #   '';
-      # };
+          # # Always color ls and group directories
+          # alias ls='ls --color=auto'
+
+          # # Reboot into my dual boot Windows partition
+          # alias windows='systemctl reboot --boot-loader-entry=auto-windows'
+        '';
+      };
 
       # git = {
       #   enable = true;
@@ -387,5 +399,6 @@ in
       #     '';
       #   };
 
+    };
   };
 }

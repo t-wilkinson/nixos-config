@@ -3,7 +3,7 @@
   imports = [
     ./packages.nix
     # ./databases.nix
-    # ./virtualisation.nix
+    ./virtualisation.nix
     # ./nfs.nix
   ];
 }

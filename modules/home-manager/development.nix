@@ -1,4 +1,9 @@
-{ pkgs, ... }:
+{ pkgs, pkgs-unstable, ... }:
+# let
+#   mynodePackages23 = pkgs.nodePackages.override {
+#     nodejs = pkgs.nodejs-23_x;
+#   };
+# in 
 with pkgs; [
   # LANGUAGES
   # jdk # has compatibility issues
@@ -11,16 +16,18 @@ with pkgs; [
   # gjs
   go
   # mono5 # C#
-  # nodejs
   # php
   rustup
   # typescript
   # nuget # C#
   # boost
+  pkgs-unstable.nodejs
+  # mypkgs.npm
+  pkgs-unstable.nodePackages.npm
 
   # openvpn
   # chromedriver
-  
+
   # DEVELOPMENT
   # k3s
   # awscli
@@ -52,12 +59,12 @@ with pkgs; [
   # nodePackages.nodemon
   # nodePackages.prettier
   # nodePackages.npm
-  # nodejs
 
   # PYTHON PACKAGES
   # black
   python3
-  virtualenv
+  python3Packages.pip
+  # virtualenv
 
   # CLOUD/DEVOPS
   # docker

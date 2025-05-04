@@ -2,7 +2,8 @@ _:
 
 [
   # Development Tools
-  # "homebrew/cask/docker"
+  # "kitty"
+  "homebrew/cask/docker"
   # "claude"
   # "insomnia"
   # "tableplus"
