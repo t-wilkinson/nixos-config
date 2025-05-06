@@ -5,7 +5,7 @@ in {
   imports = [
     # "${self}/modules/darwin/secrets.nix"
     ./home-manager.nix
-    ../../shared
+    ../../shared.nix
     # agenix.darwinModules.default
   ];
 

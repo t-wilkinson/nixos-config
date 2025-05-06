@@ -19,6 +19,7 @@
       #     '';
       #   };
       # };
+
       mkApp = scriptName: system: {
         type = "app";
         program = "${(nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
@@ -28,6 +29,7 @@
           exec ${self}/apps/${system}/${scriptName}
         '')}/bin/${scriptName}";
       };
+
       mkLinuxApps = system: {
         "apply" = mkApp "apply" system;
         "build-switch" = mkApp "build-switch" system;
@@ -37,6 +39,7 @@
         "install" = mkApp "install" system;
         "install-with-secrets" = mkApp "install-with-secrets" system;
       };
+
       mkDarwinApps = system: {
         "apply" = mkApp "apply" system;
         "b" = mkApp "build-impure" system;
@@ -114,6 +117,52 @@
         darwinSystems
       );
 
+      mkNixosConfiguration = system: extraModules:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = inputs // {
+            pkgs-unstable = import nixpkgs-unstable {
+              inherit system;
+              config.allowUnfree = true;
+              config.allowBroken = true;
+            };
+          };
+          modules = [
+            # disko.nixosModules.disko
+            # agenix.nixosModules.default
+            home-manager.nixosModules.home-manager
+            {
+              imports = [ impurity_.nixosModules.impurity ];
+              impurity.configRoot = self;
+            }
+            # {
+            #   home-manager = {
+            #     useGlobalPkgs = true;
+            #     useUserPackages = true;
+            #     users.${user} = import ./modules/nixos/home-manager.nix;
+            #   };
+            # }
+            # (import "${self}/modules/hosts/home-manager.nix" { inherit self; })
+
+            ./modules/hosts/nixos
+
+          ] ++ extraModules;
+        };
+
+      allNixosConfigurations = builtins.listToAttrs (
+          builtins.concatMap (system: [
+          {
+            name = system;
+            value = mkNixosConfiguration system [ ];
+          }
+          {
+            name = "${system}-impure";
+            value = mkNixosConfiguration system [ { impurity.enable = true; } ];
+          }
+        ])
+        linuxSystems
+      );
+
     in
     {
       # devShells = forAllSystems devShell;
@@ -122,23 +171,7 @@
 
       darwinConfigurations = allDarwinConfigurations;
 
-      # nixosConfigurations = nixpkgs.lib.genAttrs linuxSystems (system:
-      #   nixpkgs.lib.nixosSystem {
-      #     inherit system;
-      #     specialArgs = inputs;
-      #     modules = [
-      #       disko.nixosModules.disko
-      #       home-manager.nixosModules.home-manager
-      #       {
-      #         home-manager = {
-      #           useGlobalPkgs = true;
-      #           useUserPackages = true;
-      #           users.${user} = import ./modules/nixos/home-manager.nix;
-      #         };
-      #       }
-      #       ./modules/hosts/nixos
-      #     ];
-      #   });
+      # allNixosConfigurations = allNixosConfigurations;
     };
 
   inputs = {

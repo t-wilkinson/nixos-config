@@ -2,13 +2,7 @@
 
 let
   user = "trey";
-  # Define the content of your file as a derivation
-  # myEmacsLauncher = pkgs.writeScript "emacs-launcher.command" ''
-  #   #!/bin/sh
-  #     emacsclient -c -n &
-  # '';
   # sharedFiles = import ../../shared/files.nix { inherit config pkgs; };
-  # additionalFiles = import ./files.nix { inherit user config pkgs; };
 in
 {
   imports = [
@@ -57,18 +51,12 @@ in
     	  ];
         file = lib.mkMerge [
           # sharedFiles
-          # additionalFiles
-          # { "emacs-launcher.command".source = myEmacsLauncher; }
         ];
 
         stateVersion = "23.11";
       };
 
       # programs = {} // import ../../shared/home-manager.nix { inherit config pkgs lib; };
-
-      # Marked broken Oct 20, 2022 check later to remove this
-      # https://github.com/nix-community/home-manager/issues/3344
-      # manual.manpages.enable = false;
     };
   };
 

@@ -1,4 +1,4 @@
-{ inputs, outputs, pkgs, ... }:
+{ NixVirt, microvm, pkgs, ... }:
 let
   username = "trey";
   # inherit (inputs) NixVirt;
@@ -23,6 +23,12 @@ in {
   #     win-spice
   #   ];
   # };
+
+  imports = [
+    # NixVirt.nixosModules.default
+    # microvm.nixosModules.host
+    # ./dev-microvm.nix
+  ];
 
   environment.systemPackages = with pkgs; [
     colima # lima with contains (docker, containerd, kubernetes, incus)
