@@ -1,7 +1,4 @@
-{ pkgs, pkgs-unstable, ... }:
-let
-  uns = pkgs-unstable;
-in 
+{ pkgs, unstable, ... }:
 with pkgs; [
   # LANGUAGES
   # jdk # has compatibility issues
@@ -21,12 +18,12 @@ with pkgs; [
 
   # NODE.JS DEVELOPMENT TOOLS
   # fzf
-  uns.nodejs
-  uns.typescript
-  uns.nodePackages.live-server
-  uns.nodePackages.nodemon
-  uns.nodePackages.prettier
-  uns.nodePackages.npm
+  unstable.nodejs
+  unstable.typescript
+  unstable.nodePackages.live-server
+  unstable.nodePackages.nodemon
+  unstable.nodePackages.prettier
+  unstable.nodePackages.npm
   # mypkgs.npm
 
   # openvpn

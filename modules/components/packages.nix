@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unstable, ... }:
+{ pkgs, unstable, ... }:
 {
   environment.systemPackages = with pkgs; [
     # TERMINAL EMULATORS & MULTIPLEXERS
@@ -7,7 +7,7 @@
     # alacritty
     kitty
     zellij
-    pkgs-unstable.neovim
+    unstable.neovim
 
     # CORE CLI TOOLS
     fzf

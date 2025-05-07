@@ -70,7 +70,7 @@
         nix-darwin.lib.darwinSystem {
           inherit system;
           specialArgs = inputs // {
-            pkgs-unstable = import nixpkgs-unstable {
+            unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
               config.allowBroken = true;
@@ -121,7 +121,7 @@
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = inputs // {
-            pkgs-unstable = import nixpkgs-unstable {
+            unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
               config.allowBroken = true;

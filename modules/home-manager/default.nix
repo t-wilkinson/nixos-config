@@ -1,4 +1,4 @@
-{ config, pkgs, pkgs-unstable, impurity, lib, ... }:
+{ config, pkgs, unstable, impurity, lib, ... }:
 
 let name = "Trey Wilkinson";
     user = "trey";
@@ -8,8 +8,8 @@ in
   home-manager.users.${user} = {
       home = {
         packages = []
-          ++ (import ./packages.nix { inherit pkgs pkgs-unstable; })
-          ++ (import ./development.nix { inherit pkgs pkgs-unstable; })
+          ++ (import ./packages.nix { inherit pkgs unstable; })
+          ++ (import ./development.nix { inherit pkgs unstable; })
           ;
         file.".config/nvim".source = impurity.link ../../config/nvim;
         file.".config/zellij".source = impurity.link ../../config/zellij;
