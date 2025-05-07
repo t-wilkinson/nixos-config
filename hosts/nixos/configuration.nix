@@ -80,25 +80,16 @@ in {
       settings = {
         PermitRootLogin = "prohibit-password";
         UseDns = true;
-        PasswordAuthentication = true;
+        PasswordAuthentication = false;
       };
       # authorizedKeys = [
       #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
-      #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ trey@Treys-MacBook-Air.local"
       # ];
-      # hostKeys = [
-      #   {
-      #     path = "/home/${user}/.ssh/id_ed25519";
-      #     rounds = 100;
-      #     type = "ed25519";
-      #   }
-
-      #   {
-      #     path = "/home/${user}/.ssh/id_rsa";
-      #     bits = 4096;
-      #     type = "rsa";
-      #   }
-      # ];
+      hostKeys = [{
+        path = "/home/${user}/.ssh/id_ed25519";
+        rounds = 100;
+        type = "ed25519";
+      }];
     };
     envfs.enable = true;
     greetd = {
@@ -261,9 +252,10 @@ in {
         "uinput"
         (lib.mkIf config.networking.networkmanager.enable "networkmanager")
       ];
-      openssh.authorizedKeys.keys = [
-        # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
-      ];
+      openssh.authorizedKeys.keyFiles = [ "/home/${user}/.ssh/id_ed25519.pub" ];
+      # openssh.authorizedKeys.keys = [
+      # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
+      # ];
     };
     # users.end-4 = {
     #   isNormalUser = true;
@@ -400,6 +392,8 @@ in {
     # nftables.enable = true;
     # networkmanager.enable = false;
     firewall.allowedTCPPorts = [ 22 ];
+    firewall.allowedUDPPorts = [ 7 9 ];
+    interfaces.enp3s0.wakeOnLan.enable = true;
     # localCommands =
     #   ''
     #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
