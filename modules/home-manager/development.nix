@@ -15,6 +15,8 @@ with pkgs; [
   rustup # rust version manager
   # nuget # C#
   # boost
+  ghc
+  haskell-language-server
 
   # NODE.JS DEVELOPMENT TOOLS
   # fzf
@@ -24,7 +26,6 @@ with pkgs; [
   unstable.nodePackages.nodemon
   unstable.nodePackages.prettier
   unstable.nodePackages.npm
-  # mypkgs.npm
 
   # openvpn
   # chromedriver
@@ -73,4 +74,6 @@ with pkgs; [
   terraform
   # terraform-ls
   # tflint
+
+ nixfmt-rfc-style
 ]

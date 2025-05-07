@@ -1,11 +1,15 @@
-{ self, agenix, config, pkgs, ... }:
+{ self, config, pkgs, ... }:
 
-let user = "trey";
+let 
+  user = "trey";
+  # xdg_configHome = "${config.users.users.${user}.home}/.config";
+  # xdg_dataHome   = "${config.users.users.${user}.home}/.local/share";
+  # xdg_stateHome  = "${config.users.users.${user}.home}/.local/state"; in
 in {
   imports = [
     # "${self}/modules/darwin/secrets.nix"
     ./home-manager.nix
-    ../../shared.nix
+    ../../modules/shared.nix
     # agenix.darwinModules.default
   ];
 
@@ -45,6 +49,7 @@ in {
 
   # Turn off NIX_PATH warnings now that we're using flakes
   system.checks.verifyNixPath = false;
+
 
   # launchd.user.agents = {
   #   emacs = {

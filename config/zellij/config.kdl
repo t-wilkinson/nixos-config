@@ -152,19 +152,19 @@ keybinds clear-defaults=true {
 	shared_except "locked" {
 		bind "Alt g" { SwitchToMode "Locked"; }
 		bind "Alt n" { NewPane; }
-		bind "Alt h" "Alt Left" { MoveFocusOrTab "Left"; }
-		bind "Alt l" "Alt Right" { MoveFocusOrTab "Right"; }
-		bind "Alt j" "Alt Down" { MoveFocus "Down"; }
-		bind "Alt k" "Alt Up" { MoveFocus "Up"; }
+		bind "Alt h" { MoveFocusOrTab "Left"; SwitchToMode "Normal"; }
+		bind "Alt l" { MoveFocusOrTab "Right"; SwitchToMode "Normal"; }
+		bind "Alt j" { MoveFocus "Down"; SwitchToMode "Normal"; }
+		bind "Alt k" { MoveFocus "Up"; SwitchToMode "Normal"; }
 		bind "Alt =" "Alt +" { Resize "Increase"; }
 		bind "Alt -" { Resize "Decrease"; }
 		bind "Alt [" { PreviousSwapLayout; }
 		bind "Alt ]" { NextSwapLayout; }
-    bind "Alt q" {
-      LaunchOrFocusPlugin "https://github.com/Nacho114/harpoon/releases/latest/download/harpoon.wasm" {
-          floating true; move_to_focused_tab true;
-      }
-    }
+        bind "Alt q" {
+          LaunchOrFocusPlugin "https://github.com/Nacho114/harpoon/releases/latest/download/harpoon.wasm" {
+              floating true; move_to_focused_tab true;
+          }
+        }
 	}
 	shared_except "normal" "locked" {
 		bind "Enter" "Esc" { SwitchToMode "Normal"; }
@@ -184,9 +184,9 @@ keybinds clear-defaults=true {
 	shared_except "tab" "locked" {
 		bind "Alt t" { SwitchToMode "Tab"; }
 	}
-  shared_except "move" "locked" {
-    bind "Alt h" { SwitchToMode "Move"; }
-  }
+    shared_except "move" "locked" {
+      bind "Alt h" { SwitchToMode "Move"; }
+    }
 	/-shared_except "renametab" "locked" {
 		bind "Alt r" { SwitchToMode "RenameTab"; }
 	}

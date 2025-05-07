@@ -1,10 +1,22 @@
-{ lib, config, pkgs, inputs, outputs, ... }: {
+{ lib, config, pkgs, inputs, outputs, ... }: 
+let
+  user = "trey";
+in
+{
+
+  imports = [
+    ./hardware-configuration.nix
+    ./gnome.nix
+    ./home-manager
+    ../../modules/shared.nix
+  ];
+
   # nix
   documentation.nixos.enable = false; # .desktop
   nixpkgs = {
     overlays = [
       outputs.overlays.additions
-      # outputs.overlays.unstable-packages 
+      # outputs.overlays.unstable-packages
     ];
     config = {
       allowUnfree = true;
@@ -15,27 +27,19 @@
       };
     };
   };
+
   nix.settings = {
     experimental-features = "nix-command flakes";
     auto-optimise-store = true;
     substituters = [
       "https://hyprland.cachix.org"
       "https://nix-gaming.cachix.org"
-      # Nixpkgs-Wayland
-      "https://cache.nixos.org"
       "https://nixpkgs-wayland.cachix.org"
-      "https://nix-community.cachix.org"
-      # Nix-community
-      "https://nix-community.cachix.org"
     ];
     trusted-public-keys = [
       "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
       "nix-gaming.cachix.org-1:nbjlureqMbRAxR1gJ/f3hxemL9svXaZF/Ees8vCUUs4="
-      # Nixpkgs-Wayland
-      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "nixpkgs-wayland.cachix.org-1:3lwxaILxMRkVhehr5StQprHdEo4IrE8sRho9R9HOLYA="
-      # Nix-community
-      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
     ];
   };
 
@@ -189,6 +193,7 @@
       NIXPKGS_ALLOW_INSECURE = "1";
       LIBVA_DRIVER_NAME = "iHD";
     };
+
     systemPackages = with pkgs; [
       curl
       zsh
@@ -229,7 +234,7 @@
     #   shell = pkgs.zsh;
     #   extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
     # };
-    users.trey = {
+    users.${user} = {
       isNormalUser = true;
       shell = pkgs.fish;
       extraGroups = [
@@ -242,12 +247,6 @@
       openssh.authorizedKeys.keys = [
         # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
       ];
-    };
-    users.end-4 = {
-      isNormalUser = true;
-      shell = pkgs.zsh;
-      extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
-      initialPassword = "password";
     };
   };
 
@@ -301,23 +300,6 @@
     ];
   };
   # hardware.nvidia.modesetting.enable = true;
-
-  fonts = {
-    packages = with pkgs; [
-      fira-code
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-emoji
-      font-awesome
-      source-han-sans
-      source-han-sans-japanese
-      source-han-serif-japanese
-    ];
-    fontconfig.defaultFonts = {
-      serif = [ "Noto Serif" "Source Han Serif" ];
-      sansSerif = [ "Noto Sans" "Source Han Sans" ];
-    };
-  };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
 
@@ -396,4 +378,6 @@
   # };
 
   # networking.usePredictableInterfaceNames = true;
+}
+
 }

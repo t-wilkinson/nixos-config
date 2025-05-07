@@ -19,5 +19,4 @@ with pkgs; [
   # vscode
   # okular
   # reaper
-
 ]

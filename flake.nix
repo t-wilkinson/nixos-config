@@ -1,9 +1,20 @@
 {
   description = "Nixos config flake";
 
-  outputs = { self, nix-darwin, nix-homebrew, homebrew-bundle, homebrew-core
-    , homebrew-cask, home-manager, nixpkgs, nixpkgs-unstable, disko, agenix, impurity_
+  outputs = 
+    { self
+    , agenix
     , darwin-docker
+    , disko
+    , home-manager
+    , homebrew-bundle
+    , homebrew-cask
+    , homebrew-core
+    , impurity_
+    , nix-darwin
+    , nix-homebrew
+    , nixpkgs
+    , nixpkgs-unstable
     }@inputs:
     let
       user = "trey";
@@ -54,30 +65,35 @@
         "rollback" = mkApp "rollback" system;
       };
 
-      nixpkgs-unstable-overlay = system: { nixpkgs-unstable, ... }: {
-        nixpkgs.overlays = [
-          (final: prev: {
+      mkDarwinConfiguration = system: extraModules:
+        # let
+        #   pkgs = import nixpkgs {
+        #     inherit system;
+        #     config = {
+        #       allowUnfree = true;
+        #       allowBroken = true;
+        #       allowUnfree = true;
+        #       #cudaSupport = true;
+        #       #cudaCapabilities = ["8.0"];
+        #       allowInsecure = false;
+        #       allowUnsupportedSystem = true;
+        #     };
+        #   };
+        # in
+        nix-darwin.lib.darwinSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs;
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
               config.allowBroken = true;
             };
-          })
-        ];
-      };
-
-      mkDarwinConfiguration = system: extraModules:
-        nix-darwin.lib.darwinSystem {
-          inherit system;
-          specialArgs = inputs // {
-            unstable = import nixpkgs-unstable {
-              inherit system;
-              config.allowUnfree = true;
-              config.allowBroken = true;
+            myLib = import ./lib {
+              inherit self;
             };
           };
           modules = [
-            # (nixpkgs-unstable-overlay system)
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
             darwin-docker.darwinModules.docker
@@ -99,7 +115,7 @@
                 autoMigrate = true;
               };
             }
-            ./modules/hosts/darwin
+            ./hosts/darwin
           ] ++ extraModules;
         };
 
@@ -144,7 +160,7 @@
             # }
             # (import "${self}/modules/hosts/home-manager.nix" { inherit self; })
 
-            ./modules/hosts/nixos
+            ./hosts/nixos
 
           ] ++ extraModules;
         };
@@ -166,7 +182,6 @@
     in
     {
       # devShells = forAllSystems devShell;
-
       apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
 
       darwinConfigurations = allDarwinConfigurations;

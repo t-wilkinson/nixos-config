@@ -157,7 +157,7 @@ return {
             let g:zortex_remote_server_dir = '/www/zortex'
 
             let g:zortex_fenced_languages = ['python', 'javascript', 'bindzone', 'rust', 'bash', 'sh', 'json', 'sql']
-            let g:zortex_notes_dir = $HOME . '/zortex/'
+            let g:zortex_notes_dir = $HOME . '/.zortex/'
             let g:zortex_window_command = 'call FloatingFZF()'
             let g:zortex_extension = '.zortex'
             let g:zortex_theme = 'light'

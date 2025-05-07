@@ -1,4 +1,4 @@
-{ config, pkgs, lib, impurity, ... }:
+{ config, pkgs, myLib, lib, impurity, ... }:
 let
   username = "trey";
   homeDirectory = "/home/trey";
@@ -17,26 +17,10 @@ in {
   home-manager.users.${user} = {
     home = {
       inherit username homeDirectory;
-      # sessionVariables = { # doesn't seem to work
-      #   NIXPKGS_ALLOW_UNFREE = "1";
-      #   NIXPKGS_ALLOW_INSECURE = "1";
-      #   FLAKE = "$HOME/dev/t-wilkinson/nixos";
-      #   NODE_PATH = "$HOME/.npm-packages/lib/node_modules";
-      # };
       sessionPath = [ "$HOME/.local/bin" "$HOME/.npm-packages/bin" ];
       shellAliases = { vim = "nvim"; };
-      # file = {
-      #   ".screenrc".source = dotfiles/screenrc;
-      #   ".gradle/gradle.properties".text = ''
-      #   '';
-      # };
       packages = [ git-credential-pass ];
-      # file."my".source =
-      #   config.lib.file.mkOutOfStoreSymlink "${homeDirectory}/dev/t-wilkinson";
-      file = lib.listToAttrs (file: {
-        name = file."./config/${config}".source;
-        value = impurity.link ./config/${file};
-      }) [
+      file = myLib.makeConfigLinks impurity [
           "ags"
           "anyrun"
           "chrome-flags.conf"

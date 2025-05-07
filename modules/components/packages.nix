@@ -70,18 +70,13 @@
     uv
 
     # MEDIA-RELATED PACKAGES
-    emacs-all-the-icons-fonts
     imagemagick
-    dejavu_fonts
-    ffmpeg
-    font-awesome
-    glow
-    hack-font
-    jpegoptim
-    meslo-lgs-nf
-    noto-fonts
-    noto-fonts-emoji
+    # emacs-all-the-icons-fonts
     pngquant
+    ffmpeg
+    dejavu_fonts
+    glow
+    jpegoptim
 
     # SOURCE CODE MANAGEMENT, GIT, GITHUB TOOLS
     gh

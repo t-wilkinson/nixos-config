@@ -5,5 +5,6 @@
     # ./databases.nix
     ./virtualisation.nix
     # ./nfs.nix
+    ./fonts.nix
   ];
 }

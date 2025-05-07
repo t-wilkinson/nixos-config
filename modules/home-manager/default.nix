@@ -1,20 +1,23 @@
-{ config, pkgs, unstable, impurity, lib, ... }:
+{ self, config, impurity, pkgs, unstable, myLib, ... }:
 
-let name = "Trey Wilkinson";
-    user = "trey";
-    email = "winston.trey.wilkinson@gmail.com";
+let
+  name = "Trey Wilkinson";
+  user = "trey";
+  email = "winston.trey.wilkinson@gmail.com";
 in
 {
   home-manager.users.${user} = {
-      home = {
-        packages = []
-          ++ (import ./packages.nix { inherit pkgs unstable; })
-          ++ (import ./development.nix { inherit pkgs unstable; })
-          ;
-        file.".config/nvim".source = impurity.link ../../config/nvim;
-        file.".config/zellij".source = impurity.link ../../config/zellij;
-        file.".config/kitty".source = impurity.link ../../config/kitty;
-      };
+    home = {
+      packages = []
+        ++ (import ./packages.nix { inherit pkgs unstable; })
+        ++ (import ./development.nix { inherit pkgs unstable; })
+        ;
+      file = myLib.makeConfigLinks impurity [
+          "nvim"
+          "zellij"
+          "kitty"
+        ];
+    };
 
     programs = {
       direnv = {
@@ -42,6 +45,7 @@ in
         initExtraFirst = ''
           export KITTY_CONFIG_DIRECTORY="/Users/${user}/.config/kitty"
           export PROMPT="%B%F{#6e6a86}%~%f%b %B%F{#3e8fb0}λ%b%f "
+          export NIX_PATH=""
           [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh 
           alias vim=nvim
           # if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
