@@ -11,9 +11,9 @@ in
           ++ (import ./packages.nix { inherit pkgs pkgs-unstable; })
           ++ (import ./development.nix { inherit pkgs pkgs-unstable; })
           ;
-        file.".config/nvim".source = impurity.link ./config/nvim;
-        file.".config/zellij".source = impurity.link ./config/zellij;
-        file.".config/kitty".source = impurity.link ./config/kitty;
+        file.".config/nvim".source = impurity.link ../../config/nvim;
+        file.".config/zellij".source = impurity.link ../../config/zellij;
+        file.".config/kitty".source = impurity.link ../../config/kitty;
       };
 
     programs = {
