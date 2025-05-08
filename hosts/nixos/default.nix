@@ -1,6 +1,15 @@
-{ lib, config, pkgs, unstable, inputs, ... }:
-let user = "trey";
-in {
+{
+  lib,
+  config,
+  pkgs,
+  unstable,
+  inputs,
+  ...
+}:
+let
+  user = "trey";
+in
+{
 
   imports = [
     ./hardware-configuration.nix
@@ -20,8 +29,7 @@ in {
       allowUnfree = true;
       allowBroken = true;
       packageOverrides = pkgs: {
-        intel-vaapi-driver =
-          pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
+        intel-vaapi-driver = pkgs.intel-vaapi-driver.override { enableHybridCodec = true; };
       };
     };
   };
@@ -49,8 +57,7 @@ in {
       after = [ "graphical-session.target" ];
       serviceConfig = {
         Type = "simple";
-        ExecStart =
-          "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
         Restart = "on-failure";
         RestartSec = 1;
         TimeoutStopSec = 10;
@@ -85,8 +92,7 @@ in {
       enable = true;
       settings = {
         default_session = {
-          command =
-            "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
+          command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
           user = "greeter";
         };
       };
@@ -119,17 +125,21 @@ in {
             #   "[" = "esc";
             # };
             # Make esc work on small fn keyboard. modularize this?
-            "esc:S" = { esc = "~"; };
+            "esc:S" = {
+              esc = "~";
+            };
           };
         };
       };
     };
   };
 
-  swapDevices = [{
-    device = "/var/lib/swapfile";
-    size = 16 * 1024;
-  }];
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 16 * 1024;
+    }
+  ];
 
   # ZRAM
   zramSwap = {
@@ -152,11 +162,10 @@ in {
     # Run dynamically linked stuff
     nix-ld = {
       enable = true;
-      libraries = with pkgs;
-        [
-          # Add any missing dynamic libraries for unpackaged programs
-          # here, NOT in environment.systemPackages
-        ];
+      libraries = with pkgs; [
+        # Add any missing dynamic libraries for unpackaged programs
+        # here, NOT in environment.systemPackages
+      ];
     };
     gnupg.agent = {
       enable = true;
@@ -283,7 +292,8 @@ in {
     # nvidiaPatches = true;
     xwayland.enable = true;
     package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    portalPackage =
+      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
   };
 
   hardware.graphics = {
@@ -299,7 +309,10 @@ in {
 
   services.openssh = {
     enable = true;
-    ports = [ 22 6229 ];
+    ports = [
+      22
+      6229
+    ];
     settings = {
       PasswordAuthentication = false;
       AllowUsers = null;
@@ -362,14 +375,20 @@ in {
   # networking.networkmanager.enable = lib.mkForce false;
   # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
   networking = {
-  #   hostName = hostname;
-  #   # nftables.enable = true;
-  #   # networkmanager.enable = false;
-    firewall.allowedTCPPorts = [ 22 6229 ];
-  #   # localCommands =
-  #   #   ''
-  #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
-  #   #   '';
+    #   hostName = hostname;
+    #   # nftables.enable = true;
+    #   # networkmanager.enable = false;
+    interfaces.enp3s0 = {
+      wakeOnLan.enable = true;
+    };
+    firewall.allowedTCPPorts = [
+      22
+      6229
+    ];
+    #   # localCommands =
+    #   #   ''
+    #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
+    #   #   '';
   };
 
   # Boot
