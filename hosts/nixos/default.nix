@@ -143,12 +143,12 @@ in {
     zsh.enable = true;
     dconf.enable = true;
     # gamemode.enable = true;
-    firefox = {
-      enable = true;
-      preferences = { "widget.use-xdg-desktop-portal.file-picker" = 1; };
-      nativeMessagingHosts.packages =
-        [ pkgs.plasma5Packages.plasma-browser-integration ];
-    };
+    # firefox = {
+    #   enable = true;
+    #   preferences = { "widget.use-xdg-desktop-portal.file-picker" = 1; };
+    #   nativeMessagingHosts.packages =
+    #     [ pkgs.plasma5Packages.plasma-browser-integration ];
+    # };
     # Run dynamically linked stuff
     nix-ld = {
       enable = true;
@@ -227,11 +227,6 @@ in {
   # user
   users = {
     defaultUserShell = pkgs.fish;
-    # users.peter = {
-    #   isNormalUser = true;
-    #   shell = pkgs.zsh;
-    #   extraGroups = [ "networkmanager" "wheel" "video" "input" "uinput" ];
-    # };
     users.${user} = {
       isNormalUser = true;
       shell = pkgs.fish;
@@ -242,7 +237,8 @@ in {
         "uinput"
         (lib.mkIf config.networking.networkmanager.enable "networkmanager")
       ];
-      openssh.authorizedKeys.keys = [
+      openssh.authorizedKeys.keyFiles = [
+        "/home/${user}/.ssh/authorized_keys"
         # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
       ];
     };
@@ -286,6 +282,8 @@ in {
     enable = true;
     # nvidiaPatches = true;
     xwayland.enable = true;
+    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    portalPackage = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
   };
 
   hardware.graphics = {
@@ -298,6 +296,16 @@ in {
     ];
   };
   # hardware.nvidia.modesetting.enable = true;
+
+  services.openssh = {
+    enable = true;
+    ports = [ 22 6229 ];
+    settings = {
+      PasswordAuthentication = false;
+      AllowUsers = null;
+      PermitRootLogin = "no";
+    };
+  };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
 
@@ -353,16 +361,16 @@ in {
 
   # networking.networkmanager.enable = lib.mkForce false;
   # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
-  # networking = {
+  networking = {
   #   hostName = hostname;
   #   # nftables.enable = true;
   #   # networkmanager.enable = false;
-  #   firewall.allowedTCPPorts = [ 22 5900 ];
+    firewall.allowedTCPPorts = [ 22 6229 ];
   #   # localCommands =
   #   #   ''
   #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
   #   #   '';
-  # };
+  };
 
   # Boot
   # boot = {

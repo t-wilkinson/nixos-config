@@ -13,7 +13,7 @@ in {
 home-manager.extraSpecialArgs = { inherit inputs; };
   home-manager.users.${username} = {
 imports = [
-  ./files-old/default.nix
+  # ./files-old/default.nix
 ];
     home = {
       inherit username homeDirectory;
