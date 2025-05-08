@@ -1,21 +1,9 @@
 {
   description = "Nixos config flake";
 
-  outputs = 
-    { self
-    , agenix
-    , darwin-docker
-    , disko
-    , home-manager
-    , homebrew-bundle
-    , homebrew-cask
-    , homebrew-core
-    , impurity_
-    , nix-darwin
-    , nix-homebrew
-    , nixpkgs
-    , nixpkgs-unstable
-    }@inputs:
+  outputs = { self, agenix, darwin-docker, disko, home-manager, homebrew-bundle
+    , homebrew-cask, homebrew-core, impurity_, nix-darwin, nix-homebrew, nixpkgs
+    , nixpkgs-unstable }@inputs:
     let
       user = "trey";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
@@ -33,17 +21,24 @@
 
       mkApp = scriptName: system: {
         type = "app";
-        program = "${(nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
-          #!/usr/bin/env bash
-          PATH=${nixpkgs.legacyPackages.${system}.git}/bin:$PATH
-          echo "Running ${scriptName} for ${system}"
-          exec ${self}/apps/${system}/${scriptName}
-        '')}/bin/${scriptName}";
+        program = "${
+            (nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
+              #!/usr/bin/env bash
+              PATH=${nixpkgs.legacyPackages.${system}.git}/bin:$PATH
+              echo "Running ${scriptName} for ${system}"
+              exec ${self}/apps/${system}/${scriptName}
+            '')
+          }/bin/${scriptName}";
       };
 
       mkLinuxApps = system: {
         "apply" = mkApp "apply" system;
+        "b" = mkApp "build-impure" system;
+        "bs" = mkApp "build-switch-impure" system;
+        "build" = mkApp "build" system;
+        "build-impure" = mkApp "build-impure" system;
         "build-switch" = mkApp "build-switch" system;
+        "build-switch-impure" = mkApp "build-switch-impure" system;
         "copy-keys" = mkApp "copy-keys" system;
         "create-keys" = mkApp "create-keys" system;
         "check-keys" = mkApp "check-keys" system;
@@ -89,9 +84,7 @@
               config.allowUnfree = true;
               config.allowBroken = true;
             };
-            myLib = import ./lib {
-              inherit self;
-            };
+            myLib = import ./lib { inherit self; };
           };
           modules = [
             home-manager.darwinModules.home-manager
@@ -119,29 +112,29 @@
           ] ++ extraModules;
         };
 
-      allDarwinConfigurations = builtins.listToAttrs (
-        builtins.concatMap (system: [
+      allDarwinConfigurations = builtins.listToAttrs (builtins.concatMap
+        (system: [
           {
             name = system;
             value = mkDarwinConfiguration system [ ];
           }
           {
             name = "${system}-impure";
-            value = mkDarwinConfiguration system [ { impurity.enable = true; } ];
+            value = mkDarwinConfiguration system [{ impurity.enable = true; }];
           }
-        ])
-        darwinSystems
-      );
+        ]) darwinSystems);
 
       mkNixosConfiguration = system: extraModules:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          specialArgs = inputs // {
+          specialArgs = {
+            inherit inputs;
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
               config.allowBroken = true;
             };
+            myLib = import ./lib { inherit self; };
           };
           modules = [
             # disko.nixosModules.disko
@@ -161,32 +154,29 @@
             # (import "${self}/modules/hosts/home-manager.nix" { inherit self; })
 
             ./hosts/nixos
-
           ] ++ extraModules;
         };
 
-      allNixosConfigurations = builtins.listToAttrs (
-          builtins.concatMap (system: [
+      allNixosConfigurations = builtins.listToAttrs (builtins.concatMap
+        (system: [
           {
             name = system;
             value = mkNixosConfiguration system [ ];
           }
           {
             name = "${system}-impure";
-            value = mkNixosConfiguration system [ { impurity.enable = true; } ];
+            value = mkNixosConfiguration system [{ impurity.enable = true; }];
           }
-        ])
-        linuxSystems
-      );
+        ]) linuxSystems);
 
-    in
-    {
+    in {
       # devShells = forAllSystems devShell;
-      apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
+      apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps
+        // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
 
       darwinConfigurations = allDarwinConfigurations;
 
-      # allNixosConfigurations = allNixosConfigurations;
+      nixosConfigurations = allNixosConfigurations;
     };
 
   inputs = {

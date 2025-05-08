@@ -1,4 +1,4 @@
-{ lib, config, pkgs, inputs, outputs, ... }: 
+{ lib, config, pkgs, inputs, ... }: 
 let
   user = "trey";
 in
@@ -15,7 +15,7 @@ in
   documentation.nixos.enable = false; # .desktop
   nixpkgs = {
     overlays = [
-      outputs.overlays.additions
+      # outputs.overlays.additions
       # outputs.overlays.unstable-packages
     ];
     config = {

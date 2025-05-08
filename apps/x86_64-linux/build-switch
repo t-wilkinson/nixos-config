@@ -8,16 +8,16 @@ NC='\033[0m'
 SYSTEM=$(uname -m)
 
 case "$SYSTEM" in
-  x86_64)
-    FLAKE_TARGET="x86_64-linux"
-    ;;
-  aarch64)
-    FLAKE_TARGET="aarch64-linux"
-    ;;
-  *)
-    echo -e "${RED}Unsupported architecture: $SYSTEM${NC}"
-    exit 1
-    ;;
+x86_64)
+  FLAKE_TARGET="x86_64-linux"
+  ;;
+aarch64)
+  FLAKE_TARGET="aarch64-linux"
+  ;;
+*)
+  echo -e "${RED}Unsupported architecture: $SYSTEM${NC}"
+  exit 1
+  ;;
 esac
 
 echo -e "${YELLOW}Starting...${NC}"
