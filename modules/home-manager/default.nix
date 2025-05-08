@@ -43,7 +43,7 @@ in
       #    }
       #  ];
         initExtraFirst = ''
-          export KITTY_CONFIG_DIRECTORY="/Users/${user}/.config/kitty"
+          # export KITTY_CONFIG_DIRECTORY="/Users/${user}/.config/kitty"
           export PROMPT="%B%F{#6e6a86}%~%f%b %B%F{#3e8fb0}λ%b%f "
           export NIX_PATH=""
           [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh 

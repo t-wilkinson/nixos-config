@@ -1,13 +1,11 @@
-{ lib, config, pkgs, inputs, ... }: 
-let
-  user = "trey";
-in
-{
+{ lib, config, pkgs, unstable, inputs, ... }:
+let user = "trey";
+in {
 
   imports = [
     ./hardware-configuration.nix
     ./gnome.nix
-    ./home-manager
+    ./home-manager.nix
     ../../modules/shared.nix
   ];
 
@@ -378,6 +376,4 @@ in
   # };
 
   # networking.usePredictableInterfaceNames = true;
-}
-
 }

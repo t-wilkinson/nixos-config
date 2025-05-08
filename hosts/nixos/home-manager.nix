@@ -1,4 +1,4 @@
-{ config, pkgs, myLib, lib, impurity, ... }:
+{ inputs, config, pkgs, myLib, lib, impurity, ... }:
 let
   username = "trey";
   homeDirectory = "/home/trey";
@@ -10,36 +10,35 @@ let
     echo "password=$token"
   '';
 in {
-  imports =  [
-    ../../home-manager
-  ];
-
-  home-manager.users.${user} = {
+home-manager.extraSpecialArgs = { inherit inputs; };
+  home-manager.users.${username} = {
+imports = [
+  ./files-old/default.nix
+];
     home = {
       inherit username homeDirectory;
       sessionPath = [ "$HOME/.local/bin" "$HOME/.npm-packages/bin" ];
       shellAliases = { vim = "nvim"; };
       packages = [ git-credential-pass ];
       file = myLib.makeConfigLinks impurity [
-          "ags"
-          "anyrun"
-          "chrome-flags.conf"
-          "code-flags.conf"
-          "fish"
-          "fontconfig"
-          "foot"
-          "fuzzel"
-          "hypr"
-          # "kitty"
-          "Kvantum"
-          "mpv"
-          "qt5ct"
-          "starship.toml"
-          "thorium-flags.conf"
-          "wlogout"
-          "zshrc.d"
-
-        ];
+        "ags"
+        "anyrun"
+        "chrome-flags.conf"
+        "code-flags.conf"
+        "fish"
+        "fontconfig"
+        "foot"
+        "fuzzel"
+        "hypr"
+        # "kitty"
+        "Kvantum"
+        "mpv"
+        "qt5ct"
+        "starship.toml"
+        "thorium-flags.conf"
+        "wlogout"
+        "zshrc.d"
+      ];
     };
 
     programs = {

@@ -3,7 +3,7 @@
 
   outputs = { self, agenix, darwin-docker, disko, home-manager, homebrew-bundle
     , homebrew-cask, homebrew-core, impurity_, nix-darwin, nix-homebrew, nixpkgs
-    , nixpkgs-unstable }@inputs:
+    , firefox-gnome-theme , more-waita ,hyprland, hyprland-plugins, ags, anyrun, nixpkgs-unstable }@inputs:
     let
       user = "trey";
       linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
@@ -129,6 +129,7 @@
           inherit system;
           specialArgs = {
             inherit inputs;
+            user = "trey";
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
@@ -225,14 +226,15 @@
     };
 
     darwin-docker.url = "github:konradmalik/darwin-docker";
-    # hyprland.url = "github:hyprwm/Hyprland/v0.40.0";
-    # hyprland-plugins = {
-    #   url = "github:hyprwm/hyprland-plugins";
-    #   # inputs.nixpkgs.follows = "hyprland";
-    # };
+
+    hyprland.url = "github:hyprwm/Hyprland/v0.40.0";
+    hyprland-plugins = {
+      url = "github:hyprwm/hyprland-plugins";
+      # inputs.nixpkgs.follows = "hyprland";
+    };
     # thorium.url = "github:end-4/nix-thorium";
 
-    # ags.url = "github:Aylur/ags";
+    ags.url = "github:Aylur/ags";
     # flake-parts = {
     #   url = "github:hercules-ci/flake-parts";
     #   inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -246,18 +248,18 @@
     #   url = "github:/InioX/Matugen";
     #   # ref = "refs/tags/matugen-v0.10.0"
     # };
-    # more-waita = {
-    #   url = "github:somepaulo/MoreWaita";
-    #   flake = false;
-    # };
-    # firefox-gnome-theme = {
-    #   url = "github:rafaelmardojai/firefox-gnome-theme";
-    #   flake = false;
-    # };
-    # anyrun = {
-    #   url = "github:Kirottu/anyrun";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    more-waita = {
+      url = "github:somepaulo/MoreWaita";
+      flake = false;
+    };
+    firefox-gnome-theme = {
+      url = "github:rafaelmardojai/firefox-gnome-theme";
+      flake = false;
+    };
+    anyrun = {
+      url = "github:Kirottu/anyrun";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # NixVirt = {
     #   url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";

@@ -12,10 +12,10 @@ export IMPURITY_PATH=$(pwd)
 
 echo "${YELLOW}Starting build...${NC}"
 # nix --extra-experimental-features 'nix-command flakes' build --impure .#$FLAKE_TARGET --show-trace $@
-nixos-rebuild build --impure --flake .#$FLAKE_TARGET "$@"
+# sudo nixos-rebuild build --impure --flake .#$FLAKE_TARGET "$@"
 
 echo "${YELLOW}Switching to new generation...${NC}"
-/run/current-system/sw/bin/nixos-rebuild switch --impure --flake .#$FLAKE_TARGET "$@"
+sudo --preserve-env /run/current-system/sw/bin/nixos-rebuild switch --impure --flake .#$FLAKE_TARGET "$@"
 
 echo "${YELLOW}Cleaning up...${NC}"
 unlink ./result
