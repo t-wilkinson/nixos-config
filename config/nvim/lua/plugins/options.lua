@@ -11,6 +11,10 @@ return {
   { "norcalli/nvim-colorizer.lua" },
   { "echasnovski/mini.pairs", enabled = false },
 
+  -- { "mason-org/mason-lspconfig.nvim", version = "1.29.1" },
+  -- { "mason-org/mason.nvim" },
+  -- { "neovim/nvim-lspconfig" },
+
   { "windwp/nvim-autopairs" },
   {
     "echasnovski/mini.surround",

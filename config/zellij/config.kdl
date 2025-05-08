@@ -33,18 +33,18 @@ keybinds clear-defaults=true {
 	}
 	pane {
 		bind "Alt p" { SwitchToMode "Normal"; }
-		bind "h" "Left" { MoveFocus "Left"; SwitchToMode "Normal"; }
-		bind "l" "Right" { MoveFocus "Right"; SwitchToMode "Normal"; }
-		bind "j" "Down" { MoveFocus "Down"; SwitchToMode "Normal"; }
-		bind "k" "Up" { MoveFocus "Up"; SwitchToMode "Normal"; }
-		bind "Alt h" { MovePane "Left"; SwitchToMode "Normal"; }
-		bind "Alt l" { MovePane "Right"; SwitchToMode "Normal"; }
-		bind "Alt j" { MovePane "Down"; SwitchToMode "Normal"; }
-		bind "Alt k" { MovePane "Up"; SwitchToMode "Normal"; }
+		bind "h" { MoveFocus "Left"; SwitchToMode "Normal"; }
+		bind "l" { MoveFocus "Right"; SwitchToMode "Normal"; }
+		bind "j" { MoveFocus "Down"; SwitchToMode "Normal"; }
+		bind "k" { MoveFocus "Up"; SwitchToMode "Normal"; }
+		bind "H" { MovePane "Left"; SwitchToMode "Normal"; }
+		bind "L" { MovePane "Right"; SwitchToMode "Normal"; }
+		bind "J" { MovePane "Down"; SwitchToMode "Normal"; }
+		bind "K" { MovePane "Up"; SwitchToMode "Normal"; }
 		bind "p" { SwitchFocus; SwitchToMode "Normal"; }
 		bind "n" { NewPane; SwitchToMode "Normal"; }
-		bind "J" { NewPane "Down"; SwitchToMode "Normal"; }
-		bind "L" { NewPane "Right"; SwitchToMode "Normal"; }
+		bind "Alt J" { NewPane "Down"; SwitchToMode "Normal"; }
+		bind "Alt L" { NewPane "Right"; SwitchToMode "Normal"; }
 		bind "x" { CloseFocus; SwitchToMode "Normal"; }
 		bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
 		bind "z" { TogglePaneFrames; SwitchToMode "Normal"; }
@@ -167,7 +167,7 @@ keybinds clear-defaults=true {
         }
 	}
 	shared_except "normal" "locked" {
-		bind "Enter" "Esc" { SwitchToMode "Normal"; }
+		bind "Enter" "Esc" "Ctrl [" { SwitchToMode "Normal"; }
 	}
 	shared_except "pane" "locked" {
 		bind "Alt p" { SwitchToMode "Pane"; }
@@ -185,7 +185,7 @@ keybinds clear-defaults=true {
 		bind "Alt t" { SwitchToMode "Tab"; }
 	}
     shared_except "move" "locked" {
-      bind "Alt h" { SwitchToMode "Move"; }
+      // bind "Alt h" { SwitchToMode "Move"; }
     }
 	/-shared_except "renametab" "locked" {
 		bind "Alt r" { SwitchToMode "RenameTab"; }
