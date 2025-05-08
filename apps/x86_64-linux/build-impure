@@ -9,7 +9,7 @@ SYSTEM_TYPE="x86_64-linux-impure"
 FLAKE_SYSTEM="nixosConfigurations.${SYSTEM_TYPE}.system"
 
 export NIXPKGS_ALLOW_UNFREE=1
-export IMPURITY_PATH=$(pwd)
+export IMPURITY_PATH=$(git rev-parse --show-toplevel)
 
 echo "${YELLOW}Starting build...${NC}"
 nix --extra-experimental-features 'nix-command flakes' build --impure .#$FLAKE_SYSTEM --show-trace $@

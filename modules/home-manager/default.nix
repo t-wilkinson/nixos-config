@@ -1,4 +1,12 @@
-{ self, config, impurity, pkgs, unstable, myLib, ... }:
+{
+  self,
+  config,
+  impurity,
+  pkgs,
+  unstable,
+  myLib,
+  ...
+}:
 
 let
   name = "Trey Wilkinson";
@@ -8,46 +16,47 @@ in
 {
   home-manager.users.${user} = {
     home = {
-      packages = []
+      packages =
+        [ ]
         ++ (import ./packages.nix { inherit pkgs unstable; })
-        ++ (import ./development.nix { inherit pkgs unstable; })
-        ;
+        ++ (import ./development.nix { inherit pkgs unstable; });
       file = myLib.makeConfigLinks impurity [
-          "nvim"
-          "zellij"
-          "kitty"
-        ];
+        "nvim"
+        "zellij"
+        "kitty"
+      ];
     };
 
     programs = {
       direnv = {
-          enable = true;
-          enableZshIntegration = true;
-          nix-direnv.enable = true;
+        enable = true;
+        enableZshIntegration = true;
+        nix-direnv.enable = true;
       };
 
       zsh = {
         enable = true;
-      # autocd = false;
-      # cdpath = [ "~/.local/share/src" ];
-      # plugins = [
-      #    {
-      #        name = "powerlevel10k";
-      #        src = pkgs.zsh-powerlevel10k;
-      #        file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-      #    }
-      #    {
-      #        name = "powerlevel10k-config";
-      #        src = lib.cleanSource ./config;
-      #        file = "p10k.zsh";
-      #    }
-      #  ];
+        # autocd = false;
+        # cdpath = [ "~/.local/share/src" ];
+        # plugins = [
+        #    {
+        #        name = "powerlevel10k";
+        #        src = pkgs.zsh-powerlevel10k;
+        #        file = "share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
+        #    }
+        #    {
+        #        name = "powerlevel10k-config";
+        #        src = lib.cleanSource ./config;
+        #        file = "p10k.zsh";
+        #    }
+        #  ];
         initExtraFirst = ''
           # export KITTY_CONFIG_DIRECTORY="/Users/${user}/.config/kitty"
           export PROMPT="%B%F{#6e6a86}%~%f%b %B%F{#3e8fb0}λ%b%f "
           export NIX_PATH=""
           [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh 
           alias vim=nvim
+          alias ssh="TERM=xterm ssh"
           # if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
           #   . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
           #   . /nix/var/nix/profiles/default/etc/profile.d/nix.sh

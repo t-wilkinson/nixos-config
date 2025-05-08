@@ -8,7 +8,7 @@ NC='\033[0m'
 FLAKE_TARGET="x86_64-linux-impure"
 
 export NIXPKGS_ALLOW_UNFREE=1
-export IMPURITY_PATH=$(pwd)
+export IMPURITY_PATH=$(git rev-parse --show-toplevel)
 
 echo "${YELLOW}Starting build...${NC}"
 # nix --extra-experimental-features 'nix-command flakes' build --impure .#$FLAKE_TARGET --show-trace $@
