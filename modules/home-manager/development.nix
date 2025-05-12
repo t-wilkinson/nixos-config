@@ -1,5 +1,6 @@
 { pkgs, unstable, ... }:
-with pkgs; [
+with pkgs;
+[
   # LANGUAGES
   # jdk # has compatibility issues
   # R
@@ -75,5 +76,5 @@ with pkgs; [
   # terraform-ls
   # tflint
 
- nixfmt-rfc-style
+  nixfmt-rfc-style
 ]

@@ -44,6 +44,7 @@
     iftop
     nmap
     socat
+    dnsmasq
 
     # PACKAGE MANAGEMENT/NIX
     nh
