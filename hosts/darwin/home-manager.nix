@@ -1,25 +1,44 @@
-{ config, pkgs, unstable, lib, home-manager, ... }:
+{
+  config,
+  pkgs,
+  unstable,
+  lib,
+  home-manager,
+  ...
+}:
 
 let
   user = "trey";
-  # sharedFiles = import ../../shared/files.nix { inherit config pkgs; };
+  home = "/Users/${user}";
 in
+# sharedFiles = import ../../shared/files.nix { inherit config pkgs; };
 {
   imports = [
-   # ./dock.nix
+    # ./dock.nix
   ];
 
   # It me
   users.users.${user} = {
-    name = "${user}";
-    home = "/Users/${user}";
+    name = user;
+    home = home;
     isHidden = false;
     shell = pkgs.zsh;
   };
 
   homebrew = {
     enable = true;
-    casks = pkgs.callPackage ./casks.nix {};
+    casks = pkgs.callPackage ./casks.nix { };
+    taps = [
+      # taps don't work when homebrew is managed by nix (homebrew.enable = true;)
+      # Must set homebrew.enable = false; to take /opt/homebrew/Library out of nixstore
+      # "jorgelbg/tap"
+    ];
+    brews = [
+      "pinentry"
+      "pinentry-mac"
+      # "pinentry-touchid"
+      "whalebrew"
+    ];
 
     # These app IDs are from using the mas CLI app
     # mas = mac app store
@@ -40,24 +59,32 @@ in
     # useUserPackages = true;
     # backupFileExtension = "old";
     # extraSpecialArgs = { inherit unstable; }; # { inherit inputs self impurity; };
+    backupFileExtension = "old";
     useGlobalPkgs = true;
-    users.${user} = { pkgs, config, lib, ... }:{
-      home = {
-        enableNixpkgsReleaseCheck = false;
-        # packages = pkgs.callPackage ./packages.nix {};
-        packages = with pkgs; [
-    	    fswatch
-    	    dockutil
-    	  ];
-        file = lib.mkMerge [
-          # sharedFiles
-        ];
+    users.${user} =
+      {
+        pkgs,
+        config,
+        lib,
+        ...
+      }:
+      {
+        home = {
+          enableNixpkgsReleaseCheck = false;
+          # packages = pkgs.callPackage ./packages.nix {};
+          packages = with pkgs; [
+            fswatch
+            dockutil
+          ];
+          file = {
+            ".gnupg/gpg-agent.conf".source = ~/.gnupg/gpg-agent.conf.mac;
+          };
 
-        stateVersion = "23.11";
+          stateVersion = "23.11";
+        };
+
+        # programs = {} // import ../../shared/home-manager.nix { inherit config pkgs lib; };
       };
-
-      # programs = {} // import ../../shared/home-manager.nix { inherit config pkgs lib; };
-    };
   };
 
   # Fully declarative dock using the latest from Nix Store

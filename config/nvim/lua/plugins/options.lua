@@ -9,7 +9,7 @@ return {
   -- { "windwp/nvim-ts-autotag", enabled = false },
   { "folke/flash.nvim", enabled = false },
   { "norcalli/nvim-colorizer.lua" },
-  { "echasnovski/mini.pairs", enabled = false },
+  -- { "echasnovski/mini.pairs", enabled = true },
 
   -- { "mason-org/mason-lspconfig.nvim", version = "1.29.1" },
   -- { "mason-org/mason.nvim" },
@@ -20,15 +20,14 @@ return {
     "echasnovski/mini.surround",
     keys = function(_, keys)
       -- Populate the keys based on the user's options
-      local plugin = require("lazy.core.config").spec.plugins["mini.surround"]
-      local opts = require("lazy.core.plugin").values(plugin, "opts", false)
+      local opts = LazyVim.opts("mini.surround")
       local mappings = {
-        { opts.mappings.add, desc = "Add surrounding", mode = { "n", "v" } },
-        { opts.mappings.delete, desc = "Delete surrounding" },
-        { opts.mappings.find, desc = "Find right surrounding" },
-        { opts.mappings.find_left, desc = "Find left surrounding" },
-        { opts.mappings.highlight, desc = "Highlight surrounding" },
-        { opts.mappings.replace, desc = "Replace surrounding" },
+        { opts.mappings.add, desc = "Add Surrounding", mode = { "n", "v" } },
+        { opts.mappings.delete, desc = "Delete Surrounding" },
+        { opts.mappings.find, desc = "Find Right Surrounding" },
+        { opts.mappings.find_left, desc = "Find Left Surrounding" },
+        { opts.mappings.highlight, desc = "Highlight Surrounding" },
+        { opts.mappings.replace, desc = "Replace Surrounding" },
         { opts.mappings.update_n_lines, desc = "Update `MiniSurround.config.n_lines`" },
       }
       mappings = vim.tbl_filter(function(m)
@@ -44,24 +43,15 @@ return {
         ["<"] = { output = { left = "< ", right = " >" } },
       },
       mappings = {
-        add = "ys",
-        delete = "ds",
-        find = "",
-        find_left = "",
-        highlight = "",
-        replace = "cs",
-        update_n_lines = "",
+        add = "gsa",
+        delete = "gsd",
+        find = "gsf",
+        find_left = "gsF",
+        highlight = "gsh",
+        replace = "gsr",
+        update_n_lines = "gsn",
       },
       search_method = "cover_or_next",
-      -- mappings = {
-      --   add = "gsa", -- Add surrounding in Normal and Visual modes
-      --   delete = "gsd", -- Delete surrounding
-      --   find = "gsf", -- Find surrounding (to the right)
-      --   find_left = "gsF", -- Find surrounding (to the left)
-      --   highlight = "gsh", -- Highlight surrounding
-      --   replace = "gsr", -- Replace surrounding
-      --   update_n_lines = "gsn", -- Update `n_lines`
-      -- },
     },
   },
 
@@ -200,23 +190,23 @@ return {
     "imsnif/kdl.vim",
   },
 
-  {
-    "williamboman/mason.nvim",
-    opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed, {
-        "pyright",
-        "clangd",
-        -- "stylua",
-        -- "selene",
-        -- "luacheck",
-        -- "shellcheck",
-        -- "shfmt",
-        -- "tailwindcss-language-server",
-        -- "typescript-language-server",
-        -- "css-lsp",
-      })
-    end,
-  },
+  -- {
+  --   "williamboman/mason.nvim",
+  --   opts = function(_, opts)
+  --     vim.list_extend(opts.ensure_installed, {
+  --       "pyright",
+  --       "clangd",
+  --       -- "stylua",
+  --       -- "selene",
+  --       -- "luacheck",
+  --       -- "shellcheck",
+  --       -- "shfmt",
+  --       -- "tailwindcss-language-server",
+  --       -- "typescript-language-server",
+  --       -- "css-lsp",
+  --     })
+  --   end,
+  -- },
 
   {
     "nvim-treesitter/nvim-treesitter",
@@ -348,6 +338,21 @@ return {
     end,
   },
 
+  {
+    "folke/snacks.nvim",
+    ---@type snacks.Config
+    opts = {
+      explorer = {
+        replace_netrw = true,
+      },
+      picker = {
+        sources = {
+          explorer = {},
+        },
+      },
+    },
+  },
+
   --[[{
     "telescope.nvim",
     dependencies = {
@@ -360,7 +365,7 @@ return {
   },
   ]]
 
-  {
+  --[[ {
     "nvim-telescope/telescope.nvim",
     dependencies = {
       "nvim-telescope/telescope.nvim",
@@ -473,4 +478,5 @@ return {
       require("telescope").load_extension("file_browser")
     end,
   },
+  ]]
 }

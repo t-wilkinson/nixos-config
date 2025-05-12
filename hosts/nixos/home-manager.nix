@@ -1,4 +1,12 @@
-{ inputs, config, pkgs, myLib, lib, impurity, ... }:
+{
+  inputs,
+  config,
+  pkgs,
+  myLib,
+  lib,
+  impurity,
+  ...
+}:
 let
   username = "trey";
   homeDirectory = "/home/trey";
@@ -9,36 +17,47 @@ let
     echo "username=t-wilkinson"
     echo "password=$token"
   '';
-in {
-home-manager.extraSpecialArgs = { inherit inputs; };
+in
+{
+  home-manager.backupFileExtension = "old";
+  home-manager.extraSpecialArgs = { inherit inputs; };
   home-manager.users.${username} = {
-imports = [
-  # ./files-old/default.nix
-];
+    imports = [
+      # ./files-old/default.nix
+    ];
     home = {
       inherit username homeDirectory;
-      sessionPath = [ "$HOME/.local/bin" "$HOME/.npm-packages/bin" ];
-      shellAliases = { vim = "nvim"; };
-      packages = [ git-credential-pass ];
-      file = myLib.makeConfigLinks impurity [
-        "ags"
-        "anyrun"
-        "chrome-flags.conf"
-        "code-flags.conf"
-        "fish"
-        "fontconfig"
-        "foot"
-        "fuzzel"
-        "hypr"
-        # "kitty"
-        "Kvantum"
-        "mpv"
-        "qt5ct"
-        "starship.toml"
-        "thorium-flags.conf"
-        "wlogout"
-        "zshrc.d"
+      sessionPath = [
+        "$HOME/.local/bin"
+        "$HOME/.npm-packages/bin"
       ];
+      shellAliases = {
+        vim = "nvim";
+      };
+      packages = [ git-credential-pass ];
+      file =
+        myLib.makeConfigLinks impurity [
+          "ags"
+          "anyrun"
+          "chrome-flags.conf"
+          "code-flags.conf"
+          "fish"
+          "fontconfig"
+          "foot"
+          "fuzzel"
+          "hypr"
+          # "kitty"
+          "Kvantum"
+          "mpv"
+          "qt5ct"
+          "starship.toml"
+          "thorium-flags.conf"
+          "wlogout"
+          "zshrc.d"
+        ]
+        // {
+          ".gnupg/gpg-agent.conf".path = ~/.gnupg/gpg-agent.conf.linux;
+        };
     };
 
     programs = {
@@ -54,7 +73,9 @@ imports = [
         userName = "t-wilkinson";
         userEmail = "winston.trey.wilkinson@gmail.com";
         extraConfig = {
-          init = { defaultBranch = "main"; };
+          init = {
+            defaultBranch = "main";
+          };
           credential.helper = "${git-credential-pass}/bin/git-credential-pass";
         };
         aliases = {
@@ -65,7 +86,9 @@ imports = [
       };
     };
 
-    xdg.userDirs = { createDirectories = true; };
+    xdg.userDirs = {
+      createDirectories = true;
+    };
 
     # dconf.settings = {
     #   "org/virt-manager/virt-manager/connections" = {
@@ -92,7 +115,6 @@ imports = [
       };
     };
 
-    home.stateVersion =
-      "24.05"; # this must be the version at which you have started using the program
+    home.stateVersion = "24.05"; # this must be the version at which you have started using the program
   };
 }

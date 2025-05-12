@@ -1,22 +1,21 @@
-{ self, config, pkgs, ... }:
+{
+  self,
+  config,
+  pkgs,
+  ...
+}:
 
-let 
+let
   user = "trey";
-  # xdg_configHome = "${config.users.users.${user}.home}/.config";
-  # xdg_dataHome   = "${config.users.users.${user}.home}/.local/share";
-  # xdg_stateHome  = "${config.users.users.${user}.home}/.local/state"; in
-in {
+in
+{
   imports = [
     # "${self}/modules/darwin/secrets.nix"
     ./home-manager.nix
     ../../modules/shared.nix
+    ./packages.nix
     # agenix.darwinModules.default
   ];
-
-  # impurity = {
-  #   enable = true;
-  #   config = ../../..;
-  # };
 
   # environment.systemPackages = with pkgs; [
   #   # agenix.packages."${pkgs.system}".default
@@ -29,16 +28,24 @@ in {
 
     settings = {
       experimental-features = "nix-command flakes";
-      trusted-users = [ "@admin" "${user}" ];
-      substituters =
-        [ "https://cache.nixos.org" "https://nix-community.cachix.org" ];
-      trusted-public-keys =
-        [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
+      trusted-users = [
+        "@admin"
+        "${user}"
+      ];
+      substituters = [
+        "https://cache.nixos.org"
+        "https://nix-community.cachix.org"
+      ];
+      trusted-public-keys = [ "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" ];
     };
 
     gc = {
       automatic = true;
-      interval = { Weekday = 0; Hour = 2; Minute = 0; };
+      interval = {
+        Weekday = 0;
+        Hour = 2;
+        Minute = 0;
+      };
       options = "--delete-older-than 30d";
     };
 
@@ -47,9 +54,8 @@ in {
     '';
   };
 
-  # Turn off NIX_PATH warnings now that we're using flakes
+  # Turn off NIX_PATH warnings because we're using flakes
   system.checks.verifyNixPath = false;
-
 
   # launchd.user.agents = {
   #   emacs = {
@@ -67,51 +73,93 @@ in {
   #   };
   # };
 
+  # networking.wireguard.enable = true;
+  # networking.wireguard.interfaces = {
+  #   # "wg0" is the network interface name. You can name the interface arbitrarily.
+  #   wg0 = {
+  #     # Determines the IP address and subnet of the client's end of the tunnel interface.
+  #     ips = [ "10.100.0.2/24" ];
+  #     listenPort = 51820; # to match firewall allowedUDPPorts (without this wg uses random port numbers)
+
+  #     # Path to the private key file.
+  #     #
+  #     # Note: The private key can also be included inline via the privateKey option,
+  #     # but this makes the private key world-readable; thus, using privateKeyFile is
+  #     # recommended.
+  #     privateKeyFile = "path to private key file";
+
+  #     peers = [
+  #       # For a client configuration, one peer entry for the server will suffice.
+
+  #       {
+  #         # Public key of the server (not a file path).
+  #         publicKey = "{server public key}";
+
+  #         # Forward all the traffic via VPN.
+  #         allowedIPs = [ "0.0.0.0/0" ];
+  #         # Or forward only particular subnets
+  #         #allowedIPs = [ "10.100.0.1" "91.108.12.0/22" ];
+
+  #         # Set this to the server IP and port.
+  #         endpoint = "{server ip}:51820"; # ToDo: route to endpoint not automatically configured https://wiki.archlinux.org/index.php/WireGuard#Loop_routing https://discourse.nixos.org/t/solved-minimal-firewall-setup-for-wireguard-client/7577
+
+  #         # Send keepalives every 25 seconds. Important to keep NAT tables alive.
+  #         persistentKeepalive = 25;
+  #       }
+  #     ];
+  #   };
+  # };
+
   system = {
     stateVersion = 5;
 
-    # defaults = {
-    #   LaunchServices = {
-    #     # LSQuarantine = false;
-    #   };
+    activationScripts.useTouchID.text = ''
+      defaults write org.gpgtools.common UseKeychain -bool yes
+      defaults write org.gpgtools.use-gpg-agent UseKeychain -bool yes
+    '';
 
-    #   NSGlobalDomain = {
-    #     AppleShowAllExtensions = true;
-    #     # ApplePressAndHoldEnabled = false;
+    defaults = {
+      LaunchServices = {
+        # LSQuarantine = false;
+      };
 
-    #     # 120, 90, 60, 30, 12, 6, 2
-    #     KeyRepeat = 2;
+      NSGlobalDomain = {
+        AppleShowAllExtensions = true;
+        # ApplePressAndHoldEnabled = false;
 
-    #     # 120, 94, 68, 35, 25, 15
-    #     InitialKeyRepeat = 15;
+        # 120, 90, 60, 30, 12, 6, 2
+        KeyRepeat = 2;
 
-    #     # "com.apple.mouse.tapBehavior" = 1;
-    #     # "com.apple.sound.beep.volume" = 0.0;
-    #     # "com.apple.sound.beep.feedback" = 0;
-    #   };
+        # 120, 94, 68, 35, 25, 15
+        InitialKeyRepeat = 15;
 
-    #   dock = {
-    #     autohide = true;
-    #     # show-recents = false;
-    #     launchanim = true;
-    #     # mouse-over-hilite-stack = true;
-    #     orientation = "bottom";
-    #     tilesize = 48;
-    #   };
+        # "com.apple.mouse.tapBehavior" = 1;
+        # "com.apple.sound.beep.volume" = 0.0;
+        # "com.apple.sound.beep.feedback" = 0;
+      };
 
-    #   finder = {
-    #     # _FXShowPosixPathInTitle = false;
-    #   };
+      dock = {
+        autohide = true;
+        # show-recents = false;
+        launchanim = true;
+        # mouse-over-hilite-stack = true;
+        orientation = "bottom";
+        tilesize = 48;
+      };
 
-    #   trackpad = {
-    #     # Clicking = true;
-    #     # TrackpadThreeFingerDrag = true;
-    #   };
-    # };
+      finder = {
+        # _FXShowPosixPathInTitle = false;
+      };
 
-    # keyboard = {
-    #   enableKeyMapping = true;
-    #   remapCapsLockToControl = true;
-    # };
+      trackpad = {
+        # Clicking = true;
+        # TrackpadThreeFingerDrag = true;
+      };
+    };
+
+    keyboard = {
+      enableKeyMapping = true;
+      remapCapsLockToControl = true;
+    };
   };
 }

@@ -15,6 +15,7 @@ in
     ./hardware-configuration.nix
     ./gnome.nix
     ./home-manager.nix
+    ./packages.nix
     ../../modules/shared.nix
   ];
 
@@ -168,8 +169,8 @@ in
       ];
     };
     gnupg.agent = {
-      enable = true;
-      enableSSHSupport = true;
+      # enable = true;
+      # enableSSHSupport = true;
       # enableExtraSocket = true;
       # extraConfig = ''
       #   # enable-ssh-support
@@ -200,30 +201,6 @@ in
       NIXPKGS_ALLOW_INSECURE = "1";
       LIBVA_DRIVER_NAME = "iHD";
     };
-
-    systemPackages = with pkgs; [
-      curl
-      zsh
-      fish
-      git
-      gh
-      wget
-      nixpkgs-fmt
-      nixfmt-classic
-      vim
-      unstable.neovim
-      gnumake
-      gtk3
-      efibootmgr
-      # inputs.agenix.packages."${config.system}".default
-      inputs.agenix.packages."x86_64-linux".default
-
-      # need the following for file uploads to work
-      dbus
-      nss
-      gnutls
-      libglvnd
-    ];
   };
 
   # logind

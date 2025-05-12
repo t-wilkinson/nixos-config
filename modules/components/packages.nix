@@ -27,6 +27,7 @@
     unrar
     # psmisc # tools that use /proc
     openssh
+    wireguard-tools
     # usbutils
     # libnotify
     # stdenv.cc.cc.lib
