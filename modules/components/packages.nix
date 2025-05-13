@@ -16,6 +16,7 @@
     wget
     fd
     lsof
+    curl
 
     # SYSTEM TOOLS & CORE UTILITIES
     cmake
@@ -66,7 +67,7 @@
     btop
     difftastic
     du-dust
-    git-filter-repo
+    # git-filter-repo
     # neofetch
     # pandoc
     uv
@@ -82,6 +83,7 @@
 
     # SOURCE CODE MANAGEMENT, GIT, GITHUB TOOLS
     gh
+    git
 
     # Text and terminal utilities
     htop

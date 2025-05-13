@@ -23,7 +23,7 @@ in
   home-manager.extraSpecialArgs = { inherit inputs; };
   home-manager.users.${username} = {
     imports = [
-      # ./files-old/default.nix
+      ./files-old/default.nix
     ];
     home = {
       inherit username homeDirectory;
@@ -37,23 +37,23 @@ in
       packages = [ git-credential-pass ];
       file =
         myLib.makeConfigLinks impurity [
-          "ags"
-          "anyrun"
-          "chrome-flags.conf"
-          "code-flags.conf"
-          "fish"
-          "fontconfig"
-          "foot"
-          "fuzzel"
-          "hypr"
+          # "ags"
+          # "anyrun"
+          # "chrome-flags.conf"
+          # "code-flags.conf"
+          # "fish"
+          # "fontconfig"
+          # "foot"
+          # "fuzzel"
+          # "hypr"
           # "kitty"
-          "Kvantum"
-          "mpv"
-          "qt5ct"
-          "starship.toml"
-          "thorium-flags.conf"
-          "wlogout"
-          "zshrc.d"
+          # "Kvantum"
+          # "mpv"
+          # "qt5ct"
+          # "starship.toml"
+          # "thorium-flags.conf"
+          # "wlogout"
+          # "zshrc.d"
         ]
         // {
           ".gnupg/gpg-agent.conf".path = ~/.gnupg/gpg-agent.conf.linux;

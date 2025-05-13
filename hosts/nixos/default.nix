@@ -13,7 +13,7 @@ in
 
   imports = [
     ./hardware-configuration.nix
-    ./gnome.nix
+    # ./gnome.nix
     ./home-manager.nix
     ./packages.nix
     ../../modules/shared.nix
@@ -66,6 +66,16 @@ in
     };
   };
 
+  networking = {
+    interfaces.enp3s0 = {
+      wakeOnLan.enable = true;
+    };
+    firewall.allowedTCPPorts = [
+      22
+      6229
+    ];
+  };
+
   security = {
     rtkit.enable = true;
     polkit.enable = true;
@@ -82,12 +92,6 @@ in
     # blueman.enable = true;
     spice-vdagentd.enable = true;
     # printing.enable = true;
-    openssh = {
-      # enable = true;
-      # hostKeys = [
-      #   { path = "/etc/ssh/ssh_host_rsa_key"; bits = 4096; type = "rsa"; }
-      # ];
-    };
     envfs.enable = true;
     greetd = {
       enable = true;
@@ -121,11 +125,7 @@ in
               capslock = "overload(control, esc)";
               esc = "`";
             };
-            # Ctrl + [ = esc; adds lag to 'esc' though
-            # "[:C" = {
-            #   "[" = "esc";
-            # };
-            # Make esc work on small fn keyboard. modularize this?
+            # Make esc work on my small 60% fn keyboard
             "esc:S" = {
               esc = "~";
             };
@@ -153,13 +153,6 @@ in
     fish.enable = true;
     zsh.enable = true;
     dconf.enable = true;
-    # gamemode.enable = true;
-    # firefox = {
-    #   enable = true;
-    #   preferences = { "widget.use-xdg-desktop-portal.file-picker" = 1; };
-    #   nativeMessagingHosts.packages =
-    #     [ pkgs.plasma5Packages.plasma-browser-integration ];
-    # };
     # Run dynamically linked stuff
     nix-ld = {
       enable = true;
@@ -168,30 +161,16 @@ in
         # here, NOT in environment.systemPackages
       ];
     };
-    gnupg.agent = {
-      # enable = true;
-      # enableSSHSupport = true;
-      # enableExtraSocket = true;
-      # extraConfig = ''
-      #   # enable-ssh-support
-      #   allow-preset-passphrase;
-      # '';
-      # pinentryPackage = pkgs.pinentry-gnome3;
-      # defaultCacheTtl = 34560000;
-      # defaultCacheTtlSsh = 34560000;
-      # maxCacheTtl = 34560000;
-      # maxCacheTtlSsh = 34560000;
-    };
-    steam = {
+    steam.enable = true;
+    hyprland = {
       enable = true;
-      # gamescopeSession.enable = true;
-      # remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
-      # dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+      package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+      # make sure to also set the portal package, so that they are in sync
+      portalPackage =
+        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     };
   };
 
-  # Packages
-  # $ nix search <package>
   environment = {
     localBinInPath = true;
     sessionVariables = {
@@ -298,86 +277,4 @@ in
   };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
-
-  # config = mkIf cfg.server.libvert.enable {
-  #   # https://technicalsourcery.net/posts/nixos-in-libvirt/
-  #   boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
-  #
-  #   virtualisation.libvirtd.enable = true;
-  #   virtualisation.libvirtd.allowedBridges =
-  #     [ "${cfg.libvert.bridgeInterface}" ];
-  #
-  #   networking.interfaces."${cfg.libvert.bridgeInterface}".useDHCP = true;
-  #   networking.bridges = {
-  #     "${cfg.libvert.bridgeInterface}" = {
-  #       interfaces = [ "${cfg.libvert.ethInterface}" ];
-  #     };
-  #   };
-  # };
-
-  # boot.loader.grub.device = "/dev/nvme1n1p1";
-  # boot = {
-  #   tmp.cleanOnBoot = true;
-  #   supportedFilesystems = [ "btrfs" "ext4" "fat32" "ntfs" ];
-  #   loader = {
-  #     grub = {
-  #       enable = true;
-  #       device = "nodev";
-  #       efiSupport = true;
-  #       useOSProber = true;
-  #     };
-  #     efi.canTouchEfiVariables = true;
-  #   };
-  #   # kernelPackages = pkgs.linuxPackages_xanmod_latest;
-  #   # kernelPatches = [{
-  #   #   name = "enable RT_FULL";
-  #   #   patch = null;
-  #   #   # TODO: add realtime patch: PREEMPT_RT y
-  #   #   extraConfig = ''
-  #   #     PREEMPT y
-  #   #     PREEMPT_BUILD y
-  #   #     PREEMPT_VOLUNTARY n
-  #   #     PREEMPT_COUNT y
-  #   #     PREEMPTION y
-  #   #   '';
-  #   # }];
-  #   # extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
-  #   # kernelModules = [ "acpi_call" ];
-  #   # make 3.5mm jack work
-  #   # extraModprobeConfig = ''
-  #   #   options snd_hda_intel model=headset-mode
-  #   # '';
-  # };
-
-  # networking.networkmanager.enable = lib.mkForce false;
-  # systemd.services."systemd-networkd".environment.SYSTEMD_LOG_LEVEL = "debug";
-  networking = {
-    #   hostName = hostname;
-    #   # nftables.enable = true;
-    #   # networkmanager.enable = false;
-    interfaces.enp3s0 = {
-      wakeOnLan.enable = true;
-    };
-    firewall.allowedTCPPorts = [
-      22
-      6229
-    ];
-    #   # localCommands =
-    #   #   ''
-    #   #     ip -6 addr add 2001:610:685:1::1/64 dev eth0
-    #   #   '';
-  };
-
-  # Boot
-  # boot = {
-  #   doesn't work, mac addresses are randomized because of networkmanager
-  #   initrd.services.udev.rules = ''
-  #     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", \
-  #     ATTR{address}=="52:54:00:12:01:01", KERNEL=="enp*", NAME="eth0"
-  #     SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", \
-  #     ATTR{address}=="8e:10:ab:93:d5:31", KERNEL=="enp*", NAME="wlan0"
-  #   '';
-  # };
-
-  # networking.usePredictableInterfaceNames = true;
 }

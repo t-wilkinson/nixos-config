@@ -1,13 +1,38 @@
 {
   description = "Nixos config flake";
 
-  outputs = { self, agenix, darwin-docker, disko, home-manager, homebrew-bundle
-    , homebrew-cask, homebrew-core, impurity_, nix-darwin, nix-homebrew, nixpkgs
-    , firefox-gnome-theme , more-waita ,hyprland, hyprland-plugins, ags, anyrun, nixpkgs-unstable }@inputs:
+  outputs =
+    {
+      self,
+      agenix,
+      darwin-docker,
+      disko,
+      home-manager,
+      homebrew-bundle,
+      homebrew-cask,
+      homebrew-core,
+      impurity_,
+      nix-darwin,
+      nix-homebrew,
+      nixpkgs,
+      # firefox-gnome-theme,
+      # more-waita,
+      hyprland,
+      hyprland-plugins,
+      #ags,
+      # anyrun,
+      nixpkgs-unstable,
+    }@inputs:
     let
       user = "trey";
-      linuxSystems = [ "x86_64-linux" "aarch64-linux" ];
-      darwinSystems = [ "aarch64-darwin" "x86_64-darwin" ];
+      linuxSystems = [
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
+      darwinSystems = [
+        "aarch64-darwin"
+        "x86_64-darwin"
+      ];
 
       # forAllSystems = f: nixpkgs.lib.genAttrs (linuxSystems ++ darwinSystems) f;
       # devShell = system: let pkgs = nixpkgs.legacyPackages.${system}; in {
@@ -22,13 +47,13 @@
       mkApp = scriptName: system: {
         type = "app";
         program = "${
-            (nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
-              #!/usr/bin/env bash
-              PATH=${nixpkgs.legacyPackages.${system}.git}/bin:$PATH
-              echo "Running ${scriptName} for ${system}"
-              exec ${self}/apps/${system}/${scriptName}
-            '')
-          }/bin/${scriptName}";
+          (nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
+            #!/usr/bin/env bash
+            PATH=${nixpkgs.legacyPackages.${system}.git}/bin:$PATH
+            echo "Running ${scriptName} for ${system}"
+            exec ${self}/apps/${system}/${scriptName}
+          '')
+        }/bin/${scriptName}";
       };
 
       mkLinuxApps = system: {
@@ -60,7 +85,8 @@
         "rollback" = mkApp "rollback" system;
       };
 
-      mkDarwinConfiguration = system: extraModules:
+      mkDarwinConfiguration =
+        system: extraModules:
         # let
         #   pkgs = import nixpkgs {
         #     inherit system;
@@ -112,19 +138,21 @@
           ] ++ extraModules;
         };
 
-      allDarwinConfigurations = builtins.listToAttrs (builtins.concatMap
-        (system: [
+      allDarwinConfigurations = builtins.listToAttrs (
+        builtins.concatMap (system: [
           {
             name = system;
             value = mkDarwinConfiguration system [ ];
           }
           {
             name = "${system}-impure";
-            value = mkDarwinConfiguration system [{ impurity.enable = true; }];
+            value = mkDarwinConfiguration system [ { impurity.enable = true; } ];
           }
-        ]) darwinSystems);
+        ]) darwinSystems
+      );
 
-      mkNixosConfiguration = system: extraModules:
+      mkNixosConfiguration =
+        system: extraModules:
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
@@ -158,21 +186,24 @@
           ] ++ extraModules;
         };
 
-      allNixosConfigurations = builtins.listToAttrs (builtins.concatMap
-        (system: [
+      allNixosConfigurations = builtins.listToAttrs (
+        builtins.concatMap (system: [
           {
             name = system;
             value = mkNixosConfiguration system [ ];
           }
           {
             name = "${system}-impure";
-            value = mkNixosConfiguration system [{ impurity.enable = true; }];
+            value = mkNixosConfiguration system [ { impurity.enable = true; } ];
           }
-        ]) linuxSystems);
+        ]) linuxSystems
+      );
 
-    in {
+    in
+    {
       # devShells = forAllSystems devShell;
-      apps = nixpkgs.lib.genAttrs linuxSystems mkLinuxApps
+      apps =
+        nixpkgs.lib.genAttrs linuxSystems mkLinuxApps
         // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
 
       darwinConfigurations = allDarwinConfigurations;
@@ -184,17 +215,21 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
-      url =
-        "github:nix-community/home-manager/release-24.11"; # "follows" doesn't seem to work?
+      url = "github:nix-community/home-manager/release-24.11"; # "follows" doesn't seem to work?
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # impurity adds custom module arg named "impurity" which gets overriden when merging @inputs in specialArgs
+    impurity_.url = "github:outfoxxed/impurity.nix";
 
     # macOS
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin/nix-darwin-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-homebrew = { url = "github:zhaofengli-wip/nix-homebrew"; };
+    nix-homebrew = {
+      url = "github:zhaofengli-wip/nix-homebrew";
+    };
     homebrew-bundle = {
       url = "github:homebrew/homebrew-bundle";
       flake = false;
@@ -207,9 +242,7 @@
       url = "github:homebrew/homebrew-cask";
       flake = false;
     };
-
-    # impurity adds custom module arg named "impurity" which gets overriden when merging @inputs in specialArgs
-    impurity_.url = "github:outfoxxed/impurity.nix";
+    darwin-docker.url = "github:konradmalik/darwin-docker";
 
     agenix = {
       url = "github:ryantm/agenix";
@@ -225,16 +258,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    darwin-docker.url = "github:konradmalik/darwin-docker";
-
+    # hyprland
     hyprland.url = "github:hyprwm/Hyprland/v0.40.0";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
       # inputs.nixpkgs.follows = "hyprland";
     };
+
     # thorium.url = "github:end-4/nix-thorium";
 
-    ags.url = "github:Aylur/ags";
+    # ags.url = "github:Aylur/ags";
     # flake-parts = {
     #   url = "github:hercules-ci/flake-parts";
     #   inputs.nixpkgs-lib.follows = "nixpkgs";
@@ -248,18 +281,18 @@
     #   url = "github:/InioX/Matugen";
     #   # ref = "refs/tags/matugen-v0.10.0"
     # };
-    more-waita = {
-      url = "github:somepaulo/MoreWaita";
-      flake = false;
-    };
-    firefox-gnome-theme = {
-      url = "github:rafaelmardojai/firefox-gnome-theme";
-      flake = false;
-    };
-    anyrun = {
-      url = "github:Kirottu/anyrun";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # more-waita = {
+    #   url = "github:somepaulo/MoreWaita";
+    #   flake = false;
+    # };
+    # firefox-gnome-theme = {
+    #   url = "github:rafaelmardojai/firefox-gnome-theme";
+    #   flake = false;
+    # };
+    # anyrun = {
+    #   url = "github:Kirottu/anyrun";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # NixVirt = {
     #   url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
