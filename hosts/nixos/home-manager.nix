@@ -42,7 +42,7 @@ in
           # "fontconfig"
           # "foot"
           # "fuzzel"
-          # "hypr"
+          "hypr"
           # "kitty"
           # "Kvantum"
           # "mpv"

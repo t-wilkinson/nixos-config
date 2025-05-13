@@ -8,7 +8,6 @@
       with libsForQt5;
       [
         # i3 # GAMING
-        # sway
 
         # GUI
         # blueberry # bluetooth
@@ -38,25 +37,26 @@
         # pkgs.gnome-tweaks
 
         # HYPRLAND
-        # brightnessctl
-        # cliphist
-        # fuzzel
-        # grim
-        # hyprpicker
-        # tesseract
-        # imagemagick
-        # pavucontrol
-        # playerctl
-        # swappy
-        # swaylock-effects
-        # swayidle
-        # slurp
-        # swww
-        # wayshot
-        # wlsunset
-        # wl-clipboard
-        # wf-recorder
-        # wayvnc
+        brightnessctl
+        cliphist
+        fuzzel
+        grim
+        hyprpicker
+        tesseract
+        imagemagick
+        pavucontrol
+        playerctl
+        swappy
+        swaylock-effects
+        swayidle
+        slurp
+        sway
+        swww
+        wayshot
+        wlsunset
+        wl-clipboard
+        wf-recorder
+        wayvnc
 
         # NODE
         # nodePackages_latest.neovim # error: Alais neovim is still in node-packages.nix

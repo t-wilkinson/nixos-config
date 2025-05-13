@@ -10,7 +10,6 @@ let
   user = "trey";
 in
 {
-
   imports = [
     ./hardware-configuration.nix
     # ./gnome.nix
@@ -50,19 +49,34 @@ in
     ];
   };
 
-  systemd = {
-    user.services.polkit-gnome-authentication-agent-1 = {
-      description = "polkit-gnome-authentication-agent-1";
-      wantedBy = [ "graphical-session.target" ];
-      wants = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-        Restart = "on-failure";
-        RestartSec = 1;
-        TimeoutStopSec = 10;
-      };
+  environment = {
+    localBinInPath = true;
+    sessionVariables = {
+      # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
+      NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
+      NIXPKGS_ALLOW_UNFREE = "1";
+      NIXPKGS_ALLOW_INSECURE = "1";
+      LIBVA_DRIVER_NAME = "iHD";
+    };
+  };
+
+  users = {
+    defaultUserShell = pkgs.fish;
+    users.${user} = {
+      isNormalUser = true;
+      shell = pkgs.fish;
+      extraGroups = [
+        "wheel"
+        "video"
+        "input"
+        "render"
+        "uinput"
+        (lib.mkIf config.networking.networkmanager.enable "networkmanager")
+      ];
+      openssh.authorizedKeys.keyFiles = [
+        "/home/${user}/.ssh/authorized_keys"
+        # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
+      ];
     };
   };
 
@@ -71,32 +85,40 @@ in
       wakeOnLan.enable = true;
     };
     firewall.allowedTCPPorts = [
-      22
-      6229
+      6229 # ssh
+      5900 # vnc
     ];
   };
 
-  security = {
-    rtkit.enable = true;
-    polkit.enable = true;
-    pam.services.swaylock = { };
-    # pam.services.swaylock-effects = {};
-  };
-
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = false;
+  programs = {
+    fish.enable = true;
+    zsh.enable = true;
+    dconf.enable = true;
+    # Run dynamically linked stuff
+    nix-ld = {
+      enable = true;
+      libraries = with pkgs; [
+        # Add any missing dynamic libraries for unpackaged programs
+        # here, NOT in environment.systemPackages
+      ];
+    };
+    steam.enable = true;
+    hyprland = {
+      enable = true;
+      xwayland.enable = true;
+      # nvidiaPatches = true;
+      package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+      # make sure to also set the portal package, so that they are in sync
+      portalPackage =
+        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    };
   };
 
   services = {
     # blueman.enable = true;
-    spice-vdagentd.enable = true;
     # printing.enable = true;
-    wayvnc = {
-      enable = true;
-      listen = "0.0.0.0";
-      # passwordFile = "/etc/wayvnc.pass"; create this manually
-    };
+    envfs.enable = true;
+    gvfs.enable = true;
     openssh = {
       enable = true;
       ports = [
@@ -109,28 +131,34 @@ in
         PermitRootLogin = "no";
       };
     };
-    envfs.enable = true;
     greetd = {
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
-          user = "greeter";
+          # command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
+          # user = "greeter";
         };
       };
     };
-    gvfs.enable = true;
+
+    # wayvnc = {
+    #   enable = true;
+    #   listen = "0.0.0.0";
+    #   # passwordFile = "/etc/wayvnc.pass"; create this manually
+    # };
+    spice-vdagentd.enable = true;
     xserver = {
       enable = true;
-      # videoDrivers = ["nvidia"];
+      videoDrivers = [ "modesetting" ];
       # xkb.layout = "us";
       # xkb.options = "eurosign:e,caps:escape";
-      displayManager.startx.enable = true;
-      desktopManager.gnome = {
-        enable = true;
-        extraGSettingsOverridePackages = [ pkgs.nautilus-open-any-terminal ];
-      };
+      # displayManager.startx.enable = true;
+      # desktopManager.gnome = {
+      #   enable = true;
+      #   extraGSettingsOverridePackages = [ pkgs.nautilus-open-any-terminal ];
+      # };
     };
+
     keyd = {
       enable = true;
       keyboards = {
@@ -152,79 +180,27 @@ in
     };
   };
 
-  swapDevices = [
-    {
-      device = "/var/lib/swapfile";
-      size = 16 * 1024;
-    }
-  ];
-
-  # ZRAM
-  zramSwap = {
-    enable = true;
-    # memoryPercent = 50;
-    # priority = 5;
-  };
-
-  programs = {
-    fish.enable = true;
-    zsh.enable = true;
-    dconf.enable = true;
-    # Run dynamically linked stuff
-    nix-ld = {
-      enable = true;
-      libraries = with pkgs; [
-        # Add any missing dynamic libraries for unpackaged programs
-        # here, NOT in environment.systemPackages
-      ];
-    };
-    steam.enable = true;
-    hyprland = {
-      enable = true;
-      package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-      # make sure to also set the portal package, so that they are in sync
-      portalPackage =
-        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  systemd = {
+    user.services.polkit-gnome-authentication-agent-1 = {
+      description = "polkit-gnome-authentication-agent-1";
+      wantedBy = [ "graphical-session.target" ];
+      wants = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        Restart = "on-failure";
+        RestartSec = 1;
+        TimeoutStopSec = 10;
+      };
     };
   };
 
-  environment = {
-    localBinInPath = true;
-    sessionVariables = {
-      # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
-      NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
-      NIXPKGS_ALLOW_UNFREE = "1";
-      NIXPKGS_ALLOW_INSECURE = "1";
-      LIBVA_DRIVER_NAME = "iHD";
-    };
-  };
-
-  # logind
   services.logind.extraConfig = ''
     HandlePowerKey=suspend
     HandleLidSwitch=suspend
     HandleLidSwitchExternalPower=ignore
   '';
-
-  # user
-  users = {
-    defaultUserShell = pkgs.fish;
-    users.${user} = {
-      isNormalUser = true;
-      shell = pkgs.fish;
-      extraGroups = [
-        "wheel"
-        "video"
-        "input"
-        "uinput"
-        (lib.mkIf config.networking.networkmanager.enable "networkmanager")
-      ];
-      openssh.authorizedKeys.keyFiles = [
-        "/home/${user}/.ssh/authorized_keys"
-        # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
-      ];
-    };
-  };
 
   # Locale
   time.timeZone = "America/New_York";
@@ -259,16 +235,10 @@ in
     wireplumber.enable = true;
   };
 
-  # hyprland
-  programs.hyprland = {
-    enable = true;
-    # nvidiaPatches = true;
-    xwayland.enable = true;
-    package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-    portalPackage =
-      inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+  hardware.opengl = {
+    # driSupport = true;
+    driSupport32Bit = true;
   };
-
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
@@ -279,6 +249,31 @@ in
     ];
   };
   # hardware.nvidia.modesetting.enable = true;
+
+  security = {
+    rtkit.enable = true;
+    polkit.enable = true;
+    pam.services.swaylock = { };
+    # pam.services.swaylock-effects = {};
+  };
+
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = false;
+  };
+
+  swapDevices = [
+    {
+      device = "/var/lib/swapfile";
+      size = 16 * 1024;
+    }
+  ];
+
+  zramSwap = {
+    enable = true;
+    # memoryPercent = 50;
+    # priority = 5;
+  };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
 }

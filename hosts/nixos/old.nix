@@ -1,13 +1,16 @@
 # Unused configuration useful for reference
-{ ... }: {
+{ ... }:
+{
   config = mkIf cfg.server.libvert.enable {
     # https://technicalsourcery.net/posts/nixos-in-libvirt/
-    boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
-  
+    boot.kernelModules = [
+      "kvm-intel"
+      "kvm-amd"
+    ];
+
     virtualisation.libvirtd.enable = true;
-    virtualisation.libvirtd.allowedBridges =
-      [ "${cfg.libvert.bridgeInterface}" ];
-  
+    virtualisation.libvirtd.allowedBridges = [ "${cfg.libvert.bridgeInterface}" ];
+
     networking.interfaces."${cfg.libvert.bridgeInterface}".useDHCP = true;
     networking.bridges = {
       "${cfg.libvert.bridgeInterface}" = {
@@ -20,9 +23,10 @@
     gamemode.enable = true;
     firefox = {
       enable = true;
-      preferences = { "widget.use-xdg-desktop-portal.file-picker" = 1; };
-      nativeMessagingHosts.packages =
-        [ pkgs.plasma5Packages.plasma-browser-integration ];
+      preferences = {
+        "widget.use-xdg-desktop-portal.file-picker" = 1;
+      };
+      nativeMessagingHosts.packages = [ pkgs.plasma5Packages.plasma-browser-integration ];
     };
     steam = {
       gamescopeSession.enable = true;
@@ -48,7 +52,12 @@
   boot.loader.grub.device = "/dev/nvme1n1p1";
   boot = {
     tmp.cleanOnBoot = true;
-    supportedFilesystems = [ "btrfs" "ext4" "fat32" "ntfs" ];
+    supportedFilesystems = [
+      "btrfs"
+      "ext4"
+      "fat32"
+      "ntfs"
+    ];
     loader = {
       grub = {
         enable = true;
@@ -59,21 +68,23 @@
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = pkgs.linuxPackages_xanmod_latest;
-    kernelPatches = [{
-      name = "enable RT_FULL";
-      patch = null;
-      # TODO: add realtime patch: PREEMPT_RT y
-      extraConfig = ''
-        PREEMPT y
-        PREEMPT_BUILD y
-        PREEMPT_VOLUNTARY n
-        PREEMPT_COUNT y
-        PREEMPTION y
-      '';
-    }];
+    kernelPatches = [
+      {
+        name = "enable RT_FULL";
+        patch = null;
+        # TODO: add realtime patch: PREEMPT_RT y
+        extraConfig = ''
+          PREEMPT y
+          PREEMPT_BUILD y
+          PREEMPT_VOLUNTARY n
+          PREEMPT_COUNT y
+          PREEMPTION y
+        '';
+      }
+    ];
     extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
     kernelModules = [ "acpi_call" ];
-    make 3.5mm jack work
+    # make 3.5mm jack work
     extraModprobeConfig = ''
       options snd_hda_intel model=headset-mode
     '';
@@ -92,10 +103,9 @@
       22
       6229
     ];
-    localCommands =
-      ''
-        ip -6 addr add 2001:610:685:1::1/64 dev eth0
-      '';
+    localCommands = ''
+      ip -6 addr add 2001:610:685:1::1/64 dev eth0
+    '';
   };
 
   # Boot
