@@ -4,18 +4,12 @@ return {
     opts = {},
   },
 
-  -- { import = "lazyvim.plugins.extras.lang.typescript" },
-
-  -- { "windwp/nvim-ts-autotag", enabled = false },
   { "folke/flash.nvim", enabled = false },
   { "norcalli/nvim-colorizer.lua" },
-  -- { "echasnovski/mini.pairs", enabled = true },
 
-  -- { "mason-org/mason-lspconfig.nvim", version = "1.29.1" },
-  -- { "mason-org/mason.nvim" },
-  -- { "neovim/nvim-lspconfig" },
-
-  { "windwp/nvim-autopairs" },
+  -- { "windwp/nvim-autopairs" },
+  { "echasnovski/mini.pairs", enabled = false },
+  { "echasnovski/mini.ai", enabled = true },
   {
     "echasnovski/mini.surround",
     keys = function(_, keys)
@@ -187,57 +181,6 @@ return {
   },
 
   {
-    "imsnif/kdl.vim",
-  },
-
-  -- {
-  --   "williamboman/mason.nvim",
-  --   opts = function(_, opts)
-  --     vim.list_extend(opts.ensure_installed, {
-  --       "pyright",
-  --       "clangd",
-  --       -- "stylua",
-  --       -- "selene",
-  --       -- "luacheck",
-  --       -- "shellcheck",
-  --       -- "shfmt",
-  --       -- "tailwindcss-language-server",
-  --       -- "typescript-language-server",
-  --       -- "css-lsp",
-  --     })
-  --   end,
-  -- },
-
-  {
-    "nvim-treesitter/nvim-treesitter",
-    enabled = true,
-    opts = {
-      ensure_installed = {
-        "cmake",
-        "c",
-        "cpp",
-        "css",
-        "gitignore",
-        "go",
-        "http",
-        "php",
-        "rust",
-        "sql",
-        "python",
-        "make",
-        "ninja",
-        "rst",
-        "toml",
-        "typescript",
-        "tsx",
-        "javascript",
-        "markdown",
-        "r",
-      },
-    },
-  },
-
-  {
     "hrsh7th/nvim-cmp",
     opts = function(_, opts)
       opts.mapping["<CR>"] = nil
@@ -266,49 +209,6 @@ return {
       render = "minimal",
     },
   },
-
-  {
-    "folke/zen-mode.nvim",
-    opts = {
-      window = {
-        width = 0.85,
-      },
-    },
-  },
-
-  {
-    "folke/noice.nvim",
-    enabled = true,
-    event = "VeryLazy",
-    dependencies = {
-      "rcarriga/nvim-notify",
-    },
-    opts = function(_, opts)
-      table.insert(opts.routes, {
-        filter = {
-          event = "notify",
-          find = "No information available",
-        },
-        opts = { skip = true },
-      })
-      opts.lsp = {
-        -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-        override = {
-          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-          ["vim.lsp.util.stylize_markdown"] = true,
-          ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
-        },
-      }
-      opts.presets = {
-        bottom_search = true, -- use a classic bottom cmdline for search
-        command_palette = true, -- position the cmdline and popupmenu together
-        long_message_to_split = true, -- long messages will be sent to a split
-        inc_rename = false, -- enables an input dialog for inc-rename.nvim
-        lsp_doc_border = false, -- add a border to hover docs and signature help
-      }
-    end,
-  },
-
   {
     "lukas-reineke/headlines.nvim",
     -- TODO: write custom treesitter parser for zortex (https://tree-sitter.github.io/tree-sitter/creating-parsers)
@@ -352,131 +252,4 @@ return {
       },
     },
   },
-
-  --[[{
-    "telescope.nvim",
-    dependencies = {
-      "nvim-telescope/telescope-fzf-native.nvim",
-      build = "make",
-      config = function()
-        require("telescope").load_extension("fzf")
-      end,
-    },
-  },
-  ]]
-
-  --[[ {
-    "nvim-telescope/telescope.nvim",
-    dependencies = {
-      "nvim-telescope/telescope.nvim",
-      "nvim-telescope/telescope-file-browser.nvim",
-      "nvim-lua/plenary.nvim",
-    },
-
-    -- stylua: ignore
-    keys = {
-      {
-        "<leader>fP",
-        function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
-        desc = "Find Plugin File",
-      },
-      {
-        "<leader>fp",
-        function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root }) end,
-        desc = "Find Plugin File",
-      },
-  		{
-  			"<leader>fP",
-  			function() require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root, }) end,
-  			desc = "Find Plugin File",
-  		},
-  		{
-  			"<leader>;f",
-  			function() local builtin = require("telescope.builtin") builtin.find_files({ no_ignore = false, hidden = true, }) end,
-  			desc = "Lists files in your current working directory, respects .gitignore",
-  		},
-  		{
-  			"<leader>;r",
-  			function() local builtin = require("telescope.builtin") builtin.live_grep({ additional_args = { "--hidden" }, }) end,
-  			desc = "Search for a string in your current working directory and get results live as you type, respects .gitignore",
-  		},
-  		{
-  			"<leader>\\\\",
-  			function() local builtin = require("telescope.builtin") builtin.buffers() end,
-  			desc = "Lists open buffers",
-  		},
-  		{
-  			"<leader>;t",
-  			function() local builtin = require("telescope.builtin") builtin.help_tags() end,
-  			desc = "Lists available help tags and opens a new window with the relevant help info on <cr>",
-  		},
-  		{
-  			"<leader>;;",
-  			function() local builtin = require("telescope.builtin") builtin.resume() end,
-  			desc = "Resume the previous telescope picker",
-  		},
-  		{
-  			"<leader>;e",
-  			function() local builtin = require("telescope.builtin") builtin.diagnostics() end,
-  			desc = "Lists Diagnostics for all open buffers or a specific buffer",
-  		},
-  		{
-  			"<leader>;s",
-  			function() local builtin = require("telescope.builtin") builtin.treesitter() end,
-  			desc = "Lists Function names, variables, from Treesitter",
-  		},
-  		{
-  			"<leader>sf",
-  			function()
-  				local telescope = require("telescope")
-
-  				local function telescope_buffer_dir()
-  					return vim.fn.expand("%:p:h")
-  				end
-
-  				telescope.extensions.file_browser.file_browser({
-  					path = "%:p:h",
-  					cwd = telescope_buffer_dir(),
-  					respect_gitignore = false,
-  					hidden = true,
-  					grouped = true,
-  					previewer = false,
-  					initial_mode = "normal",
-  					layout_config = { height = 40 },
-  				})
-  			end,
-  			desc = "Open File Browser with the path of the current buffer",
-  		},
-  	},
-
-    config = function(_, opts)
-      local telescope = require("telescope")
-      local actions = require("telescope.actions")
-      local fb_actions = require("telescope").extensions.file_browser.actions
-
-      opts.defaults = vim.tbl_deep_extend("force", opts.defaults, {
-        wrap_results = true,
-        layout_strategy = "horizontal",
-        layout_config = { prompt_position = "top" },
-        sorting_strategy = "ascending",
-        winblend = 0,
-        mappings = {
-          n = {},
-        },
-      })
-
-      opts.extensions = {
-        file_browser = {
-          theme = "dropdown",
-          hijack_netrw = true,
-          hide_parent_dir = true,
-        },
-      }
-
-      telescope.setup(opts)
-      require("telescope").load_extension("fzf")
-      require("telescope").load_extension("file_browser")
-    end,
-  },
-  ]]
 }

@@ -3,8 +3,8 @@ Util = require("lazyvim.util")
 return {
   { "tribela/vim-transparent" },
   { "catppuccin/nvim", enabled = false },
-  { "folke/tokyonight.nvim", enabled = true },
-  { "dracula/vim", enabled = true },
+  { "folke/tokyonight.nvim", enabled = false },
+  { "dracula/vim", enabled = false },
   {
     "rose-pine/neovim",
     name = "rose-pine",
@@ -15,13 +15,16 @@ return {
     end,
   },
 
+  { "echasnovski/mini.animate", enabled = false },
+
   {
     "LazyVim/LazyVim",
-    opts = { colorscheme = "tokyonight" },
+    opts = { colorscheme = "rose-pine-moon" },
   },
 
   {
     "akinsho/bufferline.nvim",
+    enabled = false,
     dependencies = { "nvim-tree/nvim-web-devicons" },
     event = "VeryLazy",
     opts = {
@@ -42,42 +45,6 @@ return {
       linehl = false, -- Toggle with `:Gitsigns toggle_linehl`
       word_diff = false, -- Toggle with `:Gitsigns toggle_word_diff`
     },
-  },
-
-  {
-    "echasnovski/mini.animate",
-    recommended = true,
-    enabled = false,
-    event = "VeryLazy",
-    opts = function()
-      local mouse_scrolled = false
-      for _, scroll in ipairs({ "Up", "Down" }) do
-        local key = "<ScrollWheel" .. scroll .. ">"
-        vim.keymap.set({ "", "i" }, key, function()
-          mouse_scrolled = true
-          return key
-        end, { expr = true })
-      end
-
-      local animate = require("mini.animate")
-      return {
-        resize = {
-          timing = animate.gen_timing.linear({ duration = 40, unit = "total" }),
-        },
-        scroll = {
-          timing = animate.gen_timing.linear({ duration = 40, unit = "total" }),
-          subscroll = animate.gen_subscroll.equal({
-            predicate = function(total_scroll)
-              if mouse_scrolled then
-                mouse_scrolled = false
-                return false
-              end
-              return total_scroll > 1
-            end,
-          }),
-        },
-      }
-    end,
   },
 
   {
@@ -208,11 +175,11 @@ return {
     end,
   },
 
-  {
-    "MunifTanjim/nui.nvim",
-    lazy = true,
-    enabled = true,
-  },
+  -- {
+  --   "MunifTanjim/nui.nvim",
+  --   lazy = true,
+  --   enabled = true,
+  -- },
 
   {
     "folke/snacks.nvim",
@@ -251,5 +218,47 @@ return {
         },
       },
     },
+  },
+
+  {
+    "folke/zen-mode.nvim",
+    opts = {
+      window = {
+        width = 0.85,
+      },
+    },
+  },
+
+  {
+    "folke/noice.nvim",
+    enabled = true,
+    event = "VeryLazy",
+    dependencies = {
+      "rcarriga/nvim-notify",
+    },
+    opts = function(_, opts)
+      table.insert(opts.routes, {
+        filter = {
+          event = "notify",
+          find = "No information available",
+        },
+        opts = { skip = true },
+      })
+      opts.lsp = {
+        -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+        override = {
+          ["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+          ["vim.lsp.util.stylize_markdown"] = true,
+          ["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+        },
+      }
+      opts.presets = {
+        bottom_search = true, -- use a classic bottom cmdline for search
+        command_palette = true, -- position the cmdline and popupmenu together
+        long_message_to_split = true, -- long messages will be sent to a split
+        inc_rename = false, -- enables an input dialog for inc-rename.nvim
+        lsp_doc_border = false, -- add a border to hover docs and signature help
+      }
+    end,
   },
 }
