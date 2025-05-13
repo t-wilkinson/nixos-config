@@ -31,9 +31,6 @@ in
         "$HOME/.local/bin"
         "$HOME/.npm-packages/bin"
       ];
-      shellAliases = {
-        vim = "nvim";
-      };
       packages = [ git-credential-pass ];
       file =
         myLib.makeConfigLinks impurity [
@@ -56,7 +53,8 @@ in
           # "zshrc.d"
         ]
         // {
-          ".gnupg/gpg-agent.conf".path = ~/.gnupg/gpg-agent.conf.linux;
+          # TODO: add linux-specific gpg-agent later
+          # ".gnupg/gpg-agent.conf".source = "${self}${homeDirectory}/.gnupg/gpg-agent.conf.linux";
         };
     };
 

@@ -92,6 +92,23 @@ in
     # blueman.enable = true;
     spice-vdagentd.enable = true;
     # printing.enable = true;
+    wayvnc = {
+      enable = true;
+      listen = "0.0.0.0";
+      # passwordFile = "/etc/wayvnc.pass"; create this manually
+    };
+    openssh = {
+      enable = true;
+      ports = [
+        22
+        6229
+      ];
+      settings = {
+        PasswordAuthentication = false;
+        AllowUsers = null;
+        PermitRootLogin = "no";
+      };
+    };
     envfs.enable = true;
     greetd = {
       enable = true;
@@ -262,19 +279,6 @@ in
     ];
   };
   # hardware.nvidia.modesetting.enable = true;
-
-  services.openssh = {
-    enable = true;
-    ports = [
-      22
-      6229
-    ];
-    settings = {
-      PasswordAuthentication = false;
-      AllowUsers = null;
-      PermitRootLogin = "no";
-    };
-  };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
 }

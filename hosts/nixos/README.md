@@ -26,6 +26,8 @@ FRRouting to learn more advanced routing/routing protocols
 
 Traefik
 
+WayVNC
+
 ## Networking
 
 VLAN
