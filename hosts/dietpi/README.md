@@ -23,3 +23,16 @@ Forward internet to my domain (treywilkinson.com) to my pi.
 
 Raspberry Pi 4
 Gigabit ethernet
+
+## Configuring
+
+```bash
+# allow VPN clients to use pihole for DNS requests
+pihole -a -i local
+
+# adding dietpi wg0 interface
+ip link add wg0 type wireguard
+ip addr add 10.0.0.1/24 dev wg0
+wg set wg0 private-key ./privatekey
+ip link set wg0 up
+```
