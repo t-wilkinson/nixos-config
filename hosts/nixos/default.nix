@@ -2,10 +2,12 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./configuration.nix
+    ./hosts/CirnOS
+    ./homes
+    # ./configuration.nix
     # ./gnome.nix
-    ./home-manager.nix
-    ./packages.nix
-    ../../modules/shared.nix
+    # ./home-manager.nix
+    # ./packages.nix
+    # ../../modules/shared.nix
   ];
 }

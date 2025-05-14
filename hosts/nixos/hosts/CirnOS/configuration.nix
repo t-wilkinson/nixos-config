@@ -1,9 +1,11 @@
 {
   pkgs,
-  username,
   config,
   ...
 }:
+let
+  username = "trey";
+in
 {
   # nix
   documentation.nixos.enable = false; # .desktop
@@ -39,18 +41,6 @@
   # };
 
   services = {
-    openssh = {
-      enable = true;
-      ports = [
-        22
-        6229
-      ];
-      settings = {
-        PasswordAuthentication = false;
-        AllowUsers = null;
-        PermitRootLogin = "no";
-      };
-    };
     envfs.enable = true;
     greetd = {
       enable = true;
@@ -155,10 +145,6 @@
         "uinput"
         "libvirtd"
       ];
-      openssh.authorizedKeys.keyFiles = [
-        "/home/${user}/.ssh/authorized_keys"
-        # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
-      ];
     };
   };
 
@@ -166,13 +152,6 @@
   networking = {
     hostName = "nixos";
     networkmanager.enable = true;
-    interfaces.enp3s0 = {
-      wakeOnLan.enable = true;
-    };
-    firewall.allowedTCPPorts = [
-      6229 # ssh
-      5900 # vnc
-    ];
   };
 
   # bluetooth

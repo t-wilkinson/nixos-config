@@ -4,24 +4,29 @@
   outputs =
     {
       self,
+
       agenix,
+      ags,
+      anyrun,
       darwin-docker,
       disko,
+      firefox-gnome-theme,
+      flake-parts,
+      gross,
       home-manager,
       homebrew-bundle,
       homebrew-cask,
       homebrew-core,
+      hyprland,
+      hyprland-plugins,
       impurity_,
+      matugen,
+      more-waita,
       nix-darwin,
       nix-homebrew,
       nixpkgs,
-      # firefox-gnome-theme,
-      # more-waita,
-      hyprland,
-      hyprland-plugins,
-      #ags,
-      # anyrun,
       nixpkgs-unstable,
+      thorium,
     }@inputs:
     let
       user = "trey";
@@ -265,34 +270,34 @@
       # inputs.nixpkgs.follows = "hyprland";
     };
 
-    # thorium.url = "github:end-4/nix-thorium";
-
-    # ags.url = "github:Aylur/ags";
-    # flake-parts = {
-    #   url = "github:hercules-ci/flake-parts";
-    #   inputs.nixpkgs-lib.follows = "nixpkgs";
-    # };
-    # gross = {
-    #   url = "github:fufexan/gross";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    #   inputs.flake-parts.follows = "flake-parts";
-    # };
-    # matugen = {
-    #   url = "github:/InioX/Matugen";
-    #   # ref = "refs/tags/matugen-v0.10.0"
-    # };
-    # more-waita = {
-    #   url = "github:somepaulo/MoreWaita";
-    #   flake = false;
-    # };
-    # firefox-gnome-theme = {
-    #   url = "github:rafaelmardojai/firefox-gnome-theme";
-    #   flake = false;
-    # };
-    # anyrun = {
-    #   url = "github:Kirottu/anyrun";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
+    # nixos
+    thorium.url = "github:end-4/nix-thorium";
+    ags.url = "github:Aylur/ags";
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+    gross = {
+      url = "github:fufexan/gross";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
+    matugen = {
+      url = "github:/InioX/Matugen";
+      # ref = "refs/tags/matugen-v0.10.0"
+    };
+    more-waita = {
+      url = "github:somepaulo/MoreWaita";
+      flake = false;
+    };
+    firefox-gnome-theme = {
+      url = "github:rafaelmardojai/firefox-gnome-theme";
+      flake = false;
+    };
+    anyrun = {
+      url = "github:Kirottu/anyrun";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # NixVirt = {
     #   url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
