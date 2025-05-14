@@ -56,7 +56,7 @@
         wlsunset
         wl-clipboard
         wf-recorder
-        wayvnc
+        # wayvnc
 
         # NODE
         # nodePackages_latest.neovim # error: Alais neovim is still in node-packages.nix

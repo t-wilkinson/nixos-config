@@ -18,5 +18,7 @@
     nss
     gnutls
     libglvnd
+
+    pinentry
   ];
 }
