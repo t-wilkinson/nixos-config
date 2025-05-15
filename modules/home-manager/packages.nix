@@ -4,7 +4,7 @@ with pkgs;
   # TERMINAL EMULATORS
   foot
   # tmux
-  # alacritty
+  alacritty
   kitty
 
   # GAMES

@@ -1,22 +1,23 @@
 let
   mod = "Mod4";
   alt = "Mod1";
-in {
+in
+{
   wayland.windowManager.sway = {
     enable = true;
     config = {
       input = {
-        "*" =  {
+        "*" = {
           # xkb_layout = "en";
           natural_scroll = "disabled";
         };
       };
-      bars = [];
+      bars = [ ];
       keybindings = {
-        "${mod}+Return" = "exec xterm";
-        "${mod}+w" = "exec firefox";
-        "${alt}+q" = "kill";
-        "${mod}+f" = "floating toggle";
+        # "${mod}+Return" = "exec xterm";
+        # "${mod}+w" = "exec firefox";
+        # "${alt}+q" = "kill";
+        # "${mod}+f" = "floating toggle";
       };
       floating = {
         modifier = mod;

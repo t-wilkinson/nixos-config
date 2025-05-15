@@ -163,7 +163,7 @@ in
         animate_manual_resizes = false;
         animate_mouse_windowdragging = false;
         enable_swallow = false;
-        swallow_regex = "(foot|kitty|allacritty|Alacritty)";
+        swallow_regex = "(foot|kitty|alacritty|Alacritty)";
 
         disable_hyprland_logo = true;
         new_window_takes_over_fullscreen = 2;
@@ -179,7 +179,7 @@ in
         in
         [
           # "Super, C, exec, code --password-store=gnome"
-          "Super, T, exec, foot --override shell=fish"
+          "Super, T, exec, alacritty"
           "Super, E, exec, nautilus --new-window"
           "Super+Alt, E, exec, thunar"
           "Super, W, exec, firefox"

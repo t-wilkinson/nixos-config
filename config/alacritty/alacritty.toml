@@ -1,0 +1,12 @@
+live_config_reload = true
+window.opacity = 0.98
+
+[shell]
+# program = "/usr/bin/fish"
+
+[font]
+size = 12
+
+[font.normal]
+family = "FiraCode Nerd Font"
+style = "Regular"

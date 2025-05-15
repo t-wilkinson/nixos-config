@@ -17,6 +17,7 @@
         ++ (import ./packages.nix { inherit pkgs unstable; })
         ++ (import ./development.nix { inherit pkgs unstable hostname; });
       file = myLib.makeConfigLinks impurity [
+        "alacritty"
         "nvim"
         "zellij"
         "kitty"

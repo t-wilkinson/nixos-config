@@ -56,7 +56,7 @@ in
         packages = [ git-credential-pass ];
         file =
           myLib.makeConfigLinks impurity [
-            "ags-old"
+            "ags"
             # "anyrun"
             # "chrome-flags.conf"
             # "code-flags.conf"
