@@ -270,7 +270,7 @@
     };
     thorium.url = "github:end-4/nix-thorium";
     ags = {
-      url = "github:Aylur/ags";
+      url = "github:Aylur/ags/v1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts = {

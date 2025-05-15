@@ -14,7 +14,7 @@ with pkgs;
   # elixir
   # eslint
   gcc
-  # gjs
+  gjs
   go
   # mono5 # C#
   # php

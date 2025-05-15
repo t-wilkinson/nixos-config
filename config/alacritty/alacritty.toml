@@ -1,8 +1,14 @@
-live_config_reload = true
-window.opacity = 0.98
 
-[shell]
+[general]
+live_config_reload = true
+
+# [shell]
 # program = "/usr/bin/fish"
+
+[window]
+padding = { x = 15, y = 15 }
+blur = true
+opacity = 0.98
 
 [font]
 size = 12
@@ -10,3 +16,8 @@ size = 12
 [font.normal]
 family = "FiraCode Nerd Font"
 style = "Regular"
+
+[keyboard]
+bindings = [
+{ key = "l", mods = "Alt", action = "ReceiveChar" },
+]

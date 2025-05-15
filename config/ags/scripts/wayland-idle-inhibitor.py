@@ -1,9 +1,9 @@
-#!/usr/bin/env -S\_/bin/sh\_-xc\_"source\_\$(eval\_echo\_\$ILLOGICAL_IMPULSE_VIRTUAL_ENV)/bin/activate&&exec\_python\_-E\_"\$0"\_"\$@""
+#!/usr/bin/env python
+
 import sys
 from dataclasses import dataclass
 from signal import SIGINT, SIGTERM, signal
 from threading import Event
-import setproctitle
 
 from pywayland.client.display import Display
 from pywayland.protocol.idle_inhibit_unstable_v1.zwp_idle_inhibit_manager_v1 import (
@@ -78,5 +78,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    setproctitle.setproctitle("wayland-idle-inhibitor.py")
     main()
