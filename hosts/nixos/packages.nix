@@ -5,6 +5,7 @@
     fish
     nixpkgs-fmt
     nixfmt-classic
+    # nixfmt
     gnumake
     gtk3
     efibootmgr

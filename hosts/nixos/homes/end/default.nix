@@ -1,8 +1,8 @@
+{ pkgs, impurity, ... }:
 let
   username = "trey";
   homeDirectory = "/home/trey";
 in
-{ pkgs, impurity, ... }:
 {
   imports = [
     # Cachix

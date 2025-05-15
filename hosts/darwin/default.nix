@@ -2,12 +2,9 @@
   self,
   config,
   pkgs,
+  username,
   ...
 }:
-
-let
-  user = "trey";
-in
 {
   imports = [
     # "${self}/modules/darwin/secrets.nix"
@@ -30,7 +27,7 @@ in
       experimental-features = "nix-command flakes";
       trusted-users = [
         "@admin"
-        "${user}"
+        username
       ];
       substituters = [
         "https://cache.nixos.org"

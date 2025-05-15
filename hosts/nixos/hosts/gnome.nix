@@ -2,7 +2,8 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   environment = {
     sessionVariables = {
       NAUTILUS_EXTENSION_DIR = "${config.system.path}/lib/nautilus/extensions-4";
@@ -19,7 +20,7 @@
       bibata-cursors
       rubik
       lexend
-      gnome.nautilus-python
+      nautilus-python
       twitter-color-emoji
     ];
 

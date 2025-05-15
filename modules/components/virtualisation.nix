@@ -1,8 +1,11 @@
-{ NixVirt, microvm, pkgs, ... }:
-let
-  username = "trey";
-  # inherit (inputs) NixVirt;
-in {
+{
+  username,
+  NixVirt,
+  microvm,
+  pkgs,
+  ...
+}:
+{
   # home-manager.users.${username} = {
   #   home.packages = with pkgs; [
   #     virt-manager
@@ -113,7 +116,7 @@ in {
   #     ];
   #     domains = [
   #       # {
-  #       #   definition = NixVirt.lib.domain.writeXML (NixVirt.lib.domain.templates.linux 
+  #       #   definition = NixVirt.lib.domain.writeXML (NixVirt.lib.domain.templates.linux
   #       #   {
   #       #     name = "Whonix-Workstation";
   #       #     uuid = "d36db468-8c52-491a-9e83-da77d79d635f";
@@ -123,7 +126,7 @@ in {
   #       #   active = true;
   #       # }
   #       # {
-  #       #   definition = NixVirt.lib.domain.writeXML (NixVirt.lib.domain.templates.linux 
+  #       #   definition = NixVirt.lib.domain.writeXML (NixVirt.lib.domain.templates.linux
   #       #   {
   #       #     name = "Whonix-Gateway";
   #       #     uuid = "6570e4a2-d7bb-4520-9e12-b24cc685766d";
@@ -149,6 +152,6 @@ in {
   # networking.firewall.trustedInterfaces = [ "virbr0" ];
   # networking.bridges.virbr0.interfaces = [];
 
-    # users.users.${username}.extraGroups =
-    #   [ "docker" "podman" "libvirtd" "lxd" "incus" "kvm" ];
+  # users.users.${username}.extraGroups =
+  #   [ "docker" "podman" "libvirtd" "lxd" "incus" "kvm" ];
 }

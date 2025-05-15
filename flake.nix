@@ -29,7 +29,7 @@
       thorium,
     }@inputs:
     let
-      user = "trey";
+      username = "trey";
       linuxSystems = [
         "x86_64-linux"
         "aarch64-linux"
@@ -109,7 +109,7 @@
         nix-darwin.lib.darwinSystem {
           inherit system;
           specialArgs = {
-            inherit inputs;
+            inherit inputs username;
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
@@ -128,7 +128,7 @@
             }
             {
               nix-homebrew = {
-                inherit user;
+                user = username;
                 enable = true;
                 taps = {
                   "homebrew/homebrew-core" = homebrew-core;
@@ -161,8 +161,7 @@
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
-            inherit inputs;
-            user = "trey";
+            inherit inputs username;
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
@@ -182,7 +181,7 @@
             #   home-manager = {
             #     useGlobalPkgs = true;
             #     useUserPackages = true;
-            #     users.${user} = import ./modules/nixos/home-manager.nix;
+            #     users.${username} = import ./modules/nixos/home-manager.nix;
             #   };
             # }
             # (import "${self}/modules/hosts/home-manager.nix" { inherit self; })

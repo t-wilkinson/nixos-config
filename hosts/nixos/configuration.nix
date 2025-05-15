@@ -1,14 +1,12 @@
 {
-  lib,
   config,
+  inputs,
+  lib,
   pkgs,
   unstable,
-  inputs,
+  username,
   ...
 }:
-let
-  user = "trey";
-in
 {
   # nix
   documentation.nixos.enable = false; # .desktop
@@ -35,36 +33,39 @@ in
 
   environment = {
     localBinInPath = true;
-    sessionVariables = {
-      # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
-      NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
-      # NIXPKGS_ALLOW_UNFREE = "1";
-      # NIXPKGS_ALLOW_INSECURE = "1";
-      # LIBVA_DRIVER_NAME = "iHD";
-    };
+    # sessionVariables = {
+    #   # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
+    #   NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
+    #   # NIXPKGS_ALLOW_UNFREE = "1";
+    #   # NIXPKGS_ALLOW_INSECURE = "1";
+    #   # LIBVA_DRIVER_NAME = "iHD";
+    # };
   };
 
   users = {
     defaultUserShell = pkgs.fish;
-    users.${user} = {
+    users.${username} = {
       isNormalUser = true;
       shell = pkgs.fish;
       extraGroups = [
         "wheel"
         "video"
         "input"
-        "render"
         "uinput"
+        # "render"
+        "libvirtd"
         (lib.mkIf config.networking.networkmanager.enable "networkmanager")
       ];
       openssh.authorizedKeys.keyFiles = [
-        "/home/${user}/.ssh/authorized_keys"
+        "/home/${username}/.ssh/authorized_keys"
         # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
       ];
     };
   };
 
   networking = {
+    hostName = "nixos";
+    networkmanager.enable = true;
     interfaces.enp3s0 = {
       wakeOnLan.enable = true;
     };
@@ -79,6 +80,10 @@ in
     zsh.enable = true;
     dconf.enable = true;
     # Run dynamically linked stuff
+    firefox = {
+      enable = true;
+      nativeMessagingHosts.packages = [ pkgs.plasma5Packages.plasma-browser-integration ];
+    };
     nix-ld = {
       enable = true;
       libraries = with pkgs; [
@@ -87,16 +92,16 @@ in
       ];
     };
     steam.enable = true;
-    hyprland = {
-      enable = true;
-      withUWSM = true;
-      xwayland.enable = true;
-      # nvidiaPatches = true;
-      package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-      # make sure to also set the portal package, so that they are in sync
-      portalPackage =
-        inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
-    };
+    # hyprland = {
+    #   enable = true;
+    #   withUWSM = true;
+    #   xwayland.enable = true;
+    #   # nvidiaPatches = true;
+    #   package = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
+    #   # make sure to also set the portal package, so that they are in sync
+    #   portalPackage =
+    #     inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
+    # };
   };
 
   services = {
@@ -116,15 +121,15 @@ in
         PermitRootLogin = "no";
       };
     };
-    # greetd = {
-    #   enable = true;
-    #   settings = {
-    #     default_session = {
-    #       # command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
-    #       # user = "greeter";
-    #     };
-    #   };
-    # };
+    greetd = {
+      enable = true;
+      settings = {
+        default_session = {
+          command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
+          user = "greeter";
+        };
+      };
+    };
 
     # wayvnc = {
     #   enable = true;
@@ -132,17 +137,17 @@ in
     #   # passwordFile = "/etc/wayvnc.pass"; create this manually
     # };
     # spice-vdagentd.enable = true;
-    # xserver = {
-    #   enable = true;
-    #   videoDrivers = [ "modesetting" ];
-    #   # xkb.layout = "us";
-    #   # xkb.options = "eurosign:e,caps:escape";
-    #   # displayManager.startx.enable = true;
-    #   # desktopManager.gnome = {
-    #   #   enable = true;
-    #   #   extraGSettingsOverridePackages = [ pkgs.nautilus-open-any-terminal ];
-    #   # };
-    # };
+    xserver = {
+      enable = true;
+      videoDrivers = [ "modesetting" ];
+      displayManager.startx.enable = true;
+      desktopManager.gnome = {
+        enable = true;
+        extraGSettingsOverridePackages = [ pkgs.nautilus-open-any-terminal ];
+      };
+      # xkb.layout = "us";
+      # xkb.options = "eurosign:e,caps:escape";
+    };
 
     keyd = {
       enable = true;
@@ -165,58 +170,27 @@ in
     };
   };
 
-  # systemd = {
-  #   user.services.polkit-gnome-authentication-agent-1 = {
-  #     description = "polkit-gnome-authentication-agent-1";
-  #     wantedBy = [ "graphical-session.target" ];
-  #     wants = [ "graphical-session.target" ];
-  #     after = [ "graphical-session.target" ];
-  #     serviceConfig = {
-  #       Type = "simple";
-  #       ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-  #       Restart = "on-failure";
-  #       RestartSec = 1;
-  #       TimeoutStopSec = 10;
-  #     };
-  #   };
-  # };
+  systemd = {
+    user.services.polkit-gnome-authentication-agent-1 = {
+      description = "polkit-gnome-authentication-agent-1";
+      wantedBy = [ "graphical-session.target" ];
+      wants = [ "graphical-session.target" ];
+      after = [ "graphical-session.target" ];
+      serviceConfig = {
+        Type = "simple";
+        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+        Restart = "on-failure";
+        RestartSec = 1;
+        TimeoutStopSec = 10;
+      };
+    };
+  };
 
   services.logind.extraConfig = ''
     HandlePowerKey=suspend
     HandleLidSwitch=suspend
     HandleLidSwitchExternalPower=ignore
   '';
-
-  # Locale
-  time.timeZone = "America/New_York";
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
-  # Audio
-  # sound.enable = true;
-  hardware.pulseaudio.enable = false;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    # jack.enable = true;
-    wireplumber.enable = true;
-  };
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = false;
-  };
 
   hardware.graphics = {
     enable = true;
@@ -234,7 +208,7 @@ in
   security = {
     rtkit.enable = true;
     polkit.enable = true;
-    # pam.services.swaylock = { };
+    pam.services.swaylock = { };
     # pam.services.swaylock-effects = {};
   };
 

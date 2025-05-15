@@ -5,10 +5,10 @@
   myLib,
   lib,
   impurity,
+  username,
   ...
 }:
 let
-  username = "trey";
   homeDirectory = "/home/trey";
   git-credential-pass = pkgs.writeShellScriptBin "git-credential-pass" ''
     #!/bin/bash

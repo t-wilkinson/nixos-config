@@ -23,7 +23,7 @@ in
     name = "Settings";
     comment = "Gnome Control Center";
     icon = "org.gnome.Settings";
-    exec = "env XDG_CURRENT_DESKTOP=gnome ${pkgs.gnome.gnome-control-center}/bin/gnome-control-center";
+    exec = "env XDG_CURRENT_DESKTOP=gnome ${pkgs.gnome-control-center}/bin/gnome-control-center";
     categories = [ "X-Preferences" ];
     terminal = false;
   };
@@ -178,7 +178,7 @@ in
           SLURP_COMMAND = "$(slurp -d -c eedcf5BB -b 4f425644 -s 00000000)";
         in
         [
-          "Super, C, exec, code --password-store=gnome"
+          # "Super, C, exec, code --password-store=gnome"
           "Super, T, exec, foot --override shell=fish"
           "Super, E, exec, nautilus --new-window"
           "Super+Alt, E, exec, thunar"
@@ -273,16 +273,16 @@ in
           "Control+Super, S, togglespecialworkspace,"
           "Alt, Tab, cyclenext"
           "Alt, Tab, bringactivetotop,"
-          "Super+Alt, 1, movetoworkspacesilent, 1"
-          "Super+Alt, 2, movetoworkspacesilent, 2"
-          "Super+Alt, 3, movetoworkspacesilent, 3"
-          "Super+Alt, 4, movetoworkspacesilent, 4"
-          "Super+Alt, 5, movetoworkspacesilent, 5"
-          "Super+Alt, 6, movetoworkspacesilent, 6"
-          "Super+Alt, 7, movetoworkspacesilent, 7"
-          "Super+Alt, 8, movetoworkspacesilent, 8"
-          "Super+Alt, 9, movetoworkspacesilent, 9"
-          "Super+Alt, 0, movetoworkspacesilent, 10"
+          "Super+Shift, 1, movetoworkspacesilent, 1"
+          "Super+Shift, 2, movetoworkspacesilent, 2"
+          "Super+Shift, 3, movetoworkspacesilent, 3"
+          "Super+Shift, 4, movetoworkspacesilent, 4"
+          "Super+Shift, 5, movetoworkspacesilent, 5"
+          "Super+Shift, 6, movetoworkspacesilent, 6"
+          "Super+Shift, 7, movetoworkspacesilent, 7"
+          "Super+Shift, 8, movetoworkspacesilent, 8"
+          "Super+Shift, 9, movetoworkspacesilent, 9"
+          "Super+Shift, 0, movetoworkspacesilent, 10"
           "Control+Shift+Super, Up, movetoworkspacesilent, special"
           "Super+Alt, S, movetoworkspacesilent, special"
           "Super, mouse_up, workspace, +1"
@@ -345,6 +345,16 @@ in
         "float,title:^(Library)(.*)$ "
       ];
       windowrulev2 = [ "tile,class:(wpsoffice)" ];
+      # windowrulev2 = [
+      #   "tile, class:(wpsoffice)"
+      #   "opacity 0.84 0.84,class:^(foot)$"
+
+      #   # special dropdown workspace
+      #   "float, title:^dropdown$"
+      #   "workspace special:dropdown, title:^dropdown$"
+      #   "size 70% 80%, title:^dropdown$"
+      #   "move 15% 10%, title:^dropdown$"
+      # ];
       layerrule = [
         "xray 1, .*"
         "noanim, selection"

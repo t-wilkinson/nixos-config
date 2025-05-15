@@ -2,7 +2,8 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./hosts/CirnOS
+    ./configuration.nix
+    ./hosts
     ./homes
     ./packages.nix
     ../../modules/shared.nix

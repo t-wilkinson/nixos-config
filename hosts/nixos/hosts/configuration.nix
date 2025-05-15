@@ -1,14 +1,10 @@
 {
   pkgs,
   config,
+  username,
   ...
 }:
-let
-  username = "trey";
-in
 {
-  # nix
-  documentation.nixos.enable = false; # .desktop
   nixpkgs.config.allowUnfree = true;
   nix.settings = {
     experimental-features = "nix-command flakes";
@@ -34,12 +30,6 @@ in
     ];
   };
 
-  # virtualisation
-  # programs.virt-manager.enable = true;
-  # virtualisation = {
-  #   libvirtd.enable = true;
-  # };
-
   services = {
     envfs.enable = true;
     greetd = {
@@ -60,25 +50,6 @@ in
         extraGSettingsOverridePackages = [
           pkgs.nautilus-open-any-terminal
         ];
-      };
-    };
-    keyd = {
-      enable = true;
-      keyboards = {
-        default = {
-          ids = [ "*" ];
-          settings = {
-            main = {
-              # control = "oneshot(control)";
-              capslock = "overload(control, esc)";
-              esc = "`";
-            };
-            # Make esc work on my small 60% fn keyboard
-            "esc:S" = {
-              esc = "~";
-            };
-          };
-        };
       };
     };
   };
@@ -127,21 +98,6 @@ in
         # here, NOT in environment.systemPackages
       ];
     };
-  };
-  # packages
-  environment = {
-    localBinInPath = true;
-    systemPackages = with pkgs; [
-      curl
-      zsh
-      fish
-      git
-      gh
-      # home-manager
-      wget
-      nixpkgs-fmt
-      nixfmt
-    ];
   };
 
   # logind
