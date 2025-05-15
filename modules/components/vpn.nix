@@ -179,46 +179,50 @@ let
   '';
 in
 {
-  age.identityPaths = [ "${config.users.users.trey.home}/.ssh/id_rsa" ];
-  age.secrets.vpn-config.file = ../secrets/vpn-config.age;
-  age.secrets.vpn-pia-credentials = {
-    file = ../secrets/vpn-pia-credentials.age;
-    owner = "root";
-    group = "root";
-    mode = "0400";
-  };
 
-  services.openvpn.servers = {
-    one = {
-      autoStart = true;
-      config = "config /run/openvpn-config-1";
-    };
-    # two = {
-    #   autoStart = true;
-    #   config = "config /run/openvpn-config-2";
-    # };
-  };
+  environment.systemPackages = with pkgs; [
+    wireguard-tools
+  ];
+  # age.identityPaths = [ "${config.users.users.trey.home}/.ssh/id_rsa" ];
+  # age.secrets.vpn-config.file = ../secrets/vpn-config.age;
+  # age.secrets.vpn-pia-credentials = {
+  #   file = ../secrets/vpn-pia-credentials.age;
+  #   owner = "root";
+  #   group = "root";
+  #   mode = "0400";
+  # };
 
-  systemd.services."openvpn-one" = {
-    requires = [ "openvpn-pia.service" ];
-    after = [ "openvpn-pia.service" ];
-  };
+  # services.openvpn.servers = {
+  #   one = {
+  #     autoStart = true;
+  #     config = "config /run/openvpn-config-1";
+  #   };
+  #   # two = {
+  #   #   autoStart = true;
+  #   #   config = "config /run/openvpn-config-2";
+  #   # };
+  # };
 
-  # systemd.services."openvpn-two" = {
+  # systemd.services."openvpn-one" = {
   #   requires = [ "openvpn-pia.service" ];
   #   after = [ "openvpn-pia.service" ];
   # };
 
-  systemd.services."openvpn-pia" = {
-    description = "OpenVPN PIA setup";
-    wantedBy = [ "multi-user.target" ];
-    before = [ "openvpn-one.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${vpnSetupScript}";
-      SupplementaryGroups = [ config.users.groups.keys.name ];
-      ReadWritePaths = [ "/run" ];
-    };
-  };
+  # # systemd.services."openvpn-two" = {
+  # #   requires = [ "openvpn-pia.service" ];
+  # #   after = [ "openvpn-pia.service" ];
+  # # };
+
+  # systemd.services."openvpn-pia" = {
+  #   description = "OpenVPN PIA setup";
+  #   wantedBy = [ "multi-user.target" ];
+  #   before = [ "openvpn-one.service" ];
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     RemainAfterExit = true;
+  #     ExecStart = "${vpnSetupScript}";
+  #     SupplementaryGroups = [ config.users.groups.keys.name ];
+  #     ReadWritePaths = [ "/run" ];
+  #   };
+  # };
 }

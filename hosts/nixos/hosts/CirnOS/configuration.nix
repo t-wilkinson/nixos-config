@@ -62,6 +62,25 @@ in
         ];
       };
     };
+    keyd = {
+      enable = true;
+      keyboards = {
+        default = {
+          ids = [ "*" ];
+          settings = {
+            main = {
+              # control = "oneshot(control)";
+              capslock = "overload(control, esc)";
+              esc = "`";
+            };
+            # Make esc work on my small 60% fn keyboard
+            "esc:S" = {
+              esc = "~";
+            };
+          };
+        };
+      };
+    };
   };
 
   systemd = {

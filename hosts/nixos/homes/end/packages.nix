@@ -24,21 +24,14 @@
       # tools
       bat
       eza
-      fd
-      ripgrep
-      fzf
-      socat
-      jq
       gojq
       acpi
-      ffmpeg
       libnotify
       killall
       zip
       unzip
       glib
       foot
-      kitty
       starship
       showmethekey
       vscode
@@ -55,7 +48,7 @@
       grim
       hyprpicker
       tesseract
-      imagemagick
+      # imagemagick
       pavucontrol
       playerctl
       swappy
@@ -67,18 +60,6 @@
       wlsunset
       wl-clipboard
       wf-recorder
-
-      # langs
-      nodejs
-      gjs
-      bun
-      cargo
-      go
-      gcc
-      typescript
-      eslint
-      # very important stuff
-      # uwuify
     ];
   };
 }

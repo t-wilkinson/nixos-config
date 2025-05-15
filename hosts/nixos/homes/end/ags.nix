@@ -8,10 +8,10 @@
     ollama
     pywal
     sassc
-    (python311.withPackages (p: [
-      p.material-color-utilities
-      p.pywayland
-    ]))
+    # (python311.withPackages (p: [
+      # p.material-color-utilities
+      # p.pywayland
+    # ]))
   ];
 
   programs.ags = {
@@ -23,8 +23,8 @@
       gtksourceview
       gtksourceview4
       ollama
-      python311Packages.material-color-utilities
-      python311Packages.pywayland
+      # python311Packages.material-color-utilities
+      # python311Packages.pywayland
       pywal
       sassc
       webkitgtk

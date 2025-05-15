@@ -15,7 +15,8 @@ in
 {
   home.packages = with pkgs; [
     launcher
-    adoptopenjdk-jre-bin
+    # adoptopenjdk-jre-bin
+    temurin-jre-bin
   ];
 
   xdg.desktopEntries."org.gnome.Settings" = {
@@ -363,7 +364,7 @@ in
         "noanim, sideleft"
       ];
       source = [
-        "./colors.conf"
+        # "./colors.conf"
       ];
     };
   };

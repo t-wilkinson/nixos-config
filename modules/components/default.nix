@@ -1,9 +1,9 @@
 { pkgs, ... }:
 {
   imports = [
-    ./wireguard.nix
+    # ./wireguard.nix
     ./packages.nix
-    ./networking.nix
+    # ./networking.nix
     # ./databases.nix
     ./virtualisation.nix
     # ./nfs.nix

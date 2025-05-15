@@ -14,6 +14,7 @@ with pkgs;
   # mono5 # C#
   # php
   rustup # rust version manager
+  # cargo rustup or cargo?!?
   # nuget # C#
   # boost
   ghc
@@ -23,6 +24,7 @@ with pkgs;
   # fzf
   unstable.nodejs
   unstable.typescript
+  unstable.eslint
   unstable.nodePackages.live-server
   unstable.nodePackages.nodemon
   unstable.nodePackages.prettier
@@ -58,8 +60,8 @@ with pkgs;
 
   # PYTHON PACKAGES
   # black
-  python3
-  python3Packages.pip
+  python311
+  python311Packages.pip
   virtualenv
 
   # CLOUD/DEVOPS
