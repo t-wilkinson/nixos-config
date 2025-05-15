@@ -1,8 +1,7 @@
 { ... }:
 {
   imports = [
-    ./homes
-    # ./home-manager.nix
+    ./home-manager
 
     ./hardware-configuration.nix
     ./audio.nix

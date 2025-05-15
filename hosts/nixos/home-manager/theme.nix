@@ -11,26 +11,32 @@ let
     '';
   };
 
-  nerdfonts = (pkgs.nerdfonts.override {
-    fonts = [
-      "Ubuntu"
-      "UbuntuMono"
-      "CascadiaCode"
-      "FantasqueSansMono"
-      "JetBrainsMono"
-      "FiraCode"
-      "Mononoki"
-      "SpaceMono"
-    ];
-  });
-  google-fonts = (pkgs.google-fonts.override {
-    fonts = [
-      # Sans
-      "Gabarito" "Lexend"
-      # Serif
-      "Chakra Petch" "Crimson Text"
-    ];
-  });
+  nerdfonts = (
+    pkgs.nerdfonts.override {
+      fonts = [
+        "Ubuntu"
+        "UbuntuMono"
+        "CascadiaCode"
+        "FantasqueSansMono"
+        "JetBrainsMono"
+        "FiraCode"
+        "Mononoki"
+        "SpaceMono"
+      ];
+    }
+  );
+  google-fonts = (
+    pkgs.google-fonts.override {
+      fonts = [
+        # Sans
+        "Gabarito"
+        "Lexend"
+        # Serif
+        "Chakra Petch"
+        "Crimson Text"
+      ];
+    }
+  );
 
   cursor-theme = "Bibata-Modern-Classic";
   cursor-package = pkgs.bibata-cursors;
@@ -111,6 +117,6 @@ in
 
   qt = {
     enable = true;
-    platformTheme = "kde";
+    platformTheme.name = "kde";
   };
 }

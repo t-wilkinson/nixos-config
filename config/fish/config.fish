@@ -18,6 +18,8 @@ if test -f ~/.cache/ags/user/generated/terminal/sequences.txt
 end
 
 alias pamcan=pacman
+alias v=nvim
+alias vim=nvim
 
 # function fish_prompt
 #   set_color cyan; echo (pwd)

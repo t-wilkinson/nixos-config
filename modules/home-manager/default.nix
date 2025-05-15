@@ -24,6 +24,9 @@ in
         "nvim"
         "zellij"
         "kitty"
+        "fish"
+        "foot"
+        "starship.toml"
       ];
     };
 
