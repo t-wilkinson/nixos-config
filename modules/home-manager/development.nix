@@ -60,9 +60,9 @@ with pkgs;
 
   # PYTHON PACKAGES
   # black
-  python311
-  python311Packages.pip
-  virtualenv
+  # python311
+  # python311Packages.pip
+  # virtualenv
 
   # CLOUD/DEVOPS
   # docker

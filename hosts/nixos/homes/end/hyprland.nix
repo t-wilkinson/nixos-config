@@ -83,7 +83,9 @@ in
         workspace_swipe_direction_lock_threshold = 10;
         workspace_swipe_create_new = true;
       };
-      binds = { scroll_event_delay = 0; };
+      binds = {
+        scroll_event_delay = 0;
+      };
       input = {
         # Keyboard: Add a layout and uncomment kb_options for Win+Space switching shortcut
         kb_layout = "us";
@@ -117,12 +119,12 @@ in
           contrast = 1;
         };
         # Shadow
-        drop_shadow = false;
-        shadow_ignore_window = true;
-        shadow_range = 20;
-        shadow_offset = "0 2";
-        shadow_render_power = 2;
-        "col.shadow" = "rgba(0000001A)";
+        # drop_shadow = false;
+        # shadow_ignore_window = true;
+        # shadow_range = 20;
+        # shadow_offset = "0 2";
+        # shadow_render_power = 2;
+        # "col.shadow" = "rgba(0000001A)";
 
         # Dim
         dim_inactive = false;
@@ -172,8 +174,10 @@ in
         # damage_blink = true;
       };
       bind =
-        let SLURP_COMMAND = "$(slurp -d -c eedcf5BB -b 4f425644 -s 00000000)";
-        in [
+        let
+          SLURP_COMMAND = "$(slurp -d -c eedcf5BB -b 4f425644 -s 00000000)";
+        in
+        [
           "Super, C, exec, code --password-store=gnome"
           "Super, T, exec, foot --override shell=fish"
           "Super, E, exec, nautilus --new-window"
@@ -254,7 +258,7 @@ in
           "Super+Alt, mouse_up, movetoworkspace, +1"
           "Super, F, fullscreen, 0"
           "Super, D, fullscreen, 1"
-          "Super_Alt, F, fakefullscreen, 0"
+          # "Super_Alt, F, fakefullscreen, 0"
           "Super, 1, workspace, 1"
           "Super, 2, workspace, 2"
           "Super, 3, workspace, 3"
@@ -295,10 +299,8 @@ in
         ",XF86AudioMute, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 0%"
         "Super+Shift,M, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 0%"
         ",Print,exec,grim - | wl-copy"
-        ''
-          Super+Shift, N, exec, playerctl next || playerctl position `bc <<< "100 * $(playerctl metadata mpris:length) / 1000000 / 100"`''
-        ''
-          ,XF86AudioNext, exec, playerctl next || playerctl position `bc <<< "100 * $(playerctl metadata mpris:length) / 1000000 / 100"`''
+        ''Super+Shift, N, exec, playerctl next || playerctl position `bc <<< "100 * $(playerctl metadata mpris:length) / 1000000 / 100"`''
+        '',XF86AudioNext, exec, playerctl next || playerctl position `bc <<< "100 * $(playerctl metadata mpris:length) / 1000000 / 100"`''
         "Super+Shift, B, exec, playerctl previous"
         "Super+Shift, P, exec, playerctl play-pause"
         ",XF86AudioPlay, exec, playerctl play-pause"
