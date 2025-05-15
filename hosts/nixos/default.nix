@@ -1,16 +1,15 @@
 { ... }:
 {
   imports = [
-    ./hardware-configuration.nix
-    ./configuration.nix
-    ./hosts
     ./homes
+    # ./home-manager.nix
+
+    ./hardware-configuration.nix
+    ./audio.nix
+    ./locale.nix
+    ./gnome.nix
+    ./configuration.nix
     ./packages.nix
     ../../modules/shared.nix
-    # ./configuration.nix
-    # ./gnome.nix
-    # ./home-manager.nix
-    # ./packages.nix
-    # ../../modules/shared.nix
   ];
 }
