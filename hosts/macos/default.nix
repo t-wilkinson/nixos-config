@@ -14,11 +14,6 @@
     # agenix.darwinModules.default
   ];
 
-  # environment.systemPackages = with pkgs; [
-  #   # agenix.packages."${pkgs.system}".default
-  # ];
-
-  # TODO: similarly defined in modules/shared/cachix.nix?
   nix = {
     package = pkgs.nix;
     # linux-builder.enable = true;
@@ -64,6 +59,7 @@
   #   };
   # };
 
+  networking.hostName = "macos";
   # networking.wireguard.enable = true;
   # networking.wireguard.interfaces = {
   #   # "wg0" is the network interface name. You can name the interface arbitrarily.

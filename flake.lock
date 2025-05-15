@@ -530,9 +530,7 @@
       "inputs": {
         "hyprland": "hyprland_2",
         "nixpkgs": [
-          "hyprland-plugins",
-          "hyprland",
-          "nixpkgs"
+          "hyprland"
         ],
         "systems": [
           "hyprland-plugins",

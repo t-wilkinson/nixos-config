@@ -110,6 +110,7 @@
           inherit system;
           specialArgs = {
             inherit inputs username;
+            hostname = "macos";
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
@@ -139,7 +140,7 @@
                 autoMigrate = true;
               };
             }
-            ./hosts/darwin
+            ./hosts/macos
           ] ++ extraModules;
         };
 
@@ -162,6 +163,7 @@
           inherit system;
           specialArgs = {
             inherit inputs username;
+            hostname = "nixos";
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
@@ -225,6 +227,18 @@
 
     # impurity adds custom module arg named "impurity" which gets overriden when merging @inputs in specialArgs
     impurity_.url = "github:outfoxxed/impurity.nix";
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # secrets = {
+    #   url = "git+ssh://git@github.com/dustinlyons/nix-secrets.git";
+    #   flake = false;
+    # };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
     # macOS
     nix-darwin = {
@@ -248,28 +262,12 @@
     };
     darwin-docker.url = "github:konradmalik/darwin-docker";
 
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    # secrets = {
-    #   url = "git+ssh://git@github.com/dustinlyons/nix-secrets.git";
-    #   flake = false;
-    # };
-
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    # hyprland
+    # nixos
     hyprland.url = "github:hyprwm/Hyprland/v0.40.0";
     hyprland-plugins = {
       url = "github:hyprwm/hyprland-plugins";
-      # inputs.nixpkgs.follows = "hyprland";
+      inputs.nixpkgs.follows = "hyprland";
     };
-
-    # nixos
     thorium.url = "github:end-4/nix-thorium";
     ags = {
       url = "github:Aylur/ags";

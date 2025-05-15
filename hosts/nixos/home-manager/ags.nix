@@ -8,10 +8,6 @@
     ollama
     pywal
     sassc
-    (python311.withPackages (p: [
-      p.material-color-utilities
-      p.pywayland
-    ]))
   ];
 
   programs.ags = {

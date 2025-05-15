@@ -1,4 +1,9 @@
-{ pkgs, unstable, ... }:
+{
+  pkgs,
+  unstable,
+  hostname,
+  ...
+}:
 with pkgs;
 [
   # LANGUAGES
@@ -14,7 +19,6 @@ with pkgs;
   # mono5 # C#
   # php
   rustup # rust version manager
-  # cargo rustup or cargo?!?
   # nuget # C#
   # boost
   ghc
@@ -29,26 +33,9 @@ with pkgs;
   unstable.nodePackages.nodemon
   unstable.nodePackages.prettier
   unstable.nodePackages.npm
-
-  # openvpn
-  # chromedriver
-
-  # DEVELOPMENT
-  # k3s
-  # awscli
-  # azure-cli
-  # direnv
-  # kubernetes
-  maven
-  minikube
-  # ollama
-  # sqlcl
-  # sqldeveloper # download here https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html#license-lightbox
-  sqlite
-  terraform
-  vault # HashiCorp Vault
-  vsh # HashiCorp Vault Shell
-  # asio # c++
+  unstable.nodePackages.neovim
+  # unstable.vimPlugins.nvim-treesitter.withPlugins
+  # unstable.neovimUtils.makeNeovim
 
   # PHP
   # php82
@@ -60,17 +47,40 @@ with pkgs;
 
   # PYTHON PACKAGES
   # black
-  # python311
-  # python311Packages.pip
-  # virtualenv
+  (python311.withPackages (
+    p:
+    if hostname == "nixos" then
+      [
+        p.material-color-utilities
+        p.pywayland
+      ]
+    else
+      [ ]
+  ))
+  python311Packages.pip
+  virtualenv
+  ## fast python package manager written in rust
+  ## replaces: pip, pip-tools, pipx, poetry, pyenv, twine, virtualenv, and more
+  uv
+
+  # DEVELOPMENT
+  # awscli
+  # azure-cli
+  # direnv
+  maven
+  # ollama
+  # sqlcl
+  # sqldeveloper # download here https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html#license-lightbox
+  sqlite
+  terraform
+  vault # HashiCorp Vault
+  vsh # HashiCorp Vault Shell
+  # asio # c++
 
   # CLOUD/DEVOPS
-  # docker
-  # docker-compose
   # awscli2 - marked broken Mar 22
   # flyctl
   # google-cloud-sdk
-  # go
   # gopls
   # ngrok
   # ssm-session-manager-plugin
@@ -79,4 +89,6 @@ with pkgs;
   # tflint
 
   nixfmt-rfc-style
+  # nixpkgs-fmt
+  # nixfmt-classic
 ]

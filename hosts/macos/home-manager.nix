@@ -4,23 +4,14 @@
   unstable,
   lib,
   home-manager,
+  username,
+  hostname,
   ...
 }:
-
-let
-  user = "trey";
-  home = "/Users/${user}";
-in
-# sharedFiles = import ../../shared/files.nix { inherit config pkgs; };
 {
-  imports = [
-    # ./dock.nix
-  ];
-
-  # It me
-  users.users.${user} = {
-    name = user;
-    home = home;
+  users.users.${username} = {
+    name = username;
+    home = "/Users/${username}";
     isHidden = false;
     shell = pkgs.zsh;
   };
@@ -58,10 +49,18 @@ in
     verbose = true;
     # useUserPackages = true;
     # backupFileExtension = "old";
-    # extraSpecialArgs = { inherit unstable; }; # { inherit inputs self impurity; };
     backupFileExtension = "old";
     useGlobalPkgs = true;
-    users.${user} =
+    extraSpecialArgs = {
+      inherit
+        self
+        inputs
+        username
+        unstable
+        impurity
+        ;
+    };
+    users.${username} =
       {
         pkgs,
         config,

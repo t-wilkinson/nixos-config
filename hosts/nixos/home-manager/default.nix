@@ -7,6 +7,7 @@
   lib,
   impurity,
   username,
+  hostname,
   ...
 }:
 let
@@ -25,12 +26,16 @@ in
     useGlobalPkgs = true; # use the system configuration’s pkgs argument
     useUserPackages = true; # enable users.users.<name>.packages
     backupFileExtension = "old";
-    extraSpecialArgs = { inherit self inputs impurity; };
+    extraSpecialArgs = {
+      inherit
+        self
+        username
+        inputs
+        impurity
+        ;
+    };
     users.${username} = {
       imports = [
-        # Cachix
-        # ./cachix.nix
-        # Stuff
         ./ags.nix
         ./anyrun.nix
         ./browser.nix
@@ -44,10 +49,6 @@ in
       home = {
         inherit username homeDirectory;
         # TODO: doesn't work
-        sessionVariables = {
-          NIXPKGS_ALLOW_UNFREE = "1";
-          NIXPKGS_ALLOW_INSECURE = "1";
-        };
         sessionPath = [
           "$HOME/.local/bin"
           "$HOME/.npm-packages/bin"
