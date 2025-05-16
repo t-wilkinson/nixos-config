@@ -57,7 +57,6 @@ in
         file =
           myLib.makeConfigLinks impurity [
             "ags"
-            # "anyrun"
             # "chrome-flags.conf"
             # "code-flags.conf"
             # "fontconfig"
@@ -67,7 +66,6 @@ in
             "mpv"
             # "qt5ct"
             "fcitx5"
-            # "starship.toml"
             "thorium-flags.conf"
             # "wlogout"
             # "zshrc.d"
