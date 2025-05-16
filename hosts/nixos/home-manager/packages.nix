@@ -27,6 +27,7 @@
         ];
       })
       # chromedriver
+      easyeffects
 
       # tools
       libnotify
