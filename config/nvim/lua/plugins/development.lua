@@ -3,8 +3,10 @@ return {
     "imsnif/kdl.vim",
   },
 
+  { "mason-org/mason-lspconfig.nvim", version = "^1.0.0" },
   {
     "mason-org/mason.nvim",
+    version = "^1.0.0",
     opts = {
       ensure_installed = {
         "angular-language-server",
@@ -39,27 +41,19 @@ return {
         "vtsls",
         "vue-language-server",
         "yaml-language-server",
+        -- "pyright",
+        -- "clangd",
+        -- "stylua",
+        -- "selene",
+        -- "luacheck",
+        -- "shellcheck",
+        -- "shfmt",
+        -- "tailwindcss-language-server",
+        -- "typescript-language-server",
+        -- "css-lsp",
       },
     },
   },
-
-  -- {
-  --   "williamboman/mason.nvim",
-  --   opts = function(_, opts)
-  --     vim.list_extend(opts.ensure_installed, {
-  --       "pyright",
-  --       "clangd",
-  --       -- "stylua",
-  --       -- "selene",
-  --       -- "luacheck",
-  --       -- "shellcheck",
-  --       -- "shfmt",
-  --       -- "tailwindcss-language-server",
-  --       -- "typescript-language-server",
-  --       -- "css-lsp",
-  --     })
-  --   end,
-  -- },
 
   { "nvim-treesitter/nvim-treesitter-textobjects" },
 
