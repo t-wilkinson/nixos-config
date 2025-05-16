@@ -14,7 +14,6 @@ with pkgs;
   # elixir
   # eslint
   gcc
-  gjs
   go
   # mono5 # C#
   # php
@@ -23,6 +22,7 @@ with pkgs;
   # boost
   ghc
   haskell-language-server
+  nil # nix
 
   # NODE.JS DEVELOPMENT TOOLS
   # fzf

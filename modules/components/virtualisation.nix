@@ -36,13 +36,13 @@
   environment.systemPackages = with pkgs; [
     colima # lima with contains (docker, containerd, kubernetes, incus)
     lima # linux (virtual)machines
-    k3s
+    # k3s # not working on macos
     kubernetes
     minikube
     docker
     docker-compose
     kubectl
-    incus
+    # incus # not working on macos (no prctl.h on macos)
   ];
 
   # boot.kernelModules = [ "kvm-intel" ];

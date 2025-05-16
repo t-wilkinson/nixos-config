@@ -6,6 +6,7 @@
       i3
       sway
       pinentry
+      foot
 
       # GUI
       okular # pdf viewer
@@ -33,15 +34,11 @@
       libnotify
       showmethekey
       # vscode
-      ydotool
+      ydotool # simulate mouse and keyboard
 
       # theming tools
       gradience
       gnome-tweaks
-
-      # ags
-      ddcutil
-      sass
 
       # hyprland
       hyprland

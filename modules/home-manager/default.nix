@@ -33,7 +33,9 @@
         enableZshIntegration = true;
         nix-direnv.enable = true;
       };
-
+      # fish = {
+      #   enable = true;
+      # };
       zsh = {
         enable = true;
         # autocd = false;

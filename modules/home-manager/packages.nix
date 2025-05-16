@@ -2,7 +2,6 @@
 with pkgs;
 [
   # TERMINAL EMULATORS
-  foot
   # tmux
   alacritty
   kitty
@@ -22,7 +21,7 @@ with pkgs;
   # krinta
 
   # GUI
-  vlc
+  # vlc
   # vscode
   # slack
   # jetbrains-mono
@@ -52,11 +51,9 @@ with pkgs;
   # inxi
   # jq
   lf # terminal file browser
-  showmethekey
   starship
   # transmission_4 # bittorrent
   # ventoy # create bootable usb drives
-  ydotool # simulate mouse and keyboard
   zoxide
   # zsh-powerlevel10k
 

@@ -3,6 +3,7 @@ _:
 [
   # Development Tools
   # "kitty"
+  # "foot"
   "homebrew/cask/docker"
   # "claude"
   # "insomnia"

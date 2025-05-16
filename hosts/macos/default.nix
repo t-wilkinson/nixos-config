@@ -3,6 +3,7 @@
   config,
   pkgs,
   username,
+  hostname,
   ...
 }:
 {
@@ -17,6 +18,7 @@
   nix = {
     package = pkgs.nix;
     # linux-builder.enable = true;
+    optimise.automatic = true;
 
     settings = {
       trusted-users = [
@@ -40,8 +42,9 @@
     '';
   };
 
-  # Turn off NIX_PATH warnings because we're using flakes
-  system.checks.verifyNixPath = false;
+  programs = {
+    fish.enable = true;
+  };
 
   # launchd.user.agents = {
   #   emacs = {
@@ -59,7 +62,7 @@
   #   };
   # };
 
-  networking.hostName = "macos";
+  networking.hostName = hostname;
   # networking.wireguard.enable = true;
   # networking.wireguard.interfaces = {
   #   # "wg0" is the network interface name. You can name the interface arbitrarily.
@@ -99,6 +102,9 @@
 
   system = {
     stateVersion = 5;
+
+    # Turn off NIX_PATH warnings because we're using flakes
+    checks.verifyNixPath = false;
 
     activationScripts.useTouchID.text = ''
       defaults write org.gpgtools.common UseKeychain -bool yes

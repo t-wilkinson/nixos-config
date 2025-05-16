@@ -19,6 +19,7 @@
   };
 
   nix.settings = {
+    auto-optimise-store = true;
     substituters = [
       "https://hyprland.cachix.org"
       "https://nix-gaming.cachix.org"

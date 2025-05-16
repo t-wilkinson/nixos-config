@@ -8,6 +8,9 @@
     ollama
     pywal
     sassc
+    ddcutil
+    sass
+    gjs
   ];
 
   programs.ags = {

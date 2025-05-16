@@ -7,7 +7,6 @@
 
   nix.settings = {
     experimental-features = "nix-command flakes";
-    auto-optimise-store = true;
     substituters = [
       "https://nix-community.cachix.org"
       "https://cache.nixos.org/"

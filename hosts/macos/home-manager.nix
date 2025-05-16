@@ -1,5 +1,8 @@
 {
+  self,
   config,
+  inputs,
+  impurity,
   pkgs,
   unstable,
   lib,
@@ -9,11 +12,13 @@
   ...
 }:
 {
+  users.knownUsers = [ username ];
   users.users.${username} = {
+    uid = 501;
     name = username;
     home = "/Users/${username}";
     isHidden = false;
-    shell = pkgs.zsh;
+    shell = pkgs.fish;
   };
 
   homebrew = {
@@ -68,6 +73,7 @@
         ...
       }:
       {
+        # programs.fish.enable = true;
         home = {
           enableNixpkgsReleaseCheck = false;
           # packages = pkgs.callPackage ./packages.nix {};
