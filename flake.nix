@@ -162,7 +162,7 @@
         nixpkgs.lib.nixosSystem {
           inherit system;
           specialArgs = {
-            inherit inputs username;
+            inherit self inputs username;
             hostname = "nixos";
             unstable = import nixpkgs-unstable {
               inherit system;

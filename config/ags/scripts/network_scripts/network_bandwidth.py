@@ -1,4 +1,4 @@
-#!/usr/bin/env -S\_/bin/sh\_-xc\_"source\_\$(eval\_echo\_\$ILLOGICAL_IMPULSE_VIRTUAL_ENV)/bin/activate&&exec\_python\_-E\_"\$0"\_"\$@""
+#!/usr/bin/env -S\_/bin/sh\_-xc\_"source\_\$(eval\_echo\_\$AGS_VIRTUAL_ENV)/bin/activate&&exec\_python\_-E\_"\$0"\_"\$@""
 
 
 from time import sleep
@@ -23,7 +23,7 @@ match direction:
         sleep(1)
         final_bytes = psutil.net_io_counters().bytes_sent
 
-    case _: 
+    case _:
         print(f"wrong direction: {direction}")
         sys.exit()
 
@@ -37,4 +37,3 @@ while bandwidth >= divider:
     bandwidth = bandwidth / divider
 
 print(f"{bandwidth:.1f}" + units[i] + "/s")
-

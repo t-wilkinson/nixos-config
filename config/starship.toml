@@ -18,11 +18,6 @@ $directory\
 $git_branch\
 $git_status\
 $fill\
-$nodejs\
-$python\
-$java\
-$rust\
-$c\
 $line_break\
 $character\
 """

@@ -1,13 +1,10 @@
 {
   self,
   inputs,
-  config,
   pkgs,
   myLib,
-  lib,
   impurity,
   username,
-  hostname,
   ...
 }:
 let

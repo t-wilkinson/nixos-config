@@ -1,10 +1,35 @@
-{ inputs, pkgs, ... }:
+{
+  self,
+  inputs,
+  pkgs,
+  ...
+}:
+let
+  agsStartScript = pkgs.writeShellScriptBin "setup_or_run_ags" ''
+    #!/usr/bin/env bash
+
+    AGS_VIRTUAL_ENV=$HOME/.local/state/ags/.venv
+
+    if [ ! -d "$AGS_VIRTUAL_ENV" ]; then
+      UV_NO_MODIFY_PATH=1
+      mkdir -p "$AGS_VIRTUAL_ENV"
+      # we need python 3.12 https://github.com/python-pillow/Pillow/issues/8089
+      uv venv --prompt .venv "$AGS_VIRTUAL_ENV" -p 3.12
+      source "$AGS_VIRTUAL_ENV/bin/activate"
+      uv pip install -r ${self}/config/ags/requirements.txt
+      deactivate # We don't need the virtual environment anymore
+    fi
+
+    ags -c ${self}/config/ags/config.js
+  '';
+in
 {
   imports = [
     inputs.ags.homeManagerModules.default
   ];
 
   home.packages = with pkgs; [
+    agsStartScript
     ollama
     pywal
     sassc

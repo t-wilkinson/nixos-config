@@ -169,7 +169,7 @@ apply_gtk() { # Using gradience-cli
   done
 
   mkdir -p "$XDG_CONFIG_HOME/presets" # create gradience presets folder
-  source $(eval echo $ILLOGICAL_IMPULSE_VIRTUAL_ENV)/bin/activate
+  source $(eval echo $AGS_VIRTUAL_ENV)/bin/activate
   gradience-cli apply -p "$CACHE_DIR"/user/generated/gradience/preset.json --gtk both
   deactivate
 
