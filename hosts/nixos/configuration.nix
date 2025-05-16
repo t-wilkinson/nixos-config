@@ -218,6 +218,7 @@
     ];
   };
   # hardware.nvidia.modesetting.enable = true;
+  hardware.i2c.enable = true; # for ags ddcutil
 
   security = {
     rtkit.enable = true;

@@ -39,6 +39,10 @@
       gradience
       gnome-tweaks
 
+      # ags
+      ddcutil
+      sass
+
       # hyprland
       hyprland
       brightnessctl
