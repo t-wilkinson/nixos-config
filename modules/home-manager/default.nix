@@ -18,12 +18,12 @@
         ++ (import ./development.nix { inherit pkgs unstable hostname; });
       file = myLib.makeConfigLinks impurity [
         "alacritty"
-        "nvim"
-        "zellij"
-        "kitty"
         "fish"
         "foot"
+        "kitty"
+        "nvim"
         "starship.toml"
+        "zellij"
       ];
     };
 

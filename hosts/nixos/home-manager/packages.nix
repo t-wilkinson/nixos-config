@@ -40,6 +40,7 @@
       gnome-tweaks
 
       # hyprland
+      hyprland
       brightnessctl
       cliphist
       fuzzel

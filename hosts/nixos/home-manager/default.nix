@@ -62,7 +62,7 @@ in
             # "code-flags.conf"
             # "fontconfig"
             "fuzzel"
-            # "hypr"
+            "hypr"
             # "Kvantum"
             "mpv"
             # "qt5ct"
