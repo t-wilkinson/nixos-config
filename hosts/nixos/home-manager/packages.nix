@@ -8,6 +8,10 @@
       pinentry
       foot
 
+      # VIRTUALIZATION
+      k3s
+      incus
+
       # GUI
       okular # pdf viewer
       # zathura # pdf viewer
