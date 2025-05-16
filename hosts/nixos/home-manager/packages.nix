@@ -60,6 +60,7 @@
       wl-clipboard
       wf-recorder
       wayvnc
+      jq
 
       # MISC
       # android-file-transfer
