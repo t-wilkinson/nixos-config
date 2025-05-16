@@ -102,6 +102,20 @@
     #   portalPackage =
     #     inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.xdg-desktop-portal-hyprland;
     # };
+    gnupg.agent = {
+      enable = true;
+      # enableSSHSupport = true;
+      # enableExtraSocket = true;
+      # pinentryPackage = pkgs.pinentry-gnome3;
+      settings = {
+        allow-preset-passphrase = true;
+        # enable-ssh-support
+        default-cache-ttl = 34560000;
+        default-cache-ttl-ssh = 34560000;
+        max-cache-ttl = 34560000;
+        max-cache-ttl-ssh = 34560000;
+      };
+    };
   };
 
   services = {

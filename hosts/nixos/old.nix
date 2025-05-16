@@ -35,17 +35,18 @@
     };
     gnupg.agent = {
       enable = true;
-      enableSSHSupport = true;
-      enableExtraSocket = true;
-      extraConfig = ''
-        # enable-ssh-support
-        allow-preset-passphrase;
-      '';
+      # enableSSHSupport = true;
+      # enableExtraSocket = true;
       pinentryPackage = pkgs.pinentry-gnome3;
-      defaultCacheTtl = 34560000;
-      defaultCacheTtlSsh = 34560000;
-      maxCacheTtl = 34560000;
-      maxCacheTtlSsh = 34560000;
+      settings = {
+        allow-preset-passphrase = true;
+        # enable-ssh-support
+        default-cache-ttl = 34560000;
+        default-cache-ttl-ssh = 34560000;
+        max-cache-ttl = 34560000;
+        max-cache-ttl-ssh = 34560000;
+      };
+
     };
   };
 

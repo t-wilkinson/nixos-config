@@ -17,6 +17,22 @@ if test -f ~/.cache/ags/user/generated/terminal/sequences.txt
     cat ~/.cache/ags/user/generated/terminal/sequences.txt
 end
 
+function starship_transient_prompt_func
+    # tput cuu1 # Move cursor up one line to remove newline after transient prompt
+    set_color 8BE9FD
+    echo "❯ "
+end
+
+function starship_transient_rprompt_func
+    # starship module time
+end
+
+enable_transience
+
+# function prompt_newline --on-event fish_postexec
+# 	echo
+# end
+
 alias pamcan=pacman
 alias v=nvim
 alias vim=nvim
