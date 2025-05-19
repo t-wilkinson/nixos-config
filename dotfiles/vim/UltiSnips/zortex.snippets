@@ -1,0 +1,55 @@
+global !p
+from datetime import datetime, timedelta
+import random
+
+def new_zettel_id():
+	now = datetime.now()
+	rand_int_str = f'{random.randrange(1, 10**5):05}'
+
+	return now.strftime(f"z:%H%M.%u%U%g.{rand_int_str}")
+
+endglobal
+
+snippet week
+`!p
+date = datetime.now()
+snip.rv = date.date().strftime("%W")
+`.
+endsnippet
+
+snippet day
+`!p
+date = datetime.now()
+snip.rv = date.date().strftime("%A")
+`.
+    `!p`
+endsnippet
+
+snippet new-week
+`!p
+date = datetime.now()
+snip.rv = date.date().strftime("%W")
+`.
+    Monday.
+    Tuesday.
+    Wednesday.
+    Thursday.
+    Friday.
+    Saturday.
+    Sunday.
+endsnippet
+
+snippet z "zettel" w
+`!p
+# Must check this because snippet includes random number
+if snip.c == "":
+	snip.rv = f"[{new_zettel_id()}]"
+`
+endsnippet
+
+snippet Z "Zettel" w
+`!p
+if snip.c == "":
+	snip.rv = f"[{new_zettel_id()}]"
+` #$1# $0
+endsnippet

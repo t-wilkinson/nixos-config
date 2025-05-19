@@ -1,0 +1,6 @@
+configuration {
+    matching: "regex";
+    sorting-method: "fzf";
+}
+
+@theme "onedark"

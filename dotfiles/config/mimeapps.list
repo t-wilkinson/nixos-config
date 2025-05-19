@@ -1,0 +1,7 @@
+[Default Applications]
+application/pdf=org.pwmt.zathura.desktop
+application/djvu=org.pwmt.zathura.desktop
+application/ps=org.pwmt.zathura.desktop
+application/postscript=org.pwmt.zathura.desktop
+application/epub=org.pwmt.zathura.desktop
+image/vnd.djvu=org.pwmt.zathura.desktop

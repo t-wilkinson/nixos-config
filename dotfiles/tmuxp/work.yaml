@@ -1,0 +1,18 @@
+session_name: Infinite Closet
+windows:
+- window_name: Infinite Closet
+  focus: true
+  layout: main-horizontal
+  shell_command_before:
+    - cd ~/dev/t-wilkinson/infinite-closet
+  panes:
+    - shell_command:
+      - scripts/run local up
+    - shell_command:
+      -
+      focus: true
+- window_name: SSH
+  panes:
+    - shell_command:
+      - ssh -t infinitecloset -- /bin/sh -c 'tmux has-session && exec tmux attach || exec tmux'
+

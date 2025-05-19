@@ -1,0 +1,17 @@
+#!/bin/bash
+
+DAY=$(date +%A)
+DIR=/mnt/backup
+
+if [ -e $DIR/incr/$DAY ] ; then
+  rm -fr $DIR/incr/$DAY
+fi
+
+set -o noglob
+include=(.config Desktop dev Downloads langauges media .password-store .pki reading .ssh .tmux .vim .xmonad .zprezto .bash_history .gitconfig .npmrc .p10k.zsh .zhistory)
+exclude=(/opt/* /dev/* /proc/* /sys/* /tmp/* /run/* /mnt/* /media/* /lost+found /home/*/* node_modules)
+set +o noglob
+
+EXCLUDE="${exclude[@]/#/--exclude=}"
+INCLUDE="${include[@]/#/--include=/home/*/}"
+rsync -aAXH --quiet --delete --inplace $INCLUDE $EXCLUDE --backup --backup-dir=$DIR/incr/$DAY / $DIR/full/

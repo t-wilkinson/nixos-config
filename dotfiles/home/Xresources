@@ -1,0 +1,39 @@
+!! Transparency (0-1):
+*.alpha: 1.00
+
+!! Set a default font and font size as below:
+!*.font: MesloLGS-16
+/* *.font: MesloLGSDZ Nerd Font:monospace:pixelsize=16:style=RegularForPowerline:antialias=true:hinting=true */
+!*.font: NotoSans Nerd Font Mono-16:pixelsize=14
+/*! *.font: DejaVu Sans Mono-13:monospace */
+
+!*.font: Source Code Pro-16
+!*.font: Source Code Pro-15:antialias=true:hinting=true:monospace:style=Powerline
+/* rofi.font: Source Code Pro 16 */
+
+Xcursor.size: 16
+*cursorColor: #ffffff
+
+/* !! dracula: */
+*.color0: #000000
+*.color1: #ff5555
+*.color2: #50fa7b
+*.color3: #f1fa8c
+*.color4: #bd93f9
+*.color5: #ff79c6
+*.color6: #8be9fd
+*.color7: #bbbbbb
+*.color8:  #44475a
+*.color9:  #ff5555
+*.color10: #50fa7b
+*.color11: #f1fa8c
+*.color12: #bd93f9
+*.color13: #ff79c6
+*.color14: #8be9fd
+*.color15: #ffffff
+/* *.background: #000000 */
+/* *.background: #282a36 */
+/* #1e2029 */
+*.background: #282a36
+*.foreground: #f8f8f2
+

@@ -1,0 +1,125 @@
+snippet = "=" w
+$1={$1}$0
+endsnippet
+
+snippet dis "dispatch" w
+const dispatch = useDispatch()
+endsnippet
+
+snippet err "console.error" w
+console.error(err)
+endsnippet
+
+snippet sel "useSelector" w
+const $1 = useSelector(state => state$2.$1)$0
+endsnippet
+
+snippet log "console.log" i
+console.log($1)$0
+endsnippet
+
+snippet c "className" w
+className="$1"$0
+endsnippet
+
+snippet c` "className" w
+className={\`$1\`}$0
+endsnippet
+
+snippet e "export const "
+export const $0
+endsnippet
+
+snippet c.<> "Basic fragment"
+const ${1:func} = (props) =>
+  <>$0</>
+endsnippet
+
+snippet c.() "const () => {}"
+const ${1:func} = (${2:props}) => {
+  $0
+}
+endsnippet
+
+snippet rfc "New react file"
+import React from 'react'
+
+export const $1 = ($2) => {
+  $0
+}
+export default $1
+endsnippet
+
+snippet ed "export default"
+export const $1 = ($2) => {
+  $0
+}
+export default $1
+endsnippet
+
+snippet i "import"
+import {$0} from '$1'
+endsnippet
+
+snippet R.selector "useSelector Hook" w
+const $1 = useSelector(state => $2)$0
+endsnippet
+
+snippet R.txt "React context" w
+const $1 = React.useContext(`!p snip.rv=t[1][:1].upper() + t[1][1:]`Context)
+endsnippet
+
+snippet R.state "useState Hook" w
+const [${1}, set`!p snip.rv=t[1][:1].upper() + t[1][1:]`] = React.useState(${3:${4}})
+endsnippet
+
+snippet R.effect "useEffect Hook" w
+React.useEffect(() => {
+  $0
+}${1})
+endsnippet
+
+snippet R.reducer "useReducer" w
+const [${3:state}, ${4:dispatch}] = React.useReducer(${5:reducer}, ${2:initial_value})
+endsnippet
+
+snippet R.ref "useRef(null)" w
+React.useRef(null)
+endsnippet
+
+snippet w "window." w
+window.$0
+endsnippet
+snippet d "document." w
+document.$0
+endsnippet
+
+snippet qs "querySelector" w
+querySelector($1)$0
+endsnippet
+snippet qsa "querySelectorAll" w
+querySelectorAll($1)$0
+endsnippet
+
+snippet iae "insertAdjacentElement" w
+insertAdjacentElement(${1:position}, ${2:element})$0
+endsnippet
+
+snippet ael "addEventListener" w
+addEventListener($1)$0
+endsnippet
+snippet rel "removeEventListener" w
+removeEventListener($1)$0
+endsnippet
+
+snippet cjs
+'use strict'
+
+module.exports = {
+	$0
+}
+endsnippet
+
+snippet env "process.env.NODE_ENV" w
+process.env.NODE_ENV$0
+endsnippet

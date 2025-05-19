@@ -1,0 +1,26 @@
+# vim: filetype=zsh.vim
+
+alias I="yay -S"
+alias update="yay -Syu && xmonad --recompile"
+alias ip="ip -c"
+alias nc="ncat"
+alias v="nvim"
+alias zvim="nvim -S ~/zortex.vim"
+alias bat="PAGER=bat \bat"
+alias neovide="neovide --multigrid"
+alias py="python"
+alias SS="sudo systemctl"
+alias S="systemctl"
+alias S="systemctl"
+alias copy="tee /dev/tty | xclip -in -sel clip"
+alias jlab="jupyter-lab --ip=127.0.0.1 --port=8888"
+alias venv="source env/bin/activate"
+alias j="journalctl"
+
+alias eww="git add -A && git commit -m '[update]' && git push"
+
+alias src=". ~/.zprofile; . ~/.zshenv; . ~/.zpreztorc; . ~/.zshrc; xrdb ~/.Xresources;"
+alias IP="curl ifconfig.me"
+alias start="exec startx -- -keeptty >> ~/.local/share/log 2>&1"
+alias fixpulseaudio="pulseaudio --kill; systemctl --user stop pulseaudio; pulseaudio -D && pulseaudio --start && systemctl --user start pulseaudio"
+alias qemu="qemu-system-x86_64"

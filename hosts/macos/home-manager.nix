@@ -30,6 +30,7 @@
       # "jorgelbg/tap"
     ];
     brews = [
+      "bitwarden-cli"
       "pinentry"
       "pinentry-mac"
       # "pinentry-touchid"

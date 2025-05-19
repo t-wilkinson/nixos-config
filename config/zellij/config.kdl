@@ -38,7 +38,7 @@ keybinds clear-defaults=true {
     bind "J" { MovePane "Down"; SwitchToMode "Normal"; }
     bind "K" { MovePane "Up"; SwitchToMode "Normal"; }
     bind "p" { SwitchFocus; SwitchToMode "Normal"; }
-    bind "n" { NewPane; SwitchToMode "Normal"; }
+    bind "n" { NewPane "Right"; SwitchToMode "Normal"; }
     bind "Alt h" { NewPane "Left"; SwitchToMode "Normal"; }
     bind "Alt j" { NewPane "Right"; SwitchToMode "Normal"; }
     bind "Alt k" { NewPane "Down"; SwitchToMode "Normal"; }

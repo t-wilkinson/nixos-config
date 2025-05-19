@@ -1,0 +1,410 @@
+# Preserve tmux sessions
+if [[ $DISPLAY ]]; then
+    # if not running interactively: don't do anything.
+  [[ $- != *i* ]] && return
+
+  if [[ -z "$TMUX" ]]; then
+    detached="$( tmux ls 2> /dev/null | grep -vm1 attached | cut -d: -f1 )"
+    attached="$(tmux ls 2> /dev/null |  cut -d: -f1)"
+
+    if [[ "$attached" = "Main" ]]; then
+        :
+      # tmuxp load work
+    elif [[ "$detached" = "Main" ]]; then
+      tmux attach-session -t "$detached"
+    else
+      tmuxp load main
+      # tmux new-session -s "Main" -n "main"
+    fi
+  fi
+else
+    # Bash is better for tty
+    /usr/bin/env bash
+    return
+fi
+
+# Prompt
+# [[ $IN_NIX_SHELL ]] || neofetch
+neofetch
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Source Prezto.
+if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+    source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+fi
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+if [[ -f ~/.p10k.zsh ]]; then
+    source ~/.p10k.zsh
+fi
+
+fpath=(~/.stripe $fpath)
+autoload -Uz compinit && compinit -i
+
+# To customize prompt, run `p10k configure` or edit ~/dev/dotfiles/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+autoload -Uz promptinit
+promptinit
+source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
+# prompt powerlevel10k
+
+# Change cursor with support for inside/outside tmux
+if [[ ! $TERM = "eterm-color" ]]; then
+    bindkey -v
+    function _set_cursor() {
+        if [[ $TMUX = '' ]]; then
+          echo -ne $1
+        else
+          echo -ne "\ePtmux;\e\e$1\e\\"
+        fi
+    }
+    function _set_block_cursor() { _set_cursor '\e[2 q' }
+    function _set_beam_cursor() { _set_cursor '\e[6 q' }
+    function zle-keymap-select {
+      if [[ ${KEYMAP} == vicmd ]] || [[ $1 = 'block' ]]; then
+          _set_block_cursor
+      else
+          _set_beam_cursor
+      fi
+    }
+    zle -N zle-keymap-select
+    # ensure beam cursor when starting new terminal
+    precmd_functions+=(_set_beam_cursor)
+    # ensure insert mode and beam cursor when exiting vim
+    zle-line-init() { zle -K viins; _set_beam_cursor }
+    # 10ms for key sequences
+    KEYTIMEOUT=1
+fi
+
+# FZF
+# generate path
+_fzf_compgen_path() {
+  fd --hidden --follow --exclude ".git" . "$1"
+}
+
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+  fd --type d --hidden --follow --exclude ".git" . "$1"
+}
+
+# search on lines of every file in current directory
+# return files which match the searched line
+fzf-lines() {
+    # get every line in directory '$1'
+    # regex=${1:-"."} # default to all files
+    # paths=${${@:2}:-"."} # default to current directory
+    # lines=$(fd "$regex" $paths -t f -x cat {} | fzf +m)
+    lines=$(fd $@ -t f -x cat {} | fzf +m)
+    # get all lines that match users selection
+    rg -s -F -l "$lines" | fzf -1
+}
+
+# 'fzf' on all lines in all files found with 'fd'
+# populate 'vim' quickfix with results
+fzf-vim() {
+    # lines=$(fd $@ -t f -x cat {} | fzf -m)
+    quickfix=$(rg --vimgrep -F -f <(fd $@ -t f -x cat {} | fzf -m)) # generate quickfix for vim
+    # quit if no results
+    [[ -z $quickfix ]] && return
+    vim -q <(echo -n $quickfix) # open vim, populating quickfix
+}
+
+# fzf cd
+fzf-cd() {
+    cd $(fd -t d . ${1:-.} | fzf)
+}
+
+# fzf cd to file dir
+fzf-cf() {
+    files=$(fd -t f | fzf)
+    if [[ -n $files ]]; then
+        cd $(dirname $files)
+    fi
+}
+
+fzf-prj() {
+    cd $(prj fzf)
+}
+
+# ls on cd
+function cd {
+    builtin cd "$@" && ls -aF
+}
+
+pkgs() {
+    case $1 in
+        size)
+            if [[ -z $2 ]]; then
+                LC_ALL=C pacman -Qi | awk '/^Name/{name=$3} /^Installed Size/{ print $4$5, "\t", name}' | sort -h
+            else
+                pkg=$2
+                pacman -Qlq $pkg | grep -v '/$' | xargs -r du -h | sort -h
+            fi
+            ;;
+
+        install)
+            pkglist=$2
+            if [[ -f /home/trey/dev/t-wilkinson/scripts/pkglist.txt ]]; then
+                pkglist=/home/trey/dev/t-wilkinson/scripts/pkglist.txt
+            fi
+
+            pacman -S --needed $(comm -12 <(pacman -Slq | sort) <(sort $pkglist))
+            ;;
+
+        *)
+            echo "No matching command"
+            ;;
+    esac
+}
+
+# re-run command on file change
+forever() {
+    args="$@"
+    pid=""
+    rerun() {
+        kill $pid > /dev/null 2>&1
+        kill $( lsof -i:4000 -t ) > /dev/null 2>&1
+        eval $args &
+        pid=$!
+        # hide output of bringing process to background
+        # (&>/dev/null eval $args &; pid=$!)
+    }
+
+    rerun
+    while inotifywait -r -e modify .; do
+        rerun
+    done
+}
+
+# ssh... with tmux
+ssh-tmux() {
+    ssh -t $@ -- /bin/sh -c 'tmux has-session && exec tmux attach || exec tmux'
+}
+compdef '_dispatch ssh ssh'
+
+# print nth line of stdin
+n() {
+    head -$1 | tail -1
+}
+
+# steal children, murder parent
+steal() {
+    setopt -s dotglob
+    mv "$1"/* "${2:-.}"/
+    rm -r "$1"
+}
+
+# swap two files/folders
+swap() {
+    tmp=$(mktemp)
+    mv $1 $tmp
+    mv $2 $1
+    mv $tmp $2
+}
+
+line-count() {
+    # fd -E build $@ | xargs -I% wc -l % | awk '{ sum += $1}; END { print sum}'
+    # exts=()
+    # exclude=()
+
+    # while [[ $# > 0 ]]; do
+    #     case $1 in
+    #         -e)
+    #             for e in $(echo $2 | tr ',' ' '); do
+    #                 exts+=('-e')
+    #                 exts+=($e)
+    #             done
+    #             shift
+    #             ;;
+    #         -E)
+    #             for e in $(echo $2 | tr ',' '\n'); do
+    #                 exclude+=("-E" $e)
+    #             done
+    #             shift
+    #             ;;
+    #         *) ;;
+    #     esac
+    #     shift
+    # done
+
+    # echo ${exts[@]}
+    # IFS=" "
+    # for v in "${exts[@]}"; do
+    #     echo $v
+    # done
+    # for v in ${exclude[@]}; do
+    #     echo $v
+    # done
+
+    args=$@
+    if [[ $1 == js ]]; then
+        args="-E '*.png' -E '*.jpg' -E public -E '*.svg' -E yarn.lock"
+    fi
+    fd -t f -E node_modules -E build $args | tr '\n' '\0' | wc -l --files0-from=- | sort -n
+}
+
+# simple unification to get help from different commands
+help() {
+    cmd="$1"
+    args="${@:2}"
+    eval "$cmd" help "$args" 2>/dev/null || eval "$cmd" --help "$args" 2>/dev/null || eval "$cmd" -h "$args" 2>/dev/null
+}
+
+docker_run_status() {
+    user=$(pass ls github.credentials.t-wilkinson | sed 's/\(username\|password\)=//' | head -c -1 | tr '\n' ':')
+    # user=$(pass ls github.credentials.t-wilkinson | tr '=' ' ' | awk '{ print $2 }' | head -c -1 | tr '\n' ':')
+    curl -s -X GET \
+        -u "$user" \
+        https://api.github.com/repos/t-wilkinson/infinite-closet/commits/dev/check-runs | python -c '
+import json
+import sys
+for run in json.load(sys.stdin)["check_runs"]:
+    # print(json.dumps(run, indent=4, sort_keys=True))
+    print(run["completed_at"], run["status"], run["conclusion"])
+'
+}
+
+# make any necessary directories before creating file
+touchd () {
+    mkdir -p $(dirname $1)
+    touch $(basename $1)
+}
+
+countdown() {
+    minutes="$(($1 * 60))"
+    start="$(( $(date +%s) + $minutes))"
+    while [ "$start" -ge $(date +%s) ]; do
+        ## Is this more than 24h away?
+        days="$(($(($(( $start - $(date +%s) )) * 1 )) / 86400))"
+        time="$(( $start - `date +%s` ))"
+        printf '%s day(s) and %s        \r' "$days" "$(date -u -d "@$time" +%H:%M:%S)"
+        sleep 0.1
+    done
+    alarm
+}
+
+stopwatch() {
+    start=$(date +%s)
+    while true; do
+        days="$(($(( $(date +%s) - $start )) / 86400))"
+        time="$(( $(date +%s) - $start ))"
+        printf '%s day(s) and %s\r' "$days" "$(date -u -d "@$time" +%H:%M:%S)"
+        sleep 0.1
+    done
+}
+
+hist() {
+    listing=$(history -d 0--1 | fzf --layout=reverse --no-sort | awk '{print $1}')
+    fc $listing
+}
+
+dir_size() {
+    du -h --all -d 1 ${1:-.} | sort -h
+}
+
+git_files_size() {
+    git ls-files "$@" | xargs -I % ls -lh % | sort -h -k5
+}
+
+# ZORTEX
+# finds how many google docs pages the zortex takes
+zortex_page_count() {
+    # 83: on average, how many characters fit per line
+    # 45: how many lines each page fits
+    cat ${ZORTEX_DIR}/*.zortex | awk '
+BEGIN { n=0; m=0 };
+{ n += length($0)/83; m += 1 + int(length($0)/83) };
+END { print n/45, "(dense)"; print 1 + int(m/45) };
+'
+}
+
+zortex_short_articles() {
+    size=$1
+    wc -l *.zortex | sort -n | awk "{if (\$1 < ${size} ) system(\"head -1 \" \$2)}"
+}
+
+# for copying bash commands from instructions ($ echo 'hello world')
+$ () { eval "$@" }
+
+compdef _ssh ssh-tmux
+
+# bindkey -l  <- to view binded keys and their respective commands
+# bindkey -M {vicmd|viins|emacs}
+# man zshzle(1)
+# zle -al <- to list all key commands
+bindkey "^Y" list-expand  # for completion
+bindkey "^P" up-history
+bindkey "^N" down-history
+
+# PYENV
+eval "$(pyenv virtualenv-init -)"
+# command pyenv rehash 2>/dev/null
+# pyenv() {
+#   local command
+#   command="${1:-}"
+#   if [ "$#" -gt 0 ]; then
+#     shift
+#   fi
+#
+#   case "$command" in
+#   activate|deactivate|rehash|shell)
+#     eval "$(pyenv "sh-$command" "$@")"
+#     ;;
+#   *)
+#     command pyenv "$command" "$@"
+#     ;;
+#   esac
+# }
+
+# NVM
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+source /usr/share/nvm/init-nvm.sh
+
+
+#  # Transparent background.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_BACKGROUND=
+#  # Green prompt symbol if the last command succeeded.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=76
+#  # Red prompt symbol if the last command failed.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=196
+#
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_VICMD_FOREGROUND=6
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_VICMD_FOREGROUND=6
+#
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIVIS,VIOWR}_FOREGROUND=4
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIVIS,VIOWR}_FOREGROUND=4
+#
+#  # Default prompt symbol.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='λ' # \x03BB
+#  # typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIINS_CONTENT_EXPANSION='❯'
+#  # Prompt symbol in command vi mode.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='λ' # \x03BB
+#  # typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VICMD_CONTENT_EXPANSION='❮'
+#  # Prompt symbol in visual vi mode.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='V'
+#  # Prompt symbol in overwrite vi mode.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIOWR_CONTENT_EXPANSION='▶'
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_OVERWRITE_STATE=true
+#  # No line terminator if prompt_char is the last segment.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL=
+#  # No line introducer if prompt_char is the first segment.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_PROMPT_FIRST_SEGMENT_START_SYMBOL=
+#  # No surrounding whitespace.
+#  typeset -g POWERLEVEL9K_PROMPT_CHAR_LEFT_{LEFT,RIGHT}_WHITESPACE=
+#
+
+fpath=(~/.stripe $fpath)
+autoload -Uz compinit && compinit -i
+eval "$(direnv hook zsh)"
+
+export LFS=/mnt/lfs
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/trey/dev/google-cloud-sdk/path.zsh.inc' ]; then . '/home/trey/dev/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/trey/dev/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/trey/dev/google-cloud-sdk/completion.zsh.inc'; fi

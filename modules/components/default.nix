@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   imports = [
-    # ./wireguard.nix
+    ./wireguard.nix
     ./packages.nix
     # ./networking.nix
     # ./databases.nix

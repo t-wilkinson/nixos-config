@@ -1,0 +1,38 @@
+{
+  "suggest.autoTrigger": true,
+  "coc.preferences.formatOnSaveFiletypes": [
+    "svg",
+    "c",
+    "c++",
+    "cpp",
+    "rust",
+    "go",
+    "css",
+    "json",
+    "html"
+  ],
+  "coc.preferences.formatOnType": false,
+  "eslint.autoFixOnSave": false,
+  "eslint.format.enable": false,
+  "json.format.enable": true,
+  "eslint.enable": true,
+  "eslint.options": {
+    "rules": {
+      "indent": ["error", 2, { "SwitchCase": 1 }],
+      "linebreak-style": ["error", "unix"],
+      "quotes": ["off", "single"],
+      "semi": ["error", "never"]
+    }
+  },
+  "javascript.suggestionActions.enabled": false,
+  "prettier.resolveGlobalModules": true,
+  "prettier.semi": false,
+  "prettier.requireConfig": true,
+  "prettier.printWidth": 100,
+  "prettier.singleQuote": true,
+  "prettier.trailingComma": "es5",
+  "tsserver.formatOnType": false,
+  "tsserver.formatOnSave": false,
+  "typescript.suggest.autoImports": true,
+  "svelte.enable-ts-plugin": true
+}

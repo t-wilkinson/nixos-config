@@ -1,0 +1,64 @@
+# Snippets which apply to all files
+# extends :: includes snippets from other file type
+# priority :: for triggers
+# snippet trigger_word [ "description" [ biwrtsmeA ] ]		# include quotes for space ie. "my trigger"
+# the following are special chars :: `{$\
+# ${var:default/search/replace/option}
+
+global !p
+from snippets import upper_right, get_option
+from datetime import time
+import re
+endglobal
+
+snippet wow
+${1:Text}`!p snip.rv = upper_right(t[1])`
+endsnippet
+
+snippet "be(gin)?( (\S+))?" "begin{} / end{}" br
+\begin{${1:`!p
+snip.rv = match.group(3) if match.group(2) is not None else "something"`}}
+\end{$1}$0
+${2:${VISUAL}}
+endsnippet
+
+snippet t
+<tag>${VISUAL:inside text/should/is/g}</tag>
+${VISUAL/\w+\s*/\u$0/}
+endsnippet
+
+# Times
+snippet time.week "WWW-YYYY" w
+`!v strftime('W%U-%Y')`
+endsnippet
+
+snippet time.day "DD.MM.YY"
+`!v strftime('%d.%m.%y')`
+endsnippet
+
+snippet time.date "YYYY-MM-DD" w
+`!v strftime("%Y-%m-%d")`
+endsnippet
+
+snippet time.ddate "Month DD, YYYY" w
+`!v strftime("%b %d, %Y")`
+endsnippet
+
+snippet time.iso "ISO format datetime" w
+`!v strftime("%Y-%m-%d %H:%M:%S%z")`
+endsnippet
+
+snippet time.time "hh:mm" w
+`!v strftime("%H:%M")`
+endsnippet
+
+snippet time.datetime "YYYY-MM-DD hh:mm" w
+`!v strftime("%Y-%m-%d %H:%M")`
+endsnippet
+
+# ${VISUAL:title/\n*$//}${1: }
+snippet zettel "Zettelkasten 0-cell" i
+$1
+@${3:tags}
+$2
+endsnippet

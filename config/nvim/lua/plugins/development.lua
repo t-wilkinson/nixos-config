@@ -2,12 +2,22 @@ return {
   {
     "imsnif/kdl.vim",
   },
+  {
+    "neovim/nvim-lspconfig",
+    opts = { servers = { nil_ls = { mason = false, enable = false } } },
+  },
 
   { "mason-org/mason-lspconfig.nvim", version = "^1.0.0" },
   {
     "mason-org/mason.nvim",
     version = "^1.0.0",
     opts = {
+      -- servers = {
+      --   nil_ls = {
+      --     mason = false,
+      --     enable = false,
+      --   },
+      -- },
       ensure_installed = {
         "angular-language-server",
         "bash-language-server",

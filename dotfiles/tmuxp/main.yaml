@@ -1,0 +1,9 @@
+session_name: Main
+windows:
+- window_name: Zortex
+  focus: true
+  panes:
+    - cd ~/dev/t-wilkinson/personal/notes; vim -S ~/zortex.vim
+- window_name: Projects
+  panes:
+    - cd ~/dev/t-wilkinson

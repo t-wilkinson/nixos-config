@@ -1,0 +1,40 @@
+#!/bin/sh
+# vim: filetype=zsh.vim
+
+#
+# Monitor setup
+#
+xrandr --setprovideroutputsource modesetting NVIDIA-0
+xrandr --auto
+connect_monitors.py
+
+xset -dpms # don't screen blank
+xset s off
+
+#
+# Appearances
+#
+xrdb ~/.Xresources &
+xbanish &
+~/dev/jonaburg/picom/build/src/picom --experimental-backends --config ~/.config/picom/picom-jonaburg.conf &
+xsetroot -cursor_name left_ptr &
+feh --no-fehbg --bg-fill '/home/trey/dev/t-wilkinson/media/backgrounds/firewatch.jpg' '/home/trey/dev/t-wilkinson/media/backgrounds/xiaomi-mi-gaming-laptop-abstract-4k-hl-2560x1440.jpg' &
+# xwinwrap -ov -g 1920x1080+0+0 -- mpv -wid WID ~/dev/t-wilkinson/media/backgrounds/videos/DVDE_loop.mp4 --no-osc --no-osd-bar --loop-file --player-operation-mode=cplayer --no-audio --panscan=1.0 --no-input-default-bindings &
+# ~/bin/back4.sh auto ~/dev/t-wilkinson/media/gif/beautycity.gif &
+
+#
+# Default programs
+#
+# xset r rate 160 20 &
+# pacmd set-default-source $(pacmd list-sources | grep name: | grep input | sed 's/^.*<\(.*\)>/\1/p')
+mkdir -p /tmp/$USER/
+google-chrome-beta &
+kitty &
+super-caps.sh &
+/usr/lib/notification-daemon-1.0/notification-daemon &
+
+# alsactl restore
+#
+# Launch XMonad (the best WM)
+#
+exec $HOME/.xmonad/xmonad-x86_64-linux # >| ~/.local/share/log 2>&1

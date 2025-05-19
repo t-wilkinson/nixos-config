@@ -1,0 +1,1 @@
+bind main w !?git push origin

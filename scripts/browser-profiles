@@ -1,0 +1,46 @@
+#!/usr/bin/sh
+
+profiles_dir="$HOME/.local/share/browser-profiles"
+[ ! -e "$profiles_dir" ] && mkdir -p "$profiles_dir"
+
+run() {
+    browser="$1"
+    profile_dir="$2"
+    args=${@:3}
+
+    case $browser in
+        qutebrowser) exec qutebrowser --restore default -B "$profile_dir" $args
+            ;;
+        *chrome*)
+            exec "$browser" --user-data-dir="$profile_dir" $args
+            ;;
+        firefox*)
+            exec "$browser" --profile "$profile_dir" $args
+            ;;
+    esac
+}
+
+# config is file with lines formatted as follows `profile=browser`
+config=${BROWSER_CONFIG:-"$HOME/.config/browser-profiles/config"}
+[ ! -e "$config" ] && mkdir -p $(dirname "$config") && touch "$config"
+
+while IFS= read -r line; do
+    read profile browser <<< $(tr '=' ' ' <<< "$line")
+
+    if [[ "$profile" == "$1" ]]; then
+        profile_dir="$profiles_dir/$profile"
+        [ ! -e "$profile_dir" ] && mkdir -p "$profile_dir"
+        run "$browser" "$profile_dir" "${@:2}"
+        exit 0
+    fi
+
+    if [[ "$profile" == "$BROWSER_DEFAULT" ]]; then
+        def_profile_dir="$profiles_dir/$profile"
+        [ ! -e "$def_profile_dir" ] && mkdir -p "$def_profile_dir"
+        def_browser="$browser"
+    fi
+done < "$config"
+
+[ -z $1 ] || [ -n $BROWSER_DEFAULT ] && run "$def_browser" "$def_profile_dir" ${@:1}
+
+exit 1

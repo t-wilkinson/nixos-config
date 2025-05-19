@@ -1,0 +1,84 @@
+# Haskell snippets
+
+# global !p
+# import re
+# endglobal
+
+snippet Node "Node for xmonad.hs"
+Node (TSNode "$1" "$2" (spawn "$3")) [$4]$0
+endsnippet
+
+snippet , "Field for data type"
+, ${1:field} :: ${2:type}
+endsnippet
+
+snippet i "Import"
+import $0
+endsnippet
+
+snippet iq "Qualified import"
+import qualified ${1:Data.ByteString} as ${0:`!p
+chars = re.findall('[A-Z]', t[1])
+rv = ""
+for char in chars: rv += char
+
+snip.rv = rv + ""
+`}
+endsnippet
+
+snippet d "Data type"
+data ${1:name} = ${2:`!p snip.rv = t[1]`}
+    { $3
+    } $0
+endsnippet
+
+snippet der "deriving"
+deriving ($1)$0
+endsnippet
+
+snippet json "Data type deriving generic and JSON"
+data ${1:name} = ${2:`!p snip.rv = t[1]`}
+    { $0
+    } deriving (Generic)
+      deriving anyclass (ToJSON, FromJSON)
+endsnippet
+
+snippet new "newtype"
+newtype ${1:name} = { `!p snip.rv = t[1][0].lower() + t[1][1:]` :: ${2:type} }
+endsnippet
+
+snippet mf "Monadic function (with types)"
+${1:name}
+    ∷ ∀ $2 m.
+        ( Monad m$3
+        )
+    ⇒ $4
+$1$5 = do
+    $0
+endsnippet
+
+snippet f "function"
+${1:name} :: $2
+$1 $0
+endsnippet
+
+snippet L "Language pragma"
+{-# LANGUAGE $1 #-}$0
+endsnippet
+
+# snippet module.route "New module with Route"
+# module $1 where
+
+# import Quaalude
+# import Core.Config (AppS)
+
+# data Route r = Route
+# 	{ $1
+# 	} deriving (Generic)
+
+# route = route @AppS
+# 	`!p
+# lines = [re.match(line) for line in t[1] if re.match(r'^\s*,', line)]
+# snip.rv = ""
+# `
+# endsnippet

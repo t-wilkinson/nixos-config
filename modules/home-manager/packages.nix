@@ -70,6 +70,9 @@ with pkgs;
   # age-plugin-yubikey
   gnupg
   pass
+  # bitwarden-desktop
+  # bitwarden-cli
+  # unstable.nodePackages."@bitwarden/cli"
 
   # SOURCE CODE MANAGEMENT, GIT, GITHUB TOOLS
   # gh

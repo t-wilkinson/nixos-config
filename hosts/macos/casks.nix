@@ -1,9 +1,8 @@
-_:
-
-[
+_: [
   # Development Tools
   # "kitty"
   # "foot"
+  "bitwarden"
   "homebrew/cask/docker"
   # "claude"
   # "insomnia"

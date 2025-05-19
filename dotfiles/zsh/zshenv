@@ -1,0 +1,69 @@
+if [[ ( "$SHLVL" -eq 1 && ! -o LOGIN ) && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
+  source "${ZDOTDIR:-$HOME}/.zprofile"
+fi
+
+export BAT_CONFIG=$HOME/.config/bat/config
+export BAT_PAGER=
+export BROWSER_DEFAULT="personal"
+export CDPATH="$HOME/dev"
+export FZF_DEFAULT_COMMAND='/usr/bin/fd --type f'
+export FZF_DEFAULT_OPTS='--cycle --exact --color=dark --color=fg:15,bg:-1,hl:1,fg+:#ffffff,bg+:-1,hl+:1 --color=info:12,prompt:2,pointer:13,marker:12,spinner:11,header:-1 --layout=reverse  --margin=1,4 --preview-window=":60%" --bind ctrl-k:preview-up,ctrl-j:preview-down'
+export GOPATH=$HOME/go
+export NVM_DIR="$HOME/.nvm"
+export PATH=$PATH:$GOPATH/bin
+export PYENV_SHELL=zsh
+export PYTHONPATH="$HOME/dev/t-wilkinson/sysadmin:$HOME/dev/t-wilkinson/personal/languages/python/lib"
+export TMUXP_CONFIGDIR="$HOME/.config/tmuxp"
+export XDG_CONFIG_DIRS="$HOME/.config"
+export XDG_CONFIG_HOME="$HOME/.config"
+export ZSH_AUTOSUGGEST_STRATEGY=(completion match_prev_cmd)
+
+export tw_="$HOME/dev/t-wilkinson"
+export tw_p="$HOME/dev/t-wilkinson/personal"
+export tw_ic="$HOME/dev/t-wilkinson/infinite-closet"
+
+export ZORTEX_DIR="$tw_p/notes"
+
+# `set | grep _POWERLEVEL9K` to view all exported settings
+# export POWERLEVEL9K_LEFT_SEGMENT_END_SEPARATOR="  "
+# export POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR=" "
+# export POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR=" |"
+# export POWERLEVEL9K_HOME_ICON=" "
+# export POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR=" "
+# export POWERLEVEL9K_LINUX_ARCH_ICON=" "
+# export POWERLEVEL9K_NODE_ICON="  "
+# export POWERLEVEL9K_OK_ICON="  "
+# export POWERLEVEL9K_VCS_GIT_GITLAB_ICON="  "
+# export POWERLEVEL9K_VCS_GIT_GITHUB_ICON="  "
+# export POWERLEVEL9K_VCS_GIT_ICON="  "
+# export POWERLEVEL9K_VCS_BRANCH_ICON="  "
+# export POWERLEVEL9K_BATTERY_ICON="  "
+# export POWERLEVEL9K_DATE_ICON="  "
+# export POWERLEVEL9K_BACKGROUND_JOBS_ICON="  "
+# export POWERLEVEL9K_PROMPT_CHAR_{OK,ERROR}_VIVIS_CONTENT_EXPANSION='Ⅴ '
+
+# Paths
+# NPM
+if [[ -z $IN_NIX_SHELL ]];then
+    # npm config set prefix ~/.npm
+fi
+
+path+=(
+    $HOME/.pyenv/shims
+    $HOME/.local/bin
+    $HOME/.local/bin/scripting
+    $HOME/.local/bin/scripts
+    $HOME/.npm/bin
+    $HOME/.yarn/bin
+    $HOME/.config/yarn/global/node_modules/.bin
+    $HOME/bin
+    $HOME/go/bin
+    $HOME/.pyenv/bin
+)
+
+
+source ~/.aliases
+
+if [ -e /home/trey/.nix-profile/etc/profile.d/nix.sh ]; then . /home/trey/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+source "$HOME/.cargo/env"
+. "$HOME/.cargo/env"

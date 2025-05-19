@@ -1,0 +1,569 @@
+" vim: filetype=vim
+set nocompatible
+scriptencoding utf-8
+set fileencoding=utf-8
+
+"-------------------- Plugins --------------------
+    call plug#begin('~/.vim/plugged')
+    " tpope
+        Plug 'tpope/vim-fugitive'   " Git
+        Plug 'tpope/vim-abolish'    " Case matching substitute and others
+        Plug 'tpope/vim-repeat'     " Repeat plugin commands
+        Plug 'tpope/vim-surround'   " Surround Vim
+        Plug 'tpope/vim-commentary' " Comment lines
+        Plug 'tpope/vim-obsession'  " Save sessions
+        Plug 'tpope/vim-eunuch'     " Better deleting
+        Plug 'tpope/vim-vinegar'    " netrw
+
+    " t-wilkinson
+        Plug '~/dev/zortex.nvim', { 'do': 'cd app && yarn install' }
+            let g:zortex_remote_wiki_port = 8081
+            let g:zortex_remote_server = 'klean-studios'
+            let g:zortex_remote_server_dir = '/www/zortex'
+
+            let g:zortex_fenced_languages = ['python', 'javascript', 'bindzone', 'rust', 'bash', 'sh', 'json', 'sql']
+            let g:zortex_notes_dir = $HOME . '/zortex'
+            let g:zortex_window_command = 'call FloatingFZF()'
+            let g:zortex_extension = '.zortex'
+            let g:zortex_theme = 'light'
+            let g:zortex_auto_start_preview = 1
+            let g:zortex_auto_start_server = 1
+            let g:zortex_preview_options = {
+                \ 'mkit': {},
+                \ 'katex': {},
+                \ 'uml': {},
+                \ 'maid': {},
+                \ 'disable_sync_scroll': 0,
+                \ 'sync_scroll_type': 'middle',
+                \ 'hide_yaml_meta': 1,
+                \ 'sequence_diagrams': {},
+                \ 'flowchart_diagrams': {},
+                \ 'content_editable': v:false,
+                \ 'disable_filename': 0,
+                \ 'toc': {}
+                \ }
+            let g:zortex_port = '8080'
+
+            " map Zo o0␄Z<Tab>
+            " vmap Z- :g/^-/norm 2clZ<Tab><CR>
+            " vmap Z^ :g/^/norm iZ<Tab><CR>
+            " vmap <silent>Zc :s/- \(.*\)/\='- ' . tolower(substitute(submatch(1), " ", "-", "g"))<CR>
+            " map <silent>Zu :ZortexSearchUnique<CR>
+            " map <silent>Za :ZortexBranchToArticle<CR>
+            " map <silent>ZO :ZortexBranchToOutline<CR>
+            " map <silent>Zy :ZortexCopyZettelId<CR>
+            " map <silent>ZY :ZortexCopyZettel<CR>
+            " map <silent>Zl :ZortexCreateLink<CR>
+
+            nmap Z <Nop>
+            nmap ZZ <Nop>
+
+            autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+            autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+            map <silent>Zz :ZortexSearch<CR>
+            map <silent>ZZ :ZortexSearch<CR>
+
+            map <silent>Zr :ZortexResourceToZettel<CR>
+            map <silent>Zi :ZortexListitemToZettel<CR>
+            map <silent>Zs :ZortexOpenStructure<CR>
+
+            map Zw  :ZortexSearchWikipedia<Space>
+            map Zg  :ZortexSearchGoogle<Space>
+
+            map Zp  :ZortexPreview<CR>
+            map ZSs :ZortexStartServer<CR>
+            map ZSe :ZortexStopServer<CR>
+            map ZRs :ZortexStartRemoteServer<CR>
+            map ZRr :ZortexRestartRemoteServer<CR>
+            map ZRS :ZortexSyncRemoteServer<CR>
+            map ZRF :ZortexReloadFolds<CR>
+
+    Plug 'ntessore/unicode-math.vim'
+    Plug 'jlapolla/vim-coq-plugin'
+    Plug 'derekelkins/agda-vim'
+    Plug 'evanleck/vim-svelte'
+    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
+    Plug 'machakann/vim-swap'
+    Plug 'powerman/vim-plugin-AnsiEsc'      " Correctly show color codes when using vim as a pager
+        let g:no_plugin_maps = 1
+    Plug 'obreitwi/vim-sort-folds'          " Sort vim folds
+    Plug 'dracula/vim'
+    Plug 'christoomey/vim-tmux-navigator' "  Seamless tmux navigation
+    Plug 'sheerun/vim-polyglot'
+    " Plug 'moll/vim-bbye'                  "  optional dependency for vim-symlink
+    " Plug 'aymericbeaumet/vim-symlink'     "  open the file symlinks point to
+    Plug 'sbdchd/neoformat'
+    Plug 'junegunn/vim-easy-align'
+        xmap ga <Plug>(EasyAlign)
+        nmap ga <Plug>(EasyAlign)
+
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+        set hidden                        "  TextEdit might fail if hidden is not set.
+        set nobackup                      "  Some servers have issues with backup files, see #649.
+        set nowritebackup                 ""
+        set cmdheight=2                   "  Give more space for displaying messages.
+        set updatetime=100                "  Having longer updatetime (default is 4000 ms = 4 s) leads to noticeable
+        set shortmess+=c                  "  Don't pass messages to |ins-completion-menu|.
+        set signcolumn=number
+
+        nmap <silent> [g <Plug>(coc-diagnostic-prev)
+        nmap <silent> ]g <Plug>(coc-diagnostic-next)
+        nmap <silent> <leader>cd <Plug>(coc-definition)
+        nmap <silent> <leader>cy <Plug>(coc-type-definition)
+        nmap <silent> <leader>ci <Plug>(coc-implementation)
+        nmap <silent> <leader>cr <Plug>(coc-references)
+        nmap <silent> <leader>cn <Plug>(coc-codeaction)
+        nmap <silent> <leader>cf <Plug>(coc-format-selected)
+        vmap <silent> <leader>cf <Plug>(coc-format-selected)
+        nmap <silent><nowait> <leader>cld  :<C-u>CocList diagnostics<cr>
+        nmap <silent><nowait> <leader>cle  :<C-u>CocList extensions<cr>
+        nmap <silent><nowait> <leader>clc  :<C-u>CocList commands<cr>
+        nmap <silent><nowait> <leader>clo  :<C-u>CocList outline<cr>
+        nmap <silent><nowait> <leader>cls  :<C-u>CocList -I symbols<cr>
+        nmap <silent><nowait> <leader>clr  :<C-u>CocListResume<CR>
+        nmap <silent><nowait> <leader>cj  :<C-u>CocNext<CR>
+        nmap <silent><nowait> <leader>ck  :<C-u>CocPrev<CR>
+        "  nnoremap <silent> K :call CocAction('doHover')<CR>
+        nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+        " Use <c-space> to trigger completion
+        if has('nvim')
+          inoremap <silent><expr> <c-space> coc#refresh()
+        else
+          inoremap <silent><expr> <c-@> coc#refresh()
+        endif
+
+        function! s:show_documentation()
+            if (index(['vim','help'], &filetype) >= 0)
+                execute 'h '.expand('<cword>')
+            elseif (coc#rpc#ready())
+                call CocActionAsync('doHover')
+            else
+                execute '!' . &keywordprg . " " . expand('<cword>')
+            endif
+        endfunction
+
+        autocmd CursorHold * silent call CocActionAsync('highlight')
+        command! -nargs=0 Format    :call CocAction('format')
+        command! -nargs=0 Organize  :call CocAction('runCommand', 'editor.action.organizeImport')
+
+                                          "  Remap <C-f> and <C-b> for scroll float windows/popups.
+        if has('nvim-0.4.0') || has('patch-8.2.0750')
+          nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+          nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+          inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+          inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+          vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+          vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+        endif
+
+    Plug 'mattn/emmet-vim'
+        let g:user_emmet_leader_key='<C-G>'
+        let g:user_emmet_mode='i'
+        " let g:user_emmet_install_global = 0
+        " autocmd FileType html,css EmmetInstall
+
+    Plug 'junegunn/fzf'
+    Plug 'junegunn/fzf.vim'
+        " CTRL-T(tab) / CTRL-X(split) / CTRL-V(ver-split)
+        " let $FZF_DEFAULT_COMMAND =  "find * -path '*/\.*' -prune -o -path 'node_modules/**' -prune -o -path 'target/**' -prune -o -path 'dist/**' -prune -o  -type f -print -o -type l -print 2> /dev/null"
+        let $FZF_DEFAULT_COMMAND =  "fd . --type f -E node_modules"
+        let $FZF_DEFAULT_OPTS=' --cycle --exact --color=dark --color=fg:16,bg:-1,hl:1,fg+:#ffffff,bg+:-1,hl+:1 --color=info:12,prompt:0,pointer:12,marker:4,spinner:11,header:-1 --layout=reverse  --margin=1,4 --preview-window=":60%" --bind ctrl-k:preview-up,ctrl-j:preview-down,ctrl-f:preview-page-down,ctrl-b:preview-page-up'
+        let g:fzf_layout = { 'window': 'call FloatingFZF()' }
+        let g:fzf_command_prefix = "Fzf"
+
+        " https://github.com/junegunn/fzf.vim#advanced-customization
+        command! -bang -nargs=* FzfRg
+          \ call fzf#vim#grep(
+          \   'rg --column --line-number --no-heading --color=always --smart-case -g !node_modules -- '.shellescape(<q-args>), 1,
+          \   fzf#vim#with_preview(), <bang>0)
+
+        " https://www.reddit.com/r/neovim/comments/djmehv/im_probably_really_late_to_the_party_but_fzf_in_a/
+        function! FloatingFZF()
+          let buf = nvim_create_buf(v:false, v:true)
+          call setbufvar(buf, '&signcolumn', 'no')
+
+          let height = float2nr(50)
+          let width = float2nr(&columns - 8)
+          let horizontal = float2nr((&columns - width) / 2)
+          let vertical = 1
+
+          let opts = {
+                \ 'relative': 'editor',
+                \ 'row': vertical,
+                \ 'col': horizontal,
+                \ 'width': width,
+                \ 'height': height,
+                \ 'style': 'minimal'
+                \ }
+
+          call nvim_open_win(buf, v:true, opts)
+        endfunction
+
+    Plug 'pseewald/vim-anyfold'
+        let g:anyfold_fold_comments=1
+        let g:anyfold_fold_size_str='%s'
+        let g:anyfold_fold_level_str=''
+        " activate anyfold by default
+            augroup anyfold
+                autocmd!
+                " autocmd Filetype * AnyFoldActivate
+            augroup END
+
+        " disable anyfold for large files
+            let g:LargeFile = 1000000 " file is large if size greater than 1MB
+            autocmd BufReadPre,BufRead * let f=getfsize(expand("<afile>")) | if f > g:LargeFile || f == -2 | call LargeFile() | endif
+            function! LargeFile()
+                augroup anyfold
+                    autocmd! anyfold
+                    autocmd Filetype * setlocal foldmethod=indent " fall back to indent folding
+                    autocmd Filetype * syntax off
+                augroup END
+            endfunction
+
+    Plug 'itchyny/lightline.vim'
+        set noshowmode
+
+        " Functions
+            function! LightLineTime()
+                return strftime("%H:%M")
+            endfunction
+            function! LightLineFilename()
+                if &filetype == "zortex"
+                    return ''
+                else
+                    return fnamemodify(expand("%"), ":~:.")
+                endif
+            endfunction
+            function! LightlineFugitive()
+                " let branch = fugitive#head()
+                " return branch !=# '' ? "\uf126 ".branch : ''
+                return ''
+            endfunction
+            function! LightlineObsession()
+                let status = ObsessionStatus("\u25cf", "\u25cb")
+                return status == '' ? "" : status
+            endfunction
+
+        let g:lightline = {
+                    \ 'separator': { 'left': "\ue0b0", 'right': "\ue0b2" },
+                    \ 'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" },
+                    \ 'colorscheme': 'dracula',
+                    \ 'component_function': {
+                    \   'time': 'LightlineTime',
+                    \   'gitbranch': 'LightlineFugitive',
+                    \   'filename': 'LightLineFilename',
+                    \   'obsession': 'LightlineObsession',
+                    \   'zortex': 'zortex#search#LightlineZortex'
+                    \ },
+                    \ 'active': {
+                    \   'left': [ [ 'mode' ], [ 'zortex', 'filename', 'modified' ] ],
+                    \   'right': [  [ 'gitbranch', 'obsession', 'readonly', 'lineinfo' ] ]
+                    \ },
+                    \ 'inactive': {
+                    \   'left': [ ['zortex', 'filename', 'modified' ] ],
+                    \   'right': [  ]
+                    \ },
+                    \ }
+
+    if has('python3')
+    Plug 'SirVer/ultisnips'
+        let g:UltiSnipsExpandTrigger='<Tab>'
+        let g:UltiSnipsJumpForwardTrigger='<Tab>'
+        let g:UltiSnipsJumpBackwardTrigger='<S-Tab>'
+        let g:UltiSnipsSnippetDirectories=[$HOME . '/.vim/UltiSnips']
+        let g:UltiSnipsEditSplit="vertical"
+    endif
+    call plug#end()
+
+    packadd cfilter
+
+        " lua require('hop').setup()
+        " map <silent><leader>hl :HopLineStart<CR>
+        " map <silent><leader>hp :HopPattern<CR>
+        " map <silent><leader>hw :HopWord<CR>
+
+"-------------------- Scripts --------------------
+    "-------------------- Filter quickfix --------------------
+        function! s:format_qf_line(line)
+          let parts = split(a:line, ':')
+          return { 'filename': parts[0]
+                 \,'lnum': parts[1]
+                 \,'col': parts[2]
+                 \,'text': join(parts[3:], ':')
+                 \ }
+        endfunction
+
+        function! s:qf_to_fzf(key, line) abort
+          let l:filepath = expand('#' . a:line.bufnr . ':p')
+          return l:filepath . ':' . a:line.lnum . ':' . a:line.col . ':' . a:line.text
+        endfunction
+
+        function! s:fzf_to_qf(filtered_list) abort
+          let list = map(a:filtered_list, 's:format_qf_line(v:val)')
+          if len(list) > 0
+            call setqflist(list)
+            copen
+          endif
+        endfunction
+
+        command! FzfQF call fzf#run({
+              \ 'source': map(getqflist(), function('<sid>qf_to_fzf')),
+              \ 'down':   '20',
+              \ 'sink*':   function('<sid>fzf_to_qf'),
+              \ 'options': '--reverse --multi --bind=ctrl-a:select-all,ctrl-d:deselect-all --prompt "quickfix> "',
+              \ })
+
+"-------------------- Mappings --------------------
+    " Basic
+        cabbrev cdic ~/dev/t-wilkinson/infinite-closet/
+        cabbrev cdtw ~/dev/t-wilkinson/
+        cabbrev cdpj ~/dev/t-wilkinson/projects/notes/
+
+        map <Space> <leader>
+        map Q @@
+        map Y y$
+        noremap zi zizz
+        nmap <leader>yq gg0vG$"+y:q!<CR>
+        map z? ^r?
+        nmap gJ Jdw
+        map <leader>~ ^Wys$~ys$~
+        noremap <C-6> <C-^>
+
+        map <leader>^# :g/#/p<Left><Left>
+        map <leader>^s /^\s*
+        for i in [0,1,2,3,4,5,6,7,8,9]
+            execute printf("map <leader>^-%d /^\\v( {4}){0,%d}(-\\|*)\\s", i, i)
+        endfor
+
+        cabbrev QF expand("%") . ":" . line(".") .  ":" . getline(".")
+        map <silent> <leader>qf :caddexpr expand("%") . ":" . line(".") .  ":" . getline(".")
+        map <leader>sv :keeppatterns source $HOME/.vimrc<CR>
+        map <leader>sm :source $HOME/main.vim<CR>
+        map <leader>s% :source %<CR>
+
+        vmap <leader>si :sort /.\{-}\ze'/<CR>
+        map <leader>si vip:sort /.\{-}\ze'/<CR>
+        " map <silent> <leader>sf :call sortfolds#SortFolds()<CR>
+
+        nmap <silent> <leader>tc :let &signcolumn=(&signcolumn == "number" ? "no" : "number")<CR>
+        nnoremap <silent> <leader>g :redir @a<CR>:g//<CR>:redir END<CR>:new<CR>:put! a<CR>
+        map <silent> <leader>y% :let @+=expand("%:p")<CR>
+
+    " Folds
+        " Paste into fold
+        " map Zp zop>`]zc
+        " Delete fold (doesnt work if nofoldenable)
+        map zD zCdd
+        map zd zcdd
+        " Visually select fold
+        map zv zcVzogv
+        " Decrease indent of current fold
+        map z{ zvo␛ddgv<
+        map z> zv>
+        map z< zv<
+
+        " zj/zk should only go to closed tags
+        function! NextClosedFold(dir)
+            let cmd = 'norm!z' . a:dir
+            let view = winsaveview()
+            let [l0, l, open] = [0, view.lnum, 1]
+            while l != l0 && open
+                exe cmd
+                let [l0, l] = [l, line('.')]
+                let open = foldclosed(l) < 0
+            endwhile
+            if open
+                call winrestview(view)
+            endif
+        endfunction
+
+        function! RepeatCmd(cmd) range abort
+            let n = v:count < 1 ? 1 : v:count
+            while n > 0
+                exe a:cmd
+                let n -= 1
+            endwhile
+        endfunction
+
+        nnoremap <silent> zj :<c-u>call RepeatCmd('call NextClosedFold("j")')<cr>
+        nnoremap <silent> zk :<c-u>call RepeatCmd('call NextClosedFold("k")')<cr>
+
+    " Fzf
+        map <leader>fa :FzfAg<CR>
+        map <leader>fb :FzfBuffers<CR>
+        map <leader>fc :FzfColors<CR>
+        map <leader>ff :FzfFiles<CR>
+        map <leader>fh :FzfHistory<CR>
+        map <leader>fl :FzfLines<CR>
+        map <leader>fL :FzfBLines<CR>
+        map <leader>fr :FzfRg<CR>
+        map <leader>fH :FzfHelptags<CR>
+
+    " Commands
+        " com! Bdelete bp | sp | bn | bd  " delete a buffer but keep window format
+        " com! RM silent execute "Bdelete %" | silent execute "!rm #"
+        " com! W silent execute "write" "!sudo tee % >/dev/null" | silent edit!
+        " com! -complete=file -nargs=1 MV
+        "             \ silent execute "!mv %" <q-args> |
+        "             \ Bdelete |
+        "             \ execute "edit" <q-args>
+        com! ClearReg for i in range(34,122) | silent! call setreg(nr2char(i),"") | endfor
+        com! W :SudoWrite
+        com! WQ :SudoWrite | q
+        " TODO: prettier keeps asking for what package manager you are using
+        " command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
+
+        " command! -nargs=0 Prettier :CocCommand prettier.forceFormatDocument
+        command! -nargs=0 Prettier :execute "silent !prettier" "-w" "--config" "~/.config/home/.prettierrc" "%:p"
+        " com! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+        map <leader>cp :Prettier<CR>
+        com! Marks marks abcdefghijklmnopqrstuvwxyz
+        com! SL :source ~/main.vim
+
+""-------------------- Session --------------------
+"    com! -nargs=1 WS
+"                \ execute printf("mksession! %s/.vim/sessions/%s.session.vim", $HOME, <q-args>) |
+"                \ execute printf("wshada! %s/.vim/sessions/%s.shada.vim", $HOME, <q-args>) |
+"    com! -nargs=1 RS
+"                \ execute printf("source %s/.vim/sessions/%s.session.vim", $HOME, <q-args>) |
+"                \ execute printf("rshada! %s/.vim/sessions/%s.shada.vim", $HOME, <q-args>) |
+"    com! -nargs=1 WQS
+"                \ WS <args> |
+"                \ q
+"    augroup session
+"        autocmd!
+"        autocmd VimLeavePre * exe s:persist()
+"        autocmd BufEnter * exe s:persist()
+"    augroup END
+
+"-------------------- Default settings --------------------
+    " set
+        set scrolloff=5
+        set clipboard=unnamedplus           " Sync clipboard
+        set completeopt=menu,preview        " popupmenu, longest common text
+        set cmdheight=1                     " 2 to Avoid hit-enter prompt
+        set encoding=utf-8
+        set expandtab                       " Expand tab to spaces
+        set fileformat=unix
+        set fillchars=vert:\ "              " Don't like splits
+        set gdefault
+        set hidden                          " Switch buffers without saving
+        set ignorecase smartcase            " Smartcase
+        set nolazyredraw                      " Need to set when neovide
+        if exists("g:neovide")
+            set nolazyredraw                      " Need to set when neovide
+        else
+            set lazyredraw                      " Don't redraw screen after each key in macro
+        endif
+        set inccommand=split                " Live search
+        set linebreak
+        set nohlsearch                      " Disable hlsearch
+        set nowrap
+        set path=**
+        set smartindent                     " Smartindent
+        set splitbelow splitright           " Better splits
+        set termguicolors                   " Use full range of colors
+        set undofile undodir=~/.vim/undodir " Undo file
+        set wildignore=*.swp,*/__pycache__/*,*/.git/*,*/dist-newstyle/*,*/cljs-runtime/*,*.o,*.hi
+        set wildmenu
+        set nostartofline
+        " set shada=!,'50,<50,s10,h,%
+        set shada=%,'1000,<1000,s1000
+        " set history
+        set autoread
+        set pumheight=10
+        set foldlevel=1
+        set cursorline
+        set modeline
+        set number relativenumber                 " I usually have this off
+        " set norelativenumber nonumber
+        set undolevels=10000
+        set synmaxcol=800
+        set viewdir=$HOME/.vim/view
+        set iminsert=0
+        set imsearch=-1
+
+    " let
+        let &grepprg='grep -n -R --exclude=' . shellescape(&wildignore) . ' $*'
+        let g:loaded_python_provider = 0    " disable python2
+        " let g:netrw_banner=0                " hide netrwbanner
+        " let g:netrw_liststyle=3             " hide netrwbanner
+        let g:netrw_localmovecommand = 'mv'
+        let g:python_host_skip_check = 1
+        let g:python3_host_skip_check = 1
+        " let g:python3_host_prog = 'nvim'
+        " let g:node_host_prog = '/home/trey/.nvm/versions/node/v14.20.1/lib/node_modules'
+
+    digraphs
+                \ xS 739 yS 696 zS 7611 oS 7506 pS 7510 xs 8339 as 8336
+                \ xx 10008
+                \ >- 10522 -< 10521 -( 10523 )- 10524 ]- 8866
+
+"-------------------- Autocompletion --------------------
+    " see complete-items
+    set dictionary+=$HOME/dev/t-wilkinson/projects/notes/dictionary.zortex
+    set dictionary+=$HOME/dev/t-wilkinson/projects/notes/structure.zortex
+
+    set complete=.,w,b,u,t,k
+    inoremap <expr> <CR> pumvisible() ? "\<C-Y>" : "\<CR>"
+    " autocmd InsertCharPre *.zortex call AutoComplete()
+    autocmd FileType zortex setlocal complete=.,k completeopt=menu,menuone,noinsert,preview
+    function! AutoComplete()
+        if v:char =~ '\K'
+            \ && getline('.')[col('.') - 4] !~ '\K'
+            \ && getline('.')[col('.') - 3] =~ '\K'
+            \ && getline('.')[col('.') - 2] =~ '\K' " last char
+            \ && getline('.')[col('.') - 1] !~ '\K'
+
+            call feedkeys("\<C-P>", 'n')
+        end
+    endfunction
+
+"-------------------- Auto Commands --------------------
+    " Remove trailing white space
+    au BufWritePre *
+                \ let s:save = winsaveview() |
+                \ keeppatterns %s/\s\+$//e |
+                \ silent call winrestview(s:save)
+
+    augroup filetypes
+        autocmd!
+        autocmd BufRead,BufNewFile * setlocal tabstop=4 softtabstop=4 shiftwidth=4
+        " autocmd VimEnter,BufRead,BufNewFile * setlocal formatoptions -=cro " disable comments
+        autocmd VimEnter,BufRead,BufNewFile *.html,*.yml,*.css,*.yaml,*.nix,*.ts,*.tsx,*.json,*.js,*.jsx,*.clj,*.cljs,*.cljc setlocal ts=2 sts=2 sw=2
+        autocmd VimEnter,BufRead,BufNewFile *.md setlocal nowrap
+        autocmd VimEnter,BufRead,BufNewFile .eslintrc setfiletype json
+        autocmd FileType javascript,typescriptreact hi jsxClosePunct guifg=#6272a4
+        autocmd FileType javascript,typescriptreact hi jsxOpenPunct guifg=#6272a4
+        autocmd FileType javascript,typescriptreact hi jsxPunct guifg=#6272a4
+        autocmd FileType javascript,typescriptreact hi jsxCloseString guifg=#6272a4
+        " autocmd FileType typescriptreact hi typescriptBraces guifg=#8be9fd
+        autocmd FileType zortex let b:coc_additional_keywords = ["-"]
+        autocmd FileType zortex setlocal keymap=unicode-math " disable keymap with <C-6>
+        " autocmd FileType agda let @u="ð��¤â��Ì�" | let @v="ð��¥â��Ì�" | let @w="ð��¦â��Ì�"
+
+    augroup END
+
+"-------------------- Colorscheme --------------------
+    set guifont=Fira\ Code:h10
+    colorscheme dracula
+    set conceallevel=2
+    set concealcursor=
+    hi Normal guibg=NONE
+    hi Conceal guibg=NONE
+    execute 'hi CursorLine guibg='.g:dracula#palette.bgdark[0]
+    execute 'hi SignColumn guibg='.g:dracula#palette.bgdark[0]
+    execute 'hi CocErrorSign guifg='. g:dracula#palette.red[0] .' guibg='.g:dracula#palette.bgdark[0]
+    execute 'hi CocWarningSign guifg='. g:dracula#palette.orange[0] .' guibg='.g:dracula#palette.bgdark[0]
+    execute 'hi CocInfoSign guifg='. g:dracula#palette.yellow[0] .' guibg='.g:dracula#palette.bgdark[0]
+    execute 'hi Folded guifg=' . g:dracula#palette.comment[0] . ' guibg=NONE'
+    execute 'hi CursorLine guibg='.g:dracula#palette.bgdark[0]
+
+    let g:vim_jsx_pretty_highlight_close_tag = 0
+
+" Prefer to use <C-Y> to accept completion, and have enter insert a new line
+" inoremap <silent><expr> <cr> coc#pum#visible() ? coc#_select_confirm() : \<C-g>u\<CR>"
+iunmap <CR>
+inoremap <silent><expr> <CR> '<C-g>u<CR>'
+

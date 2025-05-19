@@ -12,6 +12,7 @@
     ./home-manager.nix
     ../../modules/shared.nix
     ./packages.nix
+    ./networking.nix
     # agenix.darwinModules.default
   ];
 

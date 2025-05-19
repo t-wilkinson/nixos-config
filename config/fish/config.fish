@@ -33,6 +33,10 @@ enable_transience
 # 	echo
 # end
 
+function ssh --wraps ssh
+    TERM=xterm-256color command ssh $argv
+end
+
 alias pamcan=pacman
 alias v=nvim
 alias vim=nvim
@@ -41,3 +45,5 @@ alias vim=nvim
 #   set_color cyan; echo (pwd)
 #   set_color green; echo '> '
 # end
+
+set -gx EDITOR nvim
