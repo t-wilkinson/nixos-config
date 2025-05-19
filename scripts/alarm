@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-alarm_dir=$HOME/media/alarms
-alarm=facility-alarm-2.wav
-cmd="ffplay -ss 0s -t 3s -nodisp -autoexit -hide_banner $alarm_dir/$alarm"
-
-[ $# -eq 0 ] && eval $cmd 2> /dev/null # so we can do `sleep 10m | alarm`
-
-echo $cmd | at $@

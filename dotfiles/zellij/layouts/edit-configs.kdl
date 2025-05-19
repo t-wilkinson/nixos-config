@@ -1,9 +1,0 @@
-layout {
-  cwd "/home/user/.config"
-  tab name="nvim" cwd="nvim" {
-    pane 
-  }
-  tab name="zellij" cwd="zellij" {
-    pane 
-  }
-}
