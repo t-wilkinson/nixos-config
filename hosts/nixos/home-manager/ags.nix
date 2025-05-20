@@ -5,7 +5,7 @@
   ...
 }:
 let
-  agsStartScript = pkgs.writeShellScriptBin "setup_or_run_ags" ''
+  agsStartScript = pkgs.writeShellScriptBin "run_ags" ''
     #!/usr/bin/env bash
 
     AGS_VIRTUAL_ENV=$HOME/.local/state/ags/.venv

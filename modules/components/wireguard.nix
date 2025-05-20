@@ -1,5 +1,6 @@
 {
   pkgs,
+  homedir,
   ...
 }:
 {
@@ -17,7 +18,7 @@
           "8.8.8.8"
           # "fdc9:281f:04d7:9ee9::1"
         ];
-        privateKeyFile = "~/.keys/wg-dietpi";
+        privateKeyFile = "${homedir}/.keys/wg-dietpi";
 
         peers = [
           {

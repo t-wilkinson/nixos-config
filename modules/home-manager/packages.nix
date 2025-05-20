@@ -40,7 +40,7 @@ with pkgs;
   colordiff
   difftastic # syntastic-aware diff
   # du-dust # du in rust
-  # eza # ls alternative
+  eza # ls alternative
   feh
   ffmpeg
   # go-mtpfs
@@ -61,7 +61,7 @@ with pkgs;
   # emacs-all-the-icons-fonts
   # pngquant # lossy png compressor
   dejavu_fonts
-  # glow # render markdown in terminal
+  glow # render markdown in terminal
   # jpegoptim # jpeg optimizer
 
   # ENCRYPTION AND SECURITY TOOLS
@@ -70,8 +70,6 @@ with pkgs;
   # age-plugin-yubikey
   gnupg
   pass
-  # bitwarden-desktop
-  # bitwarden-cli
   # unstable.nodePackages."@bitwarden/cli"
 
   # SOURCE CODE MANAGEMENT, GIT, GITHUB TOOLS

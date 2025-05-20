@@ -111,6 +111,7 @@
           specialArgs = {
             inherit inputs username;
             hostname = "macos";
+            homedir = "/Users/${username}";
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
@@ -164,6 +165,7 @@
           specialArgs = {
             inherit self inputs username;
             hostname = "nixos";
+            homedir = "/home/${username}";
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
@@ -172,22 +174,13 @@
             myLib = import ./lib { inherit self; };
           };
           modules = [
+            home-manager.nixosModules.home-manager
             # disko.nixosModules.disko
             # agenix.nixosModules.default
-            home-manager.nixosModules.home-manager
             {
               imports = [ impurity_.nixosModules.impurity ];
               impurity.configRoot = self;
             }
-            # {
-            #   home-manager = {
-            #     useGlobalPkgs = true;
-            #     useUserPackages = true;
-            #     users.${username} = import ./modules/nixos/home-manager.nix;
-            #   };
-            # }
-            # (import "${self}/modules/hosts/home-manager.nix" { inherit self; })
-
             ./hosts/nixos
           ] ++ extraModules;
         };

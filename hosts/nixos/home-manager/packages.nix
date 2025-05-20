@@ -7,6 +7,8 @@
       sway
       pinentry
       foot
+      bitwarden-desktop
+      bitwarden-cli
 
       # VIRTUALIZATION
       k3s

@@ -53,19 +53,20 @@ in
         packages = [ git-credential-pass ];
         file =
           myLib.makeConfigLinks impurity [
+            "Kvantum"
             "ags"
-            # "chrome-flags.conf"
-            # "code-flags.conf"
+            "chrome-flags.conf"
+            "code-flags.conf"
+            "fcitx5"
             # "fontconfig"
             "fuzzel"
             "hypr"
-            # "Kvantum"
             "mpv"
-            # "qt5ct"
-            "fcitx5"
+            "qt5ct"
+            "rofi"
             "thorium-flags.conf"
+            "zshrc.d"
             # "wlogout"
-            # "zshrc.d"
           ]
           // {
             # TODO: add linux-specific gpg-agent later

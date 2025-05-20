@@ -40,6 +40,7 @@ end
 alias pamcan=pacman
 alias v=nvim
 alias vim=nvim
+alias ls="eza --icons=always"
 
 # function fish_prompt
 #   set_color cyan; echo (pwd)
@@ -47,3 +48,5 @@ alias vim=nvim
 # end
 
 set -gx EDITOR nvim
+
+zoxide init fish | source

@@ -73,8 +73,8 @@ with pkgs;
   # sqldeveloper # download here https://www.oracle.com/java/technologies/javase/javase8u211-later-archive-downloads.html#license-lightbox
   sqlite
   terraform
-  vault # HashiCorp Vault
-  vsh # HashiCorp Vault Shell
+  # vault # HashiCorp Vault
+  # vsh # HashiCorp Vault Shell
   # asio # c++
 
   # CLOUD/DEVOPS
