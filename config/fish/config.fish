@@ -41,6 +41,7 @@ alias pamcan=pacman
 alias v=nvim
 alias vim=nvim
 alias ls="eza --icons=always"
+alias z=zoxide
 
 # function fish_prompt
 #   set_color cyan; echo (pwd)
