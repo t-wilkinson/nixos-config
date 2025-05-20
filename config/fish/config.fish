@@ -56,7 +56,6 @@ end
 
 alias pamcan=pacman
 alias ls="eza --icons=always --grid"
-# alias z=zoxide
 alias v=nvim
 alias vim=nvim
 alias fv="nvim \$(fzf)"
@@ -66,6 +65,14 @@ set -gx PAGER less
 set -gx PAGER "bat --paging=always"
 set -gx MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -gx MANROFFOPT -c
+
+set -gx LESS -SXIRFs
+# -S: chop lines, side scroll with left/right arrow keys
+# -X: leave contents on screen when less exits
+# -I: ignore case when searching with / or ?
+# -F: quit immediately when the entire file fits in one screen
+# -R: enable colored output
+# -s: squeeze blank lines into a single blank line
 
 # rose-pine-dawn fzf theme
 # set -Ux FZF_DEFAULT_OPTS "

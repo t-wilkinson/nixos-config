@@ -1,3 +1,4 @@
+# https://github.com/gokcehan/lf/blob/master/doc.md
 
 ###########
 # OPTIONS #
@@ -12,6 +13,73 @@ set hidden true
 ############
 # COMMANDS #
 ############
+
+# DEFAULTS
+# quit q
+# up k, <up>
+# half-up <c-u>
+# page-up <c-b>, <pgup>
+# scroll-up <c-y>
+# down j, <down>
+# half-down <c-d>
+# page-down <c-f>, <pgdn>
+# scroll-down <c-e>
+# updir h, <left>
+# open l, <right>
+# jump-next ]
+# jump-prev [
+# top gg, <home>
+# bottom G, <end>
+# high H
+# middle M
+# low L
+# toggle
+# invert v
+# invert-below
+# unselect u
+# glob-select
+# glob-unselect
+# calcdirsize
+# clearmaps
+# copy y
+# cut d
+# paste p
+# clear c
+# sync
+# draw
+# redraw <c-l>
+# load
+# reload <c-r>
+# echo
+# echomsg
+# echoerr
+# cd
+# select
+# delete
+# rename r
+# source
+# push
+# read :
+# shell $
+# shell-pipe %
+# shell-wait !
+# shell-async &
+# find f
+# find-back F
+# find-next ;
+# find-prev ,
+# search /
+# search-back ?
+# search-next n
+# search-prev N
+# filter
+# setfilter
+# mark-save m
+# mark-load '
+# mark-remove "
+# tag
+# tag-toggle t
+# tty-write
 
 # cmd delete ${{
 #     echo 'delete?[y/n]'
@@ -109,7 +177,6 @@ map r push :rename<space>
 # map gh cd
 # map g/ /
 # map ee editor-open
-# map V bat --paging=always $f
 
 # defaults
 # cmd open &$OPENER "$f"
@@ -121,3 +188,4 @@ map r push :rename<space>
 # cmd maps $lf -remote "query $id maps" | $PAGER
 # cmd cmaps $lf -remote "query $id cmaps" | $PAGER
 # cmd cmds $lf -remote "query $id cmds" | $PAGER
+
