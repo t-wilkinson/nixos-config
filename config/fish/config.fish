@@ -1,33 +1,33 @@
-function fish_prompt -d "Write out the prompt"
-    # This shows up as USER@HOST /home/user/ >, with the directory colored
-    # $USER and $hostname are set by fish, so you can just use them
-    # instead of using `whoami` and `hostname`
-    printf '%s@%s %s%s%s > ' $USER $hostname \
-        (set_color $fish_color_cwd) (prompt_pwd) (set_color normal)
-end
+# function fish_prompt -d "Write out the prompt"
+#     # USER@HOST /home/user/ >
+#     printf '%s@%s %s%s%s > ' $USER $hostname \
+#         (set_color $fish_color_cwd) (prompt_pwd) (set_color normal)
+# end
 
 if status is-interactive
     # Commands to run in interactive sessions can go here
     set fish_greeting
 
+    starship init fish | source
+    if test -f ~/.cache/ags/user/generated/terminal/sequences.txt
+        cat ~/.cache/ags/user/generated/terminal/sequences.txt
+    end
+
+    function starship_transient_prompt_func
+        # tput cuu1 # Move cursor up one line to remove newline after transient prompt
+        set_color 8BE9FD
+        echo "❯ "
+    end
+
+    function starship_transient_rprompt_func
+        # starship module time
+    end
+
+    enable_transience
+
 end
 
-starship init fish | source
-if test -f ~/.cache/ags/user/generated/terminal/sequences.txt
-    cat ~/.cache/ags/user/generated/terminal/sequences.txt
-end
-
-function starship_transient_prompt_func
-    # tput cuu1 # Move cursor up one line to remove newline after transient prompt
-    set_color 8BE9FD
-    echo "❯ "
-end
-
-function starship_transient_rprompt_func
-    # starship module time
-end
-
-enable_transience
+zoxide init fish | source
 
 # function prompt_newline --on-event fish_postexec
 # 	echo
@@ -38,15 +38,11 @@ function ssh --wraps ssh
 end
 
 alias pamcan=pacman
+alias ls="eza --icons=always --grid"
+alias z=zoxide
 alias v=nvim
 alias vim=nvim
-alias ls="eza --icons=always"
-alias z=zoxide
-
-# function fish_prompt
-#   set_color cyan; echo (pwd)
-#   set_color green; echo '> '
-# end
+alias fv="nvim \$(fzf)"
 
 set -gx EDITOR nvim
 
@@ -71,4 +67,3 @@ set -Ux FZF_DEFAULT_OPTS "
 # 	--color=border:#403d52,header:#31748f,gutter:#191724
 # 	--color=spinner:#f6c177,info:#9ccfd8
 # 	--color=pointer:#c4a7e7,marker:#eb6f92,prompt:#908caa"
-zoxide init fish | source
