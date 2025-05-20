@@ -1,9 +1,102 @@
+set icons true
 set previewer ~/.config/lf/lf_previewer.sh
-# cmd open $rifle $fx
-cmd open ${{
-    case $(file --mime-type -Lb $f) in
-        text/*) nvim $fx;;
-        *) for f in $fx; do xdg-open $f > /dev/null 2> /dev/null & done;;
-    esac
+
+
+############
+# COMMANDS #
+############
+
+cmd on-select &{{
+  lf -remote "send $id set statfmt \"$(eza -ld --color=always "$f")\""
 }}
 
+cmd open ${{
+  case $(file --mime-type -Lb $f) in
+#     text/*) nvim $fx;;
+#     *) for f in $fx; do xdg-open $f > /dev/null 2> /dev/null & done;;
+      text/*) lf -remote "send $id \$$EDITOR \$fx";;
+      *) for f in $fx; do $OPENER "$f" > /dev/null 2> /dev/null & done;;
+  esac
+}}
+
+# cmd editor-open $$EDITOR $f
+
+# cmd mkdir ${{
+#   printf "Directory Name: "
+#   read DIR
+#   mkdir $DIR
+# }}
+
+cmd dragon-out ${{
+  xdragon -a -x "$fx"
+}}
+
+cmd fzf ${{
+  res="$(find . | fzf --reverse --header='Jump to location')"
+  if [ -n "$res" ]; then
+      if [ -d "$res" ]; then
+          cmd="cd"
+      else
+          cmd="select"
+      fi
+      res="$(printf '%s' "$res" | sed 's/\\/\\\\/g;s/"/\\"/g')"
+      lf -remote "send $id $cmd \"$res\""
+  fi
+}}
+
+cmd unzip ${{
+  set -f
+  case $f in
+      *.tar.bz|*.tar.bz2|*.tbz|*.tbz2) tar xjvf $f;;
+      *.tar.gz|*.tgz) tar xzvf $f;;
+      *.tar.xz|*.txz) tar xJvf $f;;
+      *.zip) unzip $f;;
+      *.rar) unzip x $f;;
+      *.7z) 7z x $f;;
+  esac
+}}
+
+cmd zip ${{
+  set -f
+  mkdir $1
+  cp -r $fx $1
+  zip -r $1.zip $1
+  rm -rf $1
+}}
+
+cmd pager ${{
+  bat --paging=always "$f"
+}}
+
+cmd q quit
+
+# cmd trash ${{
+#   set -f
+#   gio trash "$fx"
+# }}
+
+###############
+# KEYBINDINGS #
+###############
+
+# map do dragon-out
+map V pager
+map f fzf
+map <enter> open
+map . set hidden!
+map a push %mkdir<space>
+map t push %touch<space>
+map r push :rename<space>
+# map x trash
+# map <delete> trash
+# map \" ""
+# map o ""
+# map c mkdir
+# map ` mark-load
+# map \' mark-load
+# map <enter> open
+# map g~ cd
+# map gh cd
+# map g/ /
+# map ee editor-open
+# map V bat --paging=always $f

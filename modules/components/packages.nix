@@ -21,7 +21,6 @@
     unzip
     wget
     zip
-    file
 
     # SYSTEM TOOLS & CORE UTILITIES
     glib
