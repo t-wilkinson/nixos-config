@@ -13,6 +13,12 @@ set hidden true
 # COMMANDS #
 ############
 
+# cmd delete ${{
+#     echo 'delete?[y/n]'
+#     read ans
+#     [ $ans = 'y' ] && echo 'deleting files..' && echo $f || echo 'cancelled.'
+# }}
+
 cmd on-select &{{
   lf -remote "send $id set statfmt \"$(eza -ld --color=always "$f")\""
 }}
@@ -34,9 +40,7 @@ cmd open ${{
 #   mkdir $DIR
 # }}
 
-cmd dragon-out ${{
-  xdragon -a -x "$fx"
-}}
+cmd dragon-out $xdragon -a -x "$fx"
 
 cmd fzf ${{
   res="$(find . | fzf --reverse --header='Jump to location')"
@@ -71,9 +75,7 @@ cmd zip ${{
   rm -rf $1
 }}
 
-cmd pager ${{
-  bat --paging=always "$f"
-}}
+cmd pager $bat --paging=always "$f"
 
 cmd q quit
 
@@ -87,6 +89,7 @@ cmd q quit
 ###############
 
 # map do dragon-out
+# map d
 map V pager
 map f fzf
 map <enter> open
@@ -107,3 +110,14 @@ map r push :rename<space>
 # map g/ /
 # map ee editor-open
 # map V bat --paging=always $f
+
+# defaults
+# cmd open &$OPENER "$f"
+# map e $$EDITOR "$f"
+# map i $$PAGER "$f"
+# map w $$SHELL
+# cmd doc $$lf -doc | $PAGER
+# map <f-1> doc
+# cmd maps $lf -remote "query $id maps" | $PAGER
+# cmd cmaps $lf -remote "query $id cmaps" | $PAGER
+# cmd cmds $lf -remote "query $id cmds" | $PAGER

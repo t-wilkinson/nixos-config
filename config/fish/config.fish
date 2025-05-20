@@ -29,6 +29,23 @@ end
 
 zoxide init fish | source
 
+# normal file complete on zoxide with no space
+function __my_zoxide_z_complete
+    set -l tokens (commandline --current-process --tokenize)
+    set -l curr_tokens (commandline --cut-at-cursor --current-process --tokenize)
+
+    if test (count $tokens) -le 2 -a (count $curr_tokens) -eq 1
+        set -l query $tokens[2..-1]
+        zoxide query --exclude (__zoxide_pwd) --list -- $query
+    else
+        __zoxide_z_complete
+    end
+end
+complete --erase --command __zoxide_z
+complete --command __zoxide_z --no-files --arguments '(__my_zoxide_z_complete)'
+
+fzf --fish | source
+
 # function prompt_newline --on-event fish_postexec
 # 	echo
 # end
@@ -39,12 +56,16 @@ end
 
 alias pamcan=pacman
 alias ls="eza --icons=always --grid"
-alias z=zoxide
+# alias z=zoxide
 alias v=nvim
 alias vim=nvim
 alias fv="nvim \$(fzf)"
 
 set -gx EDITOR nvim
+set -gx PAGER less
+set -gx PAGER "bat --paging=always"
+set -gx MANPAGER "sh -c 'col -bx | bat -l man -p'"
+set -gx MANROFFOPT -c
 
 # rose-pine-dawn fzf theme
 # set -Ux FZF_DEFAULT_OPTS "
