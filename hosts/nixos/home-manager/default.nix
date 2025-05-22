@@ -45,8 +45,8 @@ in
       ];
       home = {
         inherit username homeDirectory;
-        # TODO: doesn't work
         sessionPath = [
+          "$HOME/dev/t-wilkinson/projects/scripts"
           "$HOME/.local/bin"
           "$HOME/.npm-packages/bin"
         ];
