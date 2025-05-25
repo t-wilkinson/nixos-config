@@ -54,6 +54,10 @@ function ssh --wraps ssh
     TERM=xterm-256color command ssh $argv
 end
 
+function prjcd
+    cd $(prj cd "$argv")
+end
+
 alias pamcan=pacman
 alias ls="eza --icons=always --grid"
 alias v=nvim
