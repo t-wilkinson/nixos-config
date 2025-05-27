@@ -59,10 +59,16 @@ function prjcd
 end
 
 alias pamcan=pacman
-alias ls="eza --icons=always --grid"
 alias v=nvim
 alias vim=nvim
 alias fv="nvim \$(fzf)"
+
+alias ls="eza --icons=always --grid"
+# alias ls='eza'
+# alias l='eza -lbF --git'
+# alias ll='eza -lbGF --git'
+# alias la='eza -lbhHigUmuSa --git --color-scale'
+alias lt='eza --tree --level=2'
 
 set -gx EDITOR nvim
 set -gx PAGER less
