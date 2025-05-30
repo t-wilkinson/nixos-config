@@ -7,7 +7,6 @@
     ./audio.nix
     ./locale.nix
     ./gnome.nix
-    ./packages.nix
     ../../modules/shared.nix
   ];
 }
