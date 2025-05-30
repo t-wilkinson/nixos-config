@@ -1,6 +1,4 @@
 {
-  self,
-  config,
   pkgs,
   username,
   hostname,
@@ -11,7 +9,6 @@
     # "${self}/modules/darwin/secrets.nix"
     ./home-manager.nix
     ../../modules/shared.nix
-    ./packages.nix
     ./networking.nix
     # agenix.darwinModules.default
   ];

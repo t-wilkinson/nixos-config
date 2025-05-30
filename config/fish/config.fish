@@ -54,6 +54,19 @@ function ssh --wraps ssh
     TERM=xterm-256color command ssh $argv
 end
 
+function set_zellij_tab_title --on-variable PWD
+    if test -n "$ZELLIJ"
+        set -l git_dir (git rev-parse --show-toplevel 2>/dev/null)
+        if test -n "$git_dir"
+            set -l dir_name (basename "$git_dir")
+            zellij action rename-tab "$dir_name"
+        else
+            # set -l short_path (fish_short_pwd)
+            # zellij action rename-tab "$short_path"
+        end
+    end
+end
+
 function prjcd
     cd $(prj cd "$argv")
 end

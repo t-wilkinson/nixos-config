@@ -56,6 +56,7 @@
       tesseract
       pavucontrol
       playerctl
+      rofi-wayland
       swappy
       swaylock-effects
       swayidle
