@@ -140,10 +140,6 @@ return {
     opts = {},
     config = function()
       vim.cmd([[
-            let g:zortex_remote_wiki_port = 8081
-            let g:zortex_remote_server = 'klean-studios'
-            let g:zortex_remote_server_dir = '/www/zortex'
-
             let g:zortex_fenced_languages = ['python', 'javascript', 'bindzone', 'rust', 'bash', 'sh', 'json', 'sql']
             let g:zortex_notes_dir = $HOME . '/.zortex/'
             let g:zortex_window_command = 'call FloatingFZF()'

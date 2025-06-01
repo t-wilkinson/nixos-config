@@ -368,3 +368,4 @@ default_layout "default"
 //
 // theme_dir "./themes"
 
+support_kitty_keyboard_protocol false
