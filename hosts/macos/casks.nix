@@ -4,6 +4,7 @@ _: [
   # "foot"
   "bitwarden"
   "homebrew/cask/docker"
+  "google-drive"
   # "claude"
   # "insomnia"
   # "tableplus"
