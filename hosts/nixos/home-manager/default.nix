@@ -5,6 +5,7 @@
   myLib,
   impurity,
   username,
+  unstable,
   ...
 }:
 let
@@ -29,6 +30,7 @@ in
         username
         inputs
         impurity
+        unstable
         ;
     };
     users.${username} = {

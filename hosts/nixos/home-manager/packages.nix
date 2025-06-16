@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, unstable, ... }:
 {
 
   home = {
@@ -9,6 +9,9 @@
       foot
       bitwarden-desktop
       bitwarden-cli
+
+      minecraft
+      unstable.lunar-client
 
       # VIRTUALIZATION
       k3s
