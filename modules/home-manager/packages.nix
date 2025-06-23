@@ -14,7 +14,7 @@ with pkgs;
   # DESIGN
   # blender
   # figma-linux
-  gimp
+  # gimp
   # inkscape
   # kolourpaint
   # pinta

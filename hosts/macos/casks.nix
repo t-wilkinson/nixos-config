@@ -13,6 +13,8 @@ _: [
   # "visual-studio-code"
   # "wireshark"
 
+  "gimp"
+
   # Communication Tools
   # "discord"
   # "loom"

@@ -9,6 +9,7 @@
       foot
       bitwarden-desktop
       bitwarden-cli
+      gimp
 
       minecraft
       unstable.lunar-client
