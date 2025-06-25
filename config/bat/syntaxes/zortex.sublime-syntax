@@ -1,0 +1,130 @@
+name: "Zortex"
+file_extensions: ["zortex"]
+scope: "text.html.markdown.article"
+
+contexts:
+  main:
+    # Article names (lines starting with @@)
+    - match: '^@@.*$'
+      scope: markup.heading.article.markdown
+      
+    # Tags (lines starting with @)
+    - match: '^@.*$'
+      scope: markup.heading.tag.markdown
+      
+    # Headers
+    - match: '^#{1,6}\s+'
+      scope: punctuation.definition.heading.markdown
+      push:
+        - meta_scope: markup.heading.markdown
+        - match: $
+          pop: true
+        - include: inline
+        
+    # Horizontal rules
+    - match: '^[ ]{0,3}[-*_][ ]*[-*_][ ]*[-*_][-*_ ]*$'
+      scope: meta.separator.markdown
+      
+    # Lists
+    - match: '^[ ]{0,3}[*+-][ ]+'
+      scope: punctuation.definition.list_item.markdown
+      push:
+        - meta_scope: markup.list.unnumbered.markdown
+        - match: '^(?=\S)'
+          pop: true
+        - include: inline
+        
+    - match: '^[ ]{0,3}\d+\.[ ]+'
+      scope: punctuation.definition.list_item.markdown
+      push:
+        - meta_scope: markup.list.numbered.markdown
+        - match: '^(?=\S)'
+          pop: true
+        - include: inline
+        
+    # Blockquotes
+    - match: '^[ ]{0,3}>'
+      scope: punctuation.definition.blockquote.markdown
+      push:
+        - meta_scope: markup.quote.markdown
+        - match: '^(?!\s*>)'
+          pop: true
+        - include: inline
+        
+    # Code blocks (fenced)
+    - match: '^[ ]{0,3}```.*$'
+      scope: punctuation.definition.raw.code-fence.begin.markdown
+      push:
+        - meta_scope: markup.raw.block.markdown markup.raw.block.fenced.markdown
+        - match: '^[ ]{0,3}```[ ]*$'
+          scope: punctuation.definition.raw.code-fence.end.markdown
+          pop: true
+          
+    # Code blocks (indented)
+    - match: '^[ ]{4,}.*$'
+      scope: markup.raw.block.markdown
+      
+    # Tables
+    - match: '^\s*\|'
+      push:
+        - meta_scope: markup.other.table.markdown
+        - match: $
+          pop: true
+        - match: '\|'
+          scope: punctuation.separator.table-cell.markdown
+        - include: inline
+        
+    # Regular paragraphs
+    - match: '^(?=\S)'
+      push:
+        - meta_scope: meta.paragraph.markdown
+        - match: '^$'
+          pop: true
+        - include: inline
+
+  inline:
+    # Inline code
+    - match: '`[^`]*`'
+      scope: markup.raw.inline.markdown
+      
+    # Bold
+    - match: '\*\*([^*]+)\*\*'
+      scope: markup.bold.markdown
+      captures:
+        1: markup.bold.markdown
+        
+    - match: '__([^_]+)__'
+      scope: markup.bold.markdown
+      captures:
+        1: markup.bold.markdown
+        
+    # Italic
+    - match: '\*([^*]+)\*'
+      scope: markup.italic.markdown
+      captures:
+        1: markup.italic.markdown
+        
+    - match: '_([^_]+)_'
+      scope: markup.italic.markdown
+      captures:
+        1: markup.italic.markdown
+        
+    # Links
+    - match: '\[([^\]]*)\]\(([^)]*)\)'
+      scope: meta.link.inline.markdown
+      captures:
+        1: string.other.link.title.markdown
+        2: markup.underline.link.markdown
+        
+    # Images
+    - match: '!\[([^\]]*)\]\(([^)]*)\)'
+      scope: meta.image.inline.markdown
+      captures:
+        1: string.other.link.description.markdown
+        2: markup.underline.link.markdown
+        
+    # Strikethrough
+    - match: '~~([^~]+)~~'
+      scope: markup.strikethrough.markdown
+      captures:
+        1: markup.strikethrough.markdown

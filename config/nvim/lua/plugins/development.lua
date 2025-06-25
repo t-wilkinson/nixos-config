@@ -4,7 +4,10 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
-    opts = { servers = { nil_ls = { mason = false, enable = false } } },
+    opts = {
+      inlay_hints = { enabled = false },
+      servers = { nil_ls = { mason = false, enable = false } },
+    },
   },
 
   { "mason-org/mason-lspconfig.nvim", version = "^1.0.0" },
