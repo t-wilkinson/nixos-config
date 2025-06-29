@@ -41,6 +41,7 @@ wk.add({
   -- { "Zw", "<cmd>ZortexSearchWikipedia<Space>" },
   { "ZZ", "<cmd>ZortexSearch<cr>" },
   { "Zz", "<cmd>ZortexSearch<cr>" },
+  { "Zs", "<cmd>e " .. vim.g.zortex_notes_dir .. "/structure.zortex<cr>" },
   -- { "ZS", "Server" },
   -- { "ZSe", "<cmd>ZortexStopServer<cr>" },
   -- { "ZSs", "<cmd>ZortexStartServer<cr>" },

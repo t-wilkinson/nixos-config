@@ -7,6 +7,8 @@ return {
   { "folke/flash.nvim", enabled = false },
   { "norcalli/nvim-colorizer.lua" },
 
+  -- { "nvim-telescope/telescope.nvim", event = "VimEnter" },
+
   -- { "windwp/nvim-autopairs" },
   { "echasnovski/mini.pairs", enabled = false },
   { "echasnovski/mini.ai", enabled = true },
@@ -134,7 +136,7 @@ return {
   {
     "t-wilkinson/zortex.nvim",
     dir = "~/dev/t-wilkinson/zortex.nvim",
-    build = "(cd app && yarn install); (cd rplugin && yarn install)",
+    build = "(cd app && yarn install)",
     enabled = true,
     lazy = false,
     opts = {},
@@ -165,8 +167,8 @@ return {
 
             nmap Z <Nop>
             nmap ZZ <Nop>
-            autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
-            autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+            autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLinkSplit<CR>
+            autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLinkSplit<CR>
             autocmd FileType zortex setlocal norelativenumber nonumber
             " autocmd FileType zortex if exists(':Gitsigns') | Gitsigns toggle_signs | endif
 

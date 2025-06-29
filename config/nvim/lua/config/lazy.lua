@@ -15,6 +15,15 @@ require("lazy").setup({
     -- { import = "lazyvim.plugins.extras.lang.json" },
     -- { import = "lazyvim.plugins.extras.ui.mini-animate" },
     -- import/override with your plugins
+    {
+      "nvim-telescope/telescope.nvim",
+      event = "VimEnter", -- 2 · eager-load
+      dependencies = { "nvim-lua/plenary.nvim" },
+      config = function()
+        require("telescope").setup({ defaults = { sorting_strategy = "ascending" } })
+      end,
+    },
+    { dir = "~/dev/t-wilkinson/zortex.nvim", lazy = false },
     { import = "plugins" },
   },
   defaults = {
@@ -29,6 +38,7 @@ require("lazy").setup({
   install = { colorscheme = { "tokyonight", "habamax" } },
   checker = { enabled = true }, -- automatically check for plugin updates
   performance = {
+    cache = { enabled = true },
     rtp = {
       -- disable some rtp plugins
       disabled_plugins = {
