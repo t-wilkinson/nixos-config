@@ -14,6 +14,7 @@ return {
             let g:zortex_extension = '.zortex'
             let g:zortex_theme = 'light'
             let g:zortex_auto_start_preview = 1
+            let g:zortex_special_articles = ['structure', 'inbox']
             let g:zortex_auto_start_server = 1
             let g:zortex_preview_options = {
                 \ 'mkit': {},
