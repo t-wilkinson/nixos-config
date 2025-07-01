@@ -34,8 +34,8 @@ return {
 
             nmap Z <Nop>
             nmap ZZ <Nop>
-            autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLinkSplit<CR>
-            autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLinkSplit<CR>
+            autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+            autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
             autocmd FileType zortex setlocal norelativenumber nonumber
             " autocmd FileType zortex if exists(':Gitsigns') | Gitsigns toggle_signs | endif
 
