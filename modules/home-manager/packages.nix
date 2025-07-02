@@ -55,6 +55,7 @@ with pkgs;
   file # for lf
   starship
   # transmission_4 # bittorrent
+  tree-sitter
   # ventoy # create bootable usb drives
   zoxide
   # zsh-powerlevel10k
