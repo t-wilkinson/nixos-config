@@ -30,6 +30,7 @@
       # "jorgelbg/tap"
     ];
     brews = [
+      "terminal-notifier"
       "bitwarden-cli"
       "pinentry"
       "pinentry-mac"
