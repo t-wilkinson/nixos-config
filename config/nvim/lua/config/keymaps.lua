@@ -27,22 +27,22 @@ vim.api.nvim_set_keymap("x", "S", [[:<C-u>lua MiniSurround.add('visual')<CR>]], 
 -- Make special mapping for "add surrounding for line"
 vim.api.nvim_set_keymap("n", "yss", "ys_", { noremap = false })
 
-local wk = require("which-key")
-wk.add({
-  { "ZRF", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
-  -- { "ZRS", "<cmd>ZortexSyncRemoteServer<cr>" },
-  -- { "ZRr", "<cmd>ZortexRestartRemoteServer<cr>" },
-  -- { "ZRs", "<cmd>ZortexStartRemoteServer<cr>" },
-  -- { "Zg", "<cmd>ZortexSearchGoogle<Space>" },
-  -- { "Zi", "<cmd>ZortexListitemToZettel<cr>" },
-  -- { "Zp", "<cmd>ZortexPreview<cr>" },
-  -- { "Zr", "<cmd>ZortexResourceToZettel<cr>" },
-  -- { "Zs", "<cmd>ZortexOpenStructure<cr>" },
-  -- { "Zw", "<cmd>ZortexSearchWikipedia<Space>" },
-  { "ZZ", "<cmd>ZortexSearch<cr>" },
-  { "Zz", "<cmd>ZortexSearch<cr>" },
-  { "Zs", "<cmd>e " .. vim.g.zortex_notes_dir .. "/structure.zortex<cr>" },
-  -- { "ZS", "Server" },
-  -- { "ZSe", "<cmd>ZortexStopServer<cr>" },
-  -- { "ZSs", "<cmd>ZortexStartServer<cr>" },
-})
+-- local wk = require("which-key")
+-- wk.add({
+--   { "ZRF", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
+--   -- { "ZRS", "<cmd>ZortexSyncRemoteServer<cr>" },
+--   -- { "ZRr", "<cmd>ZortexRestartRemoteServer<cr>" },
+--   -- { "ZRs", "<cmd>ZortexStartRemoteServer<cr>" },
+--   -- { "Zg", "<cmd>ZortexSearchGoogle<Space>" },
+--   -- { "Zi", "<cmd>ZortexListitemToZettel<cr>" },
+--   -- { "Zp", "<cmd>ZortexPreview<cr>" },
+--   -- { "Zr", "<cmd>ZortexResourceToZettel<cr>" },
+--   -- { "Zs", "<cmd>ZortexOpenStructure<cr>" },
+--   -- { "Zw", "<cmd>ZortexSearchWikipedia<Space>" },
+--   { "ZZ", "<cmd>ZortexSearch<cr>" },
+--   { "Zz", "<cmd>ZortexSearch<cr>" },
+--   { "Zs", "<cmd>e " .. vim.g.zortex_notes_dir .. "/structure.zortex<cr>" },
+--   -- { "ZS", "Server" },
+--   -- { "ZSe", "<cmd>ZortexStopServer<cr>" },
+--   -- { "ZSs", "<cmd>ZortexStartServer<cr>" },
+-- })

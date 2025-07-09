@@ -2,62 +2,18 @@ return {
   {
     "t-wilkinson/zortex.nvim",
     dir = "~/dev/t-wilkinson/zortex.nvim",
-    build = "(cd app && yarn install)",
+    -- build = "(cd app && yarn install)",
     enabled = true,
     lazy = false,
     opts = {},
-    config = function()
-      vim.cmd([[
-            let g:zortex_fenced_languages = ['python', 'javascript', 'bindzone', 'rust', 'bash', 'sh', 'json', 'sql']
-            let g:zortex_notes_dir = $HOME . '/.zortex/'
-            let g:zortex_window_command = 'call FloatingFZF()'
-            let g:zortex_extension = '.zortex'
-            let g:zortex_theme = 'light'
-            let g:zortex_auto_start_preview = 1
-            let g:zortex_special_articles = ['structure', 'inbox']
-            let g:zortex_auto_start_server = 1
-            let g:zortex_preview_options = {
-                \ 'mkit': {},
-                \ 'katex': {},
-                \ 'uml': {},
-                \ 'maid': {},
-                \ 'disable_sync_scroll': 0,
-                \ 'sync_scroll_type': 'middle',
-                \ 'hide_yaml_meta': 1,
-                \ 'sequence_diagrams': {},
-                \ 'flowchart_diagrams': {},
-                \ 'content_editable': v:false,
-                \ 'disable_filename': 0,
-                \ 'toc': {}
-                \ }
-            let g:zortex_port = '8080'
-
-            nmap Z <Nop>
-            nmap ZZ <Nop>
-            autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
-            autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
-            autocmd FileType zortex setlocal norelativenumber nonumber
-            " autocmd FileType zortex if exists(':Gitsigns') | Gitsigns toggle_signs | endif
-
-            " map <silent>Zz :ZortexSearch<CR>
-            " map <silent>ZZ :ZortexSearch<CR>
-      ]])
-    end,
-  },
-
-  --[[
- -- Zortex plugin configuration
-  {
-    "your-username/zortex.nvim",
     dependencies = {
       "nvim-telescope/telescope.nvim",
       "nvim-lua/plenary.nvim",
     },
     config = function()
       require("zortex").setup({
-        -- File paths
-        zortex_notes_dir = vim.fn.expand("~/Documents/zortex/"),
-        zortex_root_dir = vim.fn.expand("~/Documents/zortex/"),
+        notes_dir = vim.fn.expand("~/.zortex/"),
+        special_articles = { "structure", "inbox" },
 
         -- XP System Configuration
         xp = {
@@ -140,49 +96,58 @@ return {
         },
       })
 
-      -- Optional: Set up which-key descriptions if you use which-key.nvim
-      local ok, which_key = pcall(require, "which-key")
+      local ok, wk = pcall(require, "which-key")
       if ok then
-        which_key.register({
-          ["<leader>z"] = {
-            name = "Zortex",
-            c = { "<cmd>ZortexCalendarToggle<cr>", "Toggle Calendar" },
-            C = { "<cmd>ZortexCalendarSearch<cr>", "Search Calendar" },
-            d = { "<cmd>ZortexDigest<cr>", "Today's Digest" },
-            D = { "<cmd>ZortexDigestBuffer<cr>", "Digest Buffer" },
-            p = { "<cmd>ZortexProjects<cr>", "Browse Projects" },
-            a = { "<cmd>ZortexAreas<cr>", "Area Progress" },
-            s = { "<cmd>ZortexSearch<cr>", "Search Notes" },
-            l = { "<cmd>ZortexLink<cr>", "Follow Link" },
-            b = { "<cmd>ZortexBack<cr>", "Go Back" },
-            x = { "<cmd>ZortexXP<cr>", "XP Stats" },
-            t = { "<cmd>ZortexSkillTree<cr>", "Skill Tree" },
-            A = { "<cmd>ZortexArchiveProject<cr>", "Archive Project" },
-          },
+        wk.add({
+          { "<CR>", "<cmd>ZortexOpenLink<cr>" },
+          { "ZRF", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
+          -- { "ZRS", "<cmd>ZortexSyncRemoteServer<cr>" },
+          -- { "ZRr", "<cmd>ZortexRestartRemoteServer<cr>" },
+          -- { "ZRs", "<cmd>ZortexStartRemoteServer<cr>" },
+          -- { "Zg", "<cmd>ZortexSearchGoogle<Space>" },
+          -- { "Zi", "<cmd>ZortexListitemToZettel<cr>" },
+          -- { "Zp", "<cmd>ZortexPreview<cr>" },
+          -- { "Zr", "<cmd>ZortexResourceToZettel<cr>" },
+          -- { "Zs", "<cmd>ZortexOpenStructure<cr>" },
+          -- { "Zw", "<cmd>ZortexSearchWikipedia<Space>" },
+          { "ZZ", "<cmd>ZortexSearch<cr>" },
+          { "Zz", "<cmd>ZortexSearch<cr>" },
+          { "Zs", "<cmd>e " .. vim.g.zortex_notes_dir .. "/structure.zortex<cr>" },
+          -- { "ZS", "Server" },
+          -- { "ZSe", "<cmd>ZortexStopServer<cr>" },
+          -- { "ZSs", "<cmd>ZortexStartServer<cr>" },
+        }, {
+          mode = "n",
         })
       end
-    end,
 
-    -- Lazy loading
-    ft = { "zortex" },
-    cmd = {
-      "Zortex",
-      "ZortexCalendar",
-      "ZortexCalendarToggle",
-      "ZortexCalendarSearch",
-      "ZortexProjects",
-      "ZortexDigest",
-      "ZortexAreas",
-      "ZortexSearch",
-      "ZortexXP",
-      "ZortexSkillTree",
-    },
-    keys = {
-      { "<leader>zc", "<cmd>ZortexCalendarToggle<cr>", desc = "Toggle Calendar" },
-      { "<leader>zd", "<cmd>ZortexDigest<cr>", desc = "Today's Digest" },
-      { "<leader>zp", "<cmd>ZortexProjects<cr>", desc = "Browse Projects" },
-    },
+      -- vim.cmd([[
+      --       nmap Z <Nop>
+      --       nmap ZZ <Nop>
+      --       autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+      --       autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
+      --       autocmd FileType zortex setlocal norelativenumber nonumber
+      --       map <silent>Zz :ZortexSearch<CR>
+      --       map <silent>ZZ :ZortexSearch<CR>
+      -- ]])
+    end,
+    -- ft = { "zortex" },
+    -- cmd = {
+    --   "Zortex",
+    --   "ZortexCalendar",
+    --   "ZortexCalendarToggle",
+    --   "ZortexCalendarSearch",
+    --   "ZortexProjects",
+    --   "ZortexDigest",
+    --   "ZortexAreas",
+    --   "ZortexSearch",
+    --   "ZortexXP",
+    --   "ZortexSkillTree",
+    -- },
+    -- keys = {
+    --   { "<leader>zc", "<cmd>ZortexCalendarToggle<cr>", desc = "Toggle Calendar" },
+    --   { "<leader>zd", "<cmd>ZortexDigest<cr>", desc = "Today's Digest" },
+    --   { "<leader>zp", "<cmd>ZortexProjects<cr>", desc = "Browse Projects" },
+    -- },
   },
-}
-]]
 }
