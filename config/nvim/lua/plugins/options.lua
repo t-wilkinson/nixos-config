@@ -135,8 +135,68 @@ return {
 
   {
     "hrsh7th/nvim-cmp",
-    opts = function(_, opts)
-      opts.mapping["<CR>"] = nil
+    event = "InsertEnter",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "onsails/lspkind-nvim",
+      -- Add other sources like snippet engines if you use them
+      -- "L3MON4D3/LuaSnip",
+      -- "saadparwaiz1/cmp_luasnip",
+    },
+    config = function()
+      local cmp = require("cmp")
+      local lspkind = require("lspkind") -- Optional: for icons
+
+      -- =================================================================
+      -- IMPORTANT: Require and set up your custom Zortex source
+      -- =================================================================
+      -- This assumes your zortex source file is at `lua/zortex/cmp.lua`
+      -- Adjust the path if you place it elsewhere.
+      local zortex_cmp = require("zortex.cmp")
+      zortex_cmp.setup()
+      -- =================================================================
+
+      cmp.setup({
+        snippet = {
+          -- expand = function(args)
+          -- 	require("luasnip").lsp_expand(args.body)
+          -- end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-e>"] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+        }),
+        -- Define the order and sources for completion
+        sources = cmp.config.sources({
+          { name = "nvim_lsp" },
+          { name = "zortex" }, -- Your custom source!
+          { name = "buffer" },
+          { name = "path" },
+          -- { name = "luasnip" },
+        }),
+        formatting = {
+          -- Optional: Add icons to completion items
+          format = lspkind.cmp_format({
+            mode = "symbol_text",
+            maxwidth = 50,
+            ellipsis_char = "...",
+          }),
+        },
+      })
+
+      -- You can also set up filetype-specific sources if you wish
+      -- For example, to prioritize Zortex suggestions in markdown files:
+      cmp.setup.filetype({ "markdown", "zortex" }, {
+        sources = cmp.config.sources({
+          { name = "zortex" },
+          { name = "buffer" },
+        }),
+      })
     end,
   },
 

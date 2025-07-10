@@ -70,7 +70,24 @@ return {
 
   { "nvim-treesitter/nvim-treesitter-textobjects" },
 
-  { "Saghen/blink.cmp" },
+  {
+    "saghen/blink.cmp",
+    enabled = false,
+    opts = {
+      sources = {
+        -- Make zortex links show up first in .zortex buffers
+        default = { "zortex" },
+        providers = {
+          zortex = {
+            name = "Zortex Links",
+            module = "zortex.blink_source", -- <- points at the file in the canvas
+            opts = {}, -- (none for now)
+          },
+        },
+      },
+    },
+  },
+  { "saghen/blink.compat", enabled = false },
 
   {
     "nvim-treesitter/nvim-treesitter",
