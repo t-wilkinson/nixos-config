@@ -148,6 +148,21 @@ return {
         }),
       }
 
+      -- cmp.setup({
+      --   formatting = {
+      --     fields = { "kind", "abbr", "menu" },
+      --     format = function(_, vim_item)
+      --       -- remove the textual part after the icon
+      --       if vim_item.kind then
+      --         -- ʻʼ or similar icon followed by its label; split on first space
+      --         local icon = vim_item.kind:match("^%S+")
+      --         vim_item.kind = icon or ""
+      --       end
+      --       return vim_item
+      --     end,
+      --   },
+      -- })
+
       return opts
     end,
   },
