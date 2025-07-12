@@ -101,53 +101,15 @@ return {
         wk.add({
           { "<CR>", "<cmd>ZortexOpenLink<cr>" },
           { "ZRF", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
-          -- { "ZRS", "<cmd>ZortexSyncRemoteServer<cr>" },
-          -- { "ZRr", "<cmd>ZortexRestartRemoteServer<cr>" },
-          -- { "ZRs", "<cmd>ZortexStartRemoteServer<cr>" },
-          -- { "Zg", "<cmd>ZortexSearchGoogle<Space>" },
-          -- { "Zi", "<cmd>ZortexListitemToZettel<cr>" },
-          -- { "Zp", "<cmd>ZortexPreview<cr>" },
-          -- { "Zr", "<cmd>ZortexResourceToZettel<cr>" },
-          -- { "Zs", "<cmd>ZortexOpenStructure<cr>" },
-          -- { "Zw", "<cmd>ZortexSearchWikipedia<Space>" },
           { "ZZ", "<cmd>ZortexSearch<cr>" },
           { "Zz", "<cmd>ZortexSearch<cr>" },
           { "Zs", "<cmd>e " .. vim.g.zortex_notes_dir .. "/structure.zortex<cr>" },
-          -- { "ZS", "Server" },
-          -- { "ZSe", "<cmd>ZortexStopServer<cr>" },
-          -- { "ZSs", "<cmd>ZortexStartServer<cr>" },
+          { "Zp", "<cmd>ZortexProjects<cr>" },
+          { "Zc", "<cmd>ZortexCalendar<cr>" },
         }, {
           mode = "n",
         })
       end
-
-      -- vim.cmd([[
-      --       nmap Z <Nop>
-      --       nmap ZZ <Nop>
-      --       autocmd FileType zortex nnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
-      --       autocmd FileType zortex vnoremap <buffer> <silent> <CR> :ZortexOpenLink<CR>
-      --       autocmd FileType zortex setlocal norelativenumber nonumber
-      --       map <silent>Zz :ZortexSearch<CR>
-      --       map <silent>ZZ :ZortexSearch<CR>
-      -- ]])
     end,
-    -- ft = { "zortex" },
-    -- cmd = {
-    --   "Zortex",
-    --   "ZortexCalendar",
-    --   "ZortexCalendarToggle",
-    --   "ZortexCalendarSearch",
-    --   "ZortexProjects",
-    --   "ZortexDigest",
-    --   "ZortexAreas",
-    --   "ZortexSearch",
-    --   "ZortexXP",
-    --   "ZortexSkillTree",
-    -- },
-    -- keys = {
-    --   { "<leader>zc", "<cmd>ZortexCalendarToggle<cr>", desc = "Toggle Calendar" },
-    --   { "<leader>zd", "<cmd>ZortexDigest<cr>", desc = "Today's Digest" },
-    --   { "<leader>zp", "<cmd>ZortexProjects<cr>", desc = "Browse Projects" },
-    -- },
   },
 }
