@@ -14,6 +14,17 @@ return {
       require("zortex").setup({
         notes_dir = vim.fn.expand("~/.zortex/"),
         special_articles = { "structure", "inbox" },
+        notifications = {
+          aws = {
+            enabled = true,
+            api_endpoint = "https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/manifest",
+            user_id = "your-unique-id-123",
+          },
+          ntfy = {
+            enabled = true,
+            topic = "zortex-your-unique-id-123", -- Should match user_id
+          },
+        },
 
         -- XP System Configuration
         xp = {

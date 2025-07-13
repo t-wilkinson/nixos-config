@@ -78,7 +78,7 @@ with pkgs;
   # asio # c++
 
   # CLOUD/DEVOPS
-  # awscli2 - marked broken Mar 22
+  awscli2 # marked broken Mar 22
   # flyctl
   # google-cloud-sdk
   # gopls

@@ -105,9 +105,9 @@
     # };
     gnupg.agent = {
       enable = true;
-      # enableSSHSupport = true;
+      enableSSHSupport = true;
       # enableExtraSocket = true;
-      # pinentryPackage = pkgs.pinentry-gnome3;
+      pinentryPackage = pkgs.pinentry-gnome3;
       settings = {
         allow-preset-passphrase = true;
         # enable-ssh-support
