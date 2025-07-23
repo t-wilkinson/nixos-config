@@ -117,6 +117,7 @@ in
           bookmarks = [
             "file://${homeDirectory}/dev"
             "file://${homeDirectory}/dev/t-wilkinson"
+            "file://${homeDirectory}/dev/t-wilkinson/zortex.nvim"
             "file://${homeDirectory}/Downloads"
             "file://${homeDirectory}/Documents"
             "file://${homeDirectory}/.config"
