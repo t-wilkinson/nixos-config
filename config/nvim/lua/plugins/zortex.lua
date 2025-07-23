@@ -2,7 +2,6 @@ return {
   {
     "t-wilkinson/zortex.nvim",
     dir = "~/dev/t-wilkinson/zortex.nvim",
-    -- build = "(cd app && yarn install)",
     enabled = true,
     lazy = false,
     opts = {},
@@ -15,56 +14,46 @@ return {
         notes_dir = vim.fn.expand("~/.zortex/"),
         special_articles = { "structure", "inbox" },
         notifications = {
-          aws = {
-            enabled = true,
-            api_endpoint = "https://your-api-id.execute-api.us-east-1.amazonaws.com/prod/manifest",
-            user_id = "your-unique-id-123",
-          },
-          ntfy = {
-            enabled = true,
-            topic = "zortex-your-unique-id-123", -- Should match user_id
-          },
-        },
-
-        -- XP System Configuration
-        xp = {
-          -- Task XP calculation
-          task = {
-            base = 10,
-            position_multiplier = 2,
-            early_bonus = 5,
-            late_penalty = 0.8,
-          },
-
-          -- Area XP settings
-          area = {
-            level_base = 100,
-            level_multiplier = 1.5,
-            bubble_percentage = 0.2, -- 20% of XP bubbles to parent
-          },
-
-          -- Season configuration
-          season = {
-            base_xp = 1000,
-            multiplier = 1.2,
-            tiers = {
-              { min = 1, max = 10, name = "Bronze" },
-              { min = 11, max = 25, name = "Silver" },
-              { min = 26, max = 50, name = "Gold" },
-              { min = 51, max = 100, name = "Platinum" },
-              { min = 101, max = 200, name = "Diamond" },
-              { min = 201, max = 999, name = "Master" },
+          providers = {
+            aws = {
+              enabled = true,
+              api_endpoint = "https://qd5wcnxpn8.execute-api.us-east-1.amazonaws.com/prod/manifest",
+              user_id = 229817327380,
+            },
+            ntfy = {
+              enabled = true,
+              topic = "zortex-notify-tcgcp",
+              server_url = "https://ntfy.sh",
+            },
+            ses = {
+              enabled = true,
+              region = "us-east-1", -- Your AWS region
+              from_email = "noreply@treywilkinson.com",
+              default_to_email = "winston.trey.wilkinson@gmail.com",
+              domain = "treywilkinson.com",
+              use_api = false, -- Use AWS CLI for now
             },
           },
-        },
 
-        -- Skills configuration
-        skills = {
-          categories = {
-            technical = { color = "#61afef", icon = "💻" },
-            creative = { color = "#c678dd", icon = "🎨" },
-            business = { color = "#98c379", icon = "💼" },
-            personal = { color = "#e06c75", icon = "🌟" },
+          -- Pomodoro settings
+          pomodoro = {
+            work_duration = 25, -- minutes
+            short_break = 5, -- minutes
+            long_break = 15, -- minutes
+            long_break_after = 4, -- number of work sessions
+            auto_start_break = true,
+            auto_start_work = false,
+            sound = "default",
+          },
+
+          -- Daily digest settings
+          digest = {
+            enabled = true,
+            auto_send = true,
+            days_ahead = 7,
+            send_hour = 7, -- 7 AM
+            check_interval_minutes = 60,
+            digest_email = "winston.trey.wilkinson@gmail.com", -- Can be different from default
           },
         },
 
@@ -73,29 +62,16 @@ return {
           -- Calendar UI settings
           calendar = {
             window = {
-              width = 0.85,
-              height = 0.85,
-              border = "rounded",
-              title = " 📅 Zortex Calendar ",
+              -- width = 0.85,
+              -- height = 0.85,
             },
-            colors = {
-              today = "DiagnosticOk",
-              selected = "CursorLine",
-              weekend = "Comment",
-              has_entry = "DiagnosticInfo",
-              header = "Title",
-            },
+            colors = {},
             keymaps = {
               -- You can override default keymaps here
               close = { "q", "<Esc>", "<C-c>" },
               today = { "t", "T" },
               add_entry = { "a", "i", "A" },
             },
-          },
-
-          -- Telescope settings (optional)
-          telescope = {
-            -- Any telescope-specific overrides
           },
         },
 
@@ -111,12 +87,14 @@ return {
       if ok then
         wk.add({
           { "<CR>", "<cmd>ZortexOpenLink<cr>" },
-          { "ZRF", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
+          { "Zr", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
+          { "ZR", "<cmd>Lazy reload zortex.nvim<cr>", desc = "Reload Zortex plugin" },
           { "ZZ", "<cmd>ZortexSearch<cr>" },
           { "Zz", "<cmd>ZortexSearch<cr>" },
           { "Zs", "<cmd>e " .. vim.g.zortex_notes_dir .. "/structure.zortex<cr>" },
           { "Zp", "<cmd>ZortexProjects<cr>" },
           { "Zc", "<cmd>ZortexCalendar<cr>" },
+          { "Zx", "<cmd>ZortexToggleTask<cr>" },
         }, {
           mode = "n",
         })
