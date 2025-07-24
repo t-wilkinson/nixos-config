@@ -91,7 +91,7 @@ return {
           { "ZR", "<cmd>Lazy reload zortex.nvim<cr>", desc = "Reload Zortex plugin" },
           { "ZZ", "<cmd>ZortexSearch<cr>" },
           { "Zz", "<cmd>ZortexSearch<cr>" },
-          { "Zs", "<cmd>e " .. vim.g.zortex_notes_dir .. "/structure.zortex<cr>" },
+          { "Zs", "<cmd>e " .. require("zortex.config").notes_dir .. "/structure.zortex<cr>" },
           { "Zp", "<cmd>ZortexProjects<cr>" },
           { "Zc", "<cmd>ZortexCalendar<cr>" },
           { "Zx", "<cmd>ZortexToggleTask<cr>" },
