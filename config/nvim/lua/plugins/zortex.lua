@@ -13,7 +13,7 @@ return {
       require("zortex").setup({
         notes_dir = vim.fn.expand("~/.zortex/"),
         special_articles = { "structure", "inbox" },
-        debug = true,
+        debug = false,
         core = {
           logger = {
             enabled = true,
@@ -96,8 +96,8 @@ return {
           { "<CR>", "<cmd>ZortexOpenLink<cr>" },
           { "Zr", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
           { "ZR", "<cmd>Lazy reload zortex.nvim<cr>", desc = "Reload Zortex plugin" },
-          { "ZZ", "<cmd>ZortexSearch<cr>" },
-          { "Zz", "<cmd>ZortexSearch<cr>" },
+          { "ZZ", "<cmd>ZortexSearchSections<cr>" },
+          { "Zz", "<cmd>ZortexSearchSections<cr>" },
           { "Zs", "<cmd>e " .. require("zortex.config").notes_dir .. "/structure.zortex<cr>" },
           { "Zp", "<cmd>ZortexProjects<cr>" },
           { "Zc", "<cmd>ZortexCalendar<cr>" },
