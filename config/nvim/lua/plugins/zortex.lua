@@ -13,6 +13,13 @@ return {
       require("zortex").setup({
         notes_dir = vim.fn.expand("~/.zortex/"),
         special_articles = { "structure", "inbox" },
+        debug = true,
+        core = {
+          logger = {
+            enabled = true,
+            log_events = true,
+          },
+        },
         notifications = {
           providers = {
             aws = {
