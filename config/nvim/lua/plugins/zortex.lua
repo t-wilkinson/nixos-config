@@ -56,7 +56,7 @@ return {
           -- Daily digest settings
           digest = {
             enabled = true,
-            auto_send = true,
+            auto_send = false,
             days_ahead = 7,
             send_hour = 7, -- 7 AM
             check_interval_minutes = 60,
