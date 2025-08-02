@@ -14,6 +14,9 @@ return {
         notes_dir = vim.fn.expand("~/.zortex/"),
         special_articles = { "structure", "inbox" },
         debug = false,
+        keymaps = {
+          prefix = "Z",
+        },
         core = {
           logger = {
             enabled = true,
@@ -93,15 +96,15 @@ return {
       local ok, wk = pcall(require, "which-key")
       if ok then
         wk.add({
-          { "<CR>", "<cmd>ZortexOpenLink<cr>" },
+          { "<CR>", "<cmd>ZortexLinkOpen<cr>" },
           { "Zr", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
           { "ZR", "<cmd>Lazy reload zortex.nvim<cr>", desc = "Reload Zortex plugin" },
-          { "ZZ", "<cmd>ZortexSearchSections<cr>" },
-          { "Zz", "<cmd>ZortexSearchSections<cr>" },
+          -- { "ZZ", "<cmd>ZortexSearchSections<cr>" },
+          -- { "Zz", "<cmd>ZortexSearchSections<cr>" },
           { "Zs", "<cmd>e " .. require("zortex.config").notes_dir .. "/structure.zortex<cr>" },
-          { "Zp", "<cmd>ZortexProjects<cr>" },
-          { "Zc", "<cmd>ZortexCalendar<cr>" },
-          { "Zx", "<cmd>ZortexToggleTask<cr>" },
+          -- { "Zp", "<cmd>ZortexProjects<cr>" },
+          -- { "Zc", "<cmd>ZortexCalendar<cr>" },
+          -- { "Zx", "<cmd>ZortexTaskToggle<cr>" },
         }, {
           mode = "n",
         })
