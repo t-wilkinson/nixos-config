@@ -97,7 +97,7 @@ return {
       if ok then
         wk.add({
           { "<CR>", "<cmd>ZortexLinkOpen<cr>" },
-          { "Zr", "<cmd>ZortexReloadFolds<cr>", desc = "Reload Zortex folds" },
+          { "Zr", "<cmd>ZortexFoldsReload<cr>", desc = "Reload Zortex folds" },
           { "ZR", "<cmd>Lazy reload zortex.nvim<cr>", desc = "Reload Zortex plugin" },
           -- { "ZZ", "<cmd>ZortexSearchSections<cr>" },
           -- { "Zz", "<cmd>ZortexSearchSections<cr>" },

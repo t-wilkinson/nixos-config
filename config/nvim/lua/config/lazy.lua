@@ -54,3 +54,14 @@ require("lazy").setup({
     },
   },
 })
+
+vim.api.nvim_create_user_command("Gsearch", function(opts)
+  -- Escape any special characters in the user's search pattern
+  local pattern = vim.fn.escape(opts.args, [[\']])
+  -- Chain commands: open a vsplit, silently put the executed command's output,
+  -- then delete the initial blank line that :put creates.
+  vim.cmd('vsplit | silent put =execute("g/' .. pattern .. '/p") | 1d_')
+end, {
+  nargs = 1, -- This command expects one argument (the pattern)
+  desc = "Global search (g/.../p) and print to a new buffer",
+})
