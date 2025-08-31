@@ -1,6 +1,7 @@
 { pkgs, unstable, ... }:
 with pkgs;
 [
+
   # TERMINAL EMULATORS
   # tmux
   alacritty

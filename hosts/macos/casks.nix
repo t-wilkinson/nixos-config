@@ -2,6 +2,8 @@ _: [
   # Development Tools
   # "kitty"
   # "foot"
+  "tor-browser"
+
   "bitwarden"
   "homebrew/cask/docker"
   "google-drive"
