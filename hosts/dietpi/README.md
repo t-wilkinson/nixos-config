@@ -24,6 +24,15 @@ Forward internet to my domain (treywilkinson.com) to my pi.
 Raspberry Pi 4
 Gigabit ethernet
 
+## Networking
+
+- Forward port 6239 to 23 from router
+
+### Dynamic DNS
+
+- Setup Dynamic DNS via changeip.com from treywilkinson.dynamic-dns.net
+- Configure domain to work with dynamic-dns
+
 ## Configuring
 
 ```bash

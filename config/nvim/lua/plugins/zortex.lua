@@ -45,25 +45,26 @@ return {
             },
           },
 
-          -- Pomodoro settings
-          pomodoro = {
-            work_duration = 25, -- minutes
-            short_break = 5, -- minutes
-            long_break = 15, -- minutes
-            long_break_after = 4, -- number of work sessions
-            auto_start_break = true,
-            auto_start_work = false,
-            sound = "default",
-          },
+          types = {
+            pomodoro = {
+              work_duration = 25, -- minutes
+              short_break = 5, -- minutes
+              long_break = 15, -- minutes
+              long_break_after = 4, -- number of work sessions
+              auto_start_break = true,
+              auto_start_work = false,
+              sound = "default",
+            },
 
-          -- Daily digest settings
-          digest = {
-            enabled = true,
-            auto_send = false,
-            days_ahead = 7,
-            send_hour = 7, -- 7 AM
-            check_interval_minutes = 60,
-            digest_email = "winston.trey.wilkinson@gmail.com", -- Can be different from default
+            -- Daily digest settings
+            digest = {
+              enabled = true,
+              auto_send = false,
+              days_ahead = 7,
+              send_hour = 7, -- 7 AM
+              check_interval_minutes = 60,
+              digest_email = "winston.trey.wilkinson@gmail.com", -- Can be different from default
+            },
           },
         },
 

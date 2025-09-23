@@ -1,3 +1,8 @@
+if test (uname) = Darwin
+    set -x TMPDIR (getconf DARWIN_USER_TEMP_DIR)
+end
+
+
 # function fish_prompt -d "Write out the prompt"
 #     # USER@HOST /home/user/ >
 #     printf '%s@%s %s%s%s > ' $USER $hostname \
