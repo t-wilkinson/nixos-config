@@ -67,13 +67,42 @@
   networking = {
     hostName = "nixos";
     networkmanager.enable = true;
-    interfaces.enp3s0 = {
-      wakeOnLan.enable = true;
-    };
+    defaultGateway = "192.168.1.1";
+    # interfaces.enp3s0 = {
+    #   wakeOnLan.enable = true;
+    # };
+    # interfaces.wlo1 = {
+    #   useDHCP = false;
+    #   ipv4.addresses = [
+    #     {
+    #       address = "192.168.1.181";
+    #       prefixLength = 24;
+    #     }
+    #   ];
+    # };
     firewall.allowedTCPPorts = [
+      22
       6229 # ssh
       5900 # vnc
     ];
+    # networkmanager.connectionConfig."static-wifi" = {
+    #   type = "wifi";
+    #   interfaceName = "wlo1";
+    #   ipv4 = {
+    #     method = "manual";
+    #     addresses = [
+    #       {
+    #         address = "192.168.1.181";
+    #         prefix = 24;
+    #       }
+    #     ];
+    #     gateway = "192.168.1.1";
+    #     dns = [
+    #       "1.1.1.1"
+    #       "8.8.8.8"
+    #     ];
+    #   };
+    # };
   };
 
   programs = {
@@ -131,7 +160,7 @@
         6229
       ];
       settings = {
-        PasswordAuthentication = false;
+        PasswordAuthentication = true;
         AllowUsers = null;
         PermitRootLogin = "no";
       };

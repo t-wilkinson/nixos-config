@@ -24,6 +24,17 @@ return {
           },
         },
         notifications = {
+          channels = {
+            calendar = { "vim", "system", "ntfy" },
+            alarm = { "vim", "system", "ntfy" },
+            timer = { "vim", "system", "ntfy" },
+            pomodoro = { "vim", "system", "ntfy" },
+            digest = { "ses" },
+            xp = { "vim" },
+            task_due = { "vim", "ntfy", "ses" },
+            default = { "vim", "system" },
+          },
+
           providers = {
             aws = {
               enabled = true,
@@ -33,7 +44,7 @@ return {
             ntfy = {
               enabled = true,
               topic = "zortex-notify-tcgcp",
-              server_url = "https://ntfy.sh",
+              server_url = "https://ntfy.treywilkinson.com",
             },
             ses = {
               enabled = true,
