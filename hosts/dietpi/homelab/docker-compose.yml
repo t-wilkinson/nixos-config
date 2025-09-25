@@ -3,8 +3,6 @@ services:
     image: caddy:latest
     container_name: caddy
     restart: unless-stopped
-    logging:
-      driver: "none"
     ports:
       - "80:80"
       - "443:443"
@@ -19,8 +17,6 @@ services:
     image: binwiederhier/ntfy:latest
     container_name: ntfy
     restart: unless-stopped
-    logging:
-      driver: "none"
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
       - ./ntfy/cache:/var/cache/ntfy
