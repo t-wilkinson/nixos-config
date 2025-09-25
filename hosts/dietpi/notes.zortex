@@ -1,0 +1,196 @@
+# DietPI
+
+## Architecture
+Caddy
+ntfy
+Filesharing
+Photo gallary
+Password manager
+DNS
+
+Docker compose:
+- caddy reverse proxy
+- ntfy
+
+Zortex:
+- ntfy
+- AWS mail sending
+- Move manifest management to server
+- zortex note server
+
+NixOS:
+- Have certain services run on nixos
+- NAS
+
+## Services
+
+System stats & Management:
+webmin - remote system management with web interface
+linux dash, phpSysInfo, RPi-Monitor, Netdata - web interface system stats
+Homer - a modern homepage for services
+portainer - docker container management
+K3s - lightweight kubernetes
+
+Network Security:
+OPNsense
+
+VPN:
+- WireGuard, OpenVPN, PiVPN, Tailscale, ZeroTier
+
+Password:
+Vault warden - bitwarden password manager server
+
+Files/photos:
+Syncthing - backup and sync server with web interface
+    - Sync files on android
+NextCloud - NAS + OneDrive + Office365
+    - File sharing
+- Seafile
+NFS, ProFTPD, Samba, vsftpd - FIle server
+PhotoPrism - decentralized ai-powered photo app
+immich
+
+Reverse proxy:
+Nginx
+Traefik - complex
+Caddy
+
+DNS:
+- PiHole
+
+## Setup
+
+- Needed to change wifi country
+- Never added/connected to wifi on startup
+
+AUTO_SETUP_SSH_SERVER_INDEX=
+AUTO_SETUP_INSTALL_SOFTWARE_ID=
+AUTO_SETUP_HEADLESS=
+
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER
+docker run hello-world
+docker run -d --name ntfy \
+  -p 80:80 \
+  -v ntfy-data:/etc/ntfy \
+  binwiederhier/ntfy serve
+
+dietpi-software install 138   # WireGuard server (or 126??)
+nano /etc/wireguard/wg0.conf
+
+dietpi-software install 162   # Docker
+dietpi-software install 163   # Docker-Compose (optional)
+
+- harden ssh
+
+SOFTWARE_DROPBEAR_PASSWORD_LOGIN=0
+KEY_ROOT="YOUR_SSH_PUBLIC_KEY_HERE"
+KEY_USER="YOUR_SSH_PUBLIC_KEY_HERE"
+
+## ntfy
+```
+services:
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: ntfy
+    command:
+      - serve
+    environment:
+      - TZ=America/New_York
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ./cache:/var/cache/ntfy
+      - ./config:/etc/ntfy
+    ports:
+      - '80:80'
+    logging:
+      - driver: none
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1",
+        ]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./certs:/etc/nginx/certs:ro
+    depends_on:
+      - ntfy
+    restart: unless-stopped
+```
+
+/etc/ntfy/config/server.yml
+/etc/ntfy/cache
+
+```yaml
+base-url: 'https://ntfy.yourdomain.com'
+behind-proxy: true
+auth-file: '/var/lib/ntfy/user.db'
+auth-default-access: 'deny-all'
+enable-signup: false
+```
+
+```yaml
+base-url: "http://ntfy.example.com"
+listen-http: ":80"
+listen-https: ":443"
+key-file: "/etc/letsencrypt/live/ntfy.example.com.key"
+cert-file: "/etc/letsencrypt/live/ntfy.example.com.crt"
+cache-file: "/var/cache/ntfy/cache.db"
+```
+
+## https for ntfy server
+install certbot and namecheap plugin:
+```
+sudo apt update
+sudo apt install python3-pip python3-venv libaugeas0 -y
+sudo python3 -m venv /opt/certbot/
+sudo /opt/certbot/bin/pip install --upgrade pip
+sudo /opt/certbot/bin/pip install certbot certbot-dns-namecheap
+sudo ln -s /opt/certbot/bin/certbot /usr/bin/certbot
+```
+
+get namecheap api credentials:
+Profile > Tools > API Access > Enable, white list ip, copy api key
+```
+sudo mkdir -p /etc/letsencrypt
+sudo nano /etc/letsencrypt/namecheap.ini
+
+dns_namecheap_username = YOUR_NAMECHEAP_USERNAME
+dns_namecheap_api_key = YOUR_NAMECHEAP_API_KEY
+
+sudo chmod 600 /etc/letsencrypt/namecheap.ini
+```
+
+optaining certificate:
+```
+sudo certbot certonly \
+  --dns-namecheap \
+  --dns-namecheap-credentials /etc/letsencrypt/namecheap.ini \
+  -d your.domain.com
+```
+
+/etc/letsencrypt/live/ntfy.treywilkinson.com/{fullchain,privkey}.pem
+
+configure ntfy to use https:
+```
+sudo nano /etc/ntfy/server.yml
+```
+
+enable auto-renew:
+https://certbot.org/renewal-setup
+sudo certbot renew --dry-run
+
+

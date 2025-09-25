@@ -1,0 +1,7 @@
+ntfy.treywilkinson.com {
+  reverse_proxy ntfy:80
+}
+
+vault.treywilkinson.com {
+  reverse_proxy vaultwarden:80
+}

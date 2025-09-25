@@ -1,0 +1,68 @@
+services:
+  caddy:
+    image: caddy:latest
+    container_name: caddy
+    restart: unless-stopped
+    logging:
+      driver: "none"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - proxy-net
+
+  ntfy:
+    image: binwiederhier/ntfy:latest
+    container_name: ntfy
+    restart: unless-stopped
+    logging:
+      driver: "none"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ./ntfy/cache:/var/cache/ntfy
+      - ./ntfy/config:/etc/ntfy # For server.yml configuration
+    command:
+      - serve
+    networks:
+      - proxy-net
+
+  # nginx:
+  #   image: nginx:stable-alpine
+  #   container_name: nginx
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx/conf.d:/etc/nginx/conf.d:ro
+  #     - /etc/letsencrypt:/etc/letsencrypt:ro
+  #   depends_on:
+  #     - ntfy
+  #   restart: unless-stopped
+  #   networks:
+  #     - proxy-net
+
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    volumes:
+      - ./vw-data:/data
+    # environment:
+    # Customize environment variables as needed
+    # - WEBSOCKET_ENABLED=true
+    # - SIGNUPS_ALLOWED=false
+    # - ADMIN_TOKEN=your_admin_token_here
+    networks:
+      - proxy-net
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  proxy-net:
+    driver: bridge
