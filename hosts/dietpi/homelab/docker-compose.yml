@@ -55,6 +55,58 @@ services:
     networks:
       - proxy-net
 
+  # nextcloud:
+  #   image: nextcloud
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /mnt/drive/nextcloud:/var/www/html
+  #   networks:
+  #     - proxy-net
+
+  # mariadb:
+  #   image: mariadb:10.6
+  #   restart: unless-stopped
+  #   container_name: nextcloud-mariadb
+  #   environment:
+  #     - MYSQL_ROOT_PASSWORD=your_root_password # MariaDB root password
+  #     - MYSQL_DATABASE=nextcloud # Database name for Nextcloud
+  #     - MYSQL_USER=nextcloud # Database user for Nextcloud
+  #     - MYSQL_PASSWORD=your_secure_password # Database password for Nextcloud
+  #   volumes:
+  #     - /mnt/drive/nextcloud-mariadb:/config # Persistent MariaDB data
+
+  # zortex:
+  #   build: ./zortex
+  #   container_name: zortex
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /etc/localtime:/etc/localtime:ro
+  #     - ./zortex/data
+  #   environment:
+  #     # Core settings
+  #     - PORT=5000
+  #     - DB_PATH=/data/zortex.db
+
+  #     # Authentication - CHANGE THESE!
+  #     - API_KEY=${ZORTEX_API_KEY:-your-secure-api-key-here}
+  #     - BASIC_AUTH_USER=${ZORTEX_USER:-admin}
+  #     - BASIC_AUTH_PASS=${ZORTEX_PASS:-change-me-please}
+  #     - SECRET_KEY=${ZORTEX_SECRET:-generate-random-key}
+
+  #     # Notification settings
+  #     - NTFY_URL=${NTFY_URL:-http://ntfy:8080}
+  #     - NTFY_TOPIC=${NTFY_TOPIC:-zortex}
+  #     - CHECK_INTERVAL=60
+
+  #     # Email settings (optional)
+  #     - EMAIL_ENABLED=${EMAIL_ENABLED:-false}
+  #     - SES_REGION=${SES_REGION:-us-east-1}
+  #     - FROM_EMAIL=${FROM_EMAIL:-digest@example.com}
+  #     - TO_EMAIL=${TO_EMAIL:-user@example.com}
+
+  #   networks:
+  #     - proxy-net
+
 volumes:
   caddy_data:
   caddy_config:

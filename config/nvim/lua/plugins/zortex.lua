@@ -25,22 +25,21 @@ return {
         },
         notifications = {
           channels = {
-            calendar = { "vim", "system", "ntfy" },
-            alarm = { "vim", "system", "ntfy" },
-            timer = { "vim", "system", "ntfy" },
-            pomodoro = { "vim", "system", "ntfy" },
+            calendar = { "vim", "ntfy" },
+            alarm = { "vim", "ntfy" },
+            timer = { "vim", "ntfy" },
+            pomodoro = { "vim", "ntfy" },
             digest = { "ses" },
-            xp = { "vim" },
-            task_due = { "vim", "ntfy", "ses" },
-            default = { "vim", "system" },
+            task_due = { "ntfy", "ses" },
+            default = { "vim", "ntfy" },
           },
 
           providers = {
-            aws = {
-              enabled = true,
-              api_endpoint = "https://qd5wcnxpn8.execute-api.us-east-1.amazonaws.com/prod/manifest",
-              user_id = 229817327380,
-            },
+            -- aws = {
+            --   enabled = true,
+            --   api_endpoint = "https://qd5wcnxpn8.execute-api.us-east-1.amazonaws.com/prod/manifest",
+            --   user_id = 229817327380,
+            -- },
             ntfy = {
               enabled = true,
               topic = "zortex-notify-tcgcp",
@@ -53,6 +52,12 @@ return {
               default_to_email = "winston.trey.wilkinson@gmail.com",
               domain = "treywilkinson.com",
               use_api = false, -- Use AWS CLI for now
+            },
+            homelab = {
+              enabled = true,
+              api_endpoint = "https://zortex.treywilkinson.com",
+              api_key = "your-secure-api-key-here", -- Same as in Docker .env
+              user_id = "default",
             },
           },
 

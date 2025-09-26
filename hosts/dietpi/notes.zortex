@@ -2,11 +2,13 @@
 
 ## Architecture
 Caddy
+    - basic_auth https://caddyserver.com/docs/caddyfile/directives/basic_auth
 ntfy
 Filesharing
 Photo gallary
 Password manager
 DNS
+Docker registry https://hub.docker.com/_/registry
 
 Docker compose:
 - caddy reverse proxy
@@ -16,7 +18,12 @@ Zortex:
 - ntfy
 - AWS mail sending
 - Move manifest management to server
-- zortex note server
+- zortex note server, show digest and other things
+
+Zortex Notifications:
+- Use cron to run script every minute
+- Server to inject manifests
+- Server endpoint or script that will check and send notifications
 
 NixOS:
 - Have certain services run on nixos

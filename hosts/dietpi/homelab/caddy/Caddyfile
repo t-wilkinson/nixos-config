@@ -5,3 +5,14 @@ ntfy.treywilkinson.com {
 vault.treywilkinson.com {
   reverse_proxy vaultwarden:80
 }
+
+# zortex.treywilkinson.com {
+#   reverse_proxy zortex:80
+# }
+
+# cloud.treywilkinson.com {
+#   reverse_proxy nextcloud:80
+#   basic_auth {
+#     Trey ...
+#   }
+# }
