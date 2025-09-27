@@ -23,6 +23,14 @@ return {
             log_events = true,
           },
         },
+
+        zortex_server = {
+          enabled = true,
+          api_endpoint = "https://zortex.treywilkinson.com",
+          api_key = "your-secure-api-key-here", -- Same as in Docker .env
+          user_id = "default",
+        },
+
         notifications = {
           channels = {
             calendar = { "vim", "ntfy" },
@@ -52,12 +60,6 @@ return {
               default_to_email = "winston.trey.wilkinson@gmail.com",
               domain = "treywilkinson.com",
               use_api = false, -- Use AWS CLI for now
-            },
-            homelab = {
-              enabled = true,
-              api_endpoint = "https://zortex.treywilkinson.com",
-              api_key = "your-secure-api-key-here", -- Same as in Docker .env
-              user_id = "default",
             },
           },
 
