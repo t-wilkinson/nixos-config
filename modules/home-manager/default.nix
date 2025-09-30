@@ -4,7 +4,9 @@
   impurity,
   pkgs,
   unstable,
+  lib,
   myLib,
+  homedir,
   username,
   hostname,
   ...
@@ -43,7 +45,7 @@
       zsh = {
         enable = true;
         # autocd = false;
-        # cdpath = [ "~/.local/share/src" ];
+        # cdpath = [ "${homedir}/.local/share/src" ];
         # plugins = [
         #    {
         #        name = "powerlevel10k";
@@ -56,7 +58,7 @@
         #        file = "p10k.zsh";
         #    }
         #  ];
-        initExtraFirst = ''
+        initContent = lib.mkBefore ''
           export PROMPT="%B%F{#6e6a86}%~%f%b %B%F{#3e8fb0}λ%b%f "
           export NIX_PATH=""
           [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh 

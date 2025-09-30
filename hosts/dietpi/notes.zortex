@@ -10,9 +10,24 @@ Password manager
 DNS
 Docker registry https://hub.docker.com/_/registry
 
+Rsync or syncthing with NFS for linux
+SMB + SyncThing or FolderSync or Rsync
+NextCloud
+
+Raspberry pi as gateway connect to desktop via ethernet
+
+On desktop:
+Samba+NFS or NextCloud
+PhotoPrism or Immich
+
 Docker compose:
 - caddy reverse proxy
 - ntfy
+
+Homelab:
+- Website endpoint that provides monitoring, and ability to turn pc on and off via a button
+- Have caddy authenticate. Take users to login page? Or basic-auth?
+- Dashy, Homer, or homepage
 
 Zortex:
 - ntfy
@@ -28,6 +43,18 @@ Zortex Notifications:
 NixOS:
 - Have certain services run on nixos
 - NAS
+
+## Zortex
+I want you to create a docker container for my note system.
+Dockerfile - packages the other files into an easily deployable container. Should take environment variables for the ntfy server endpoint.
+crontab - runs run.sh every minute on the minute
+server.py - flask server that receives manifests, updates the sqlite database for notifications and when they will occur
+run.sh - script that will check the database and send requests to my ntfy server to send notifications.
+database - sqlite database to store the notifications and when
+
+This docker container will be run with docker-compose, which runs other containers for my homelab. It should be built to attach to the same docker network and integrate with a reverse proxy.
+The manifest is a JSON document that includes all upcoming notifications. The server.py injests the manifest, updating the local database with pending notifications to be sent.
+run.sh will send any pending notifications. And remove all stale notifications from the database.
 
 ## Services
 

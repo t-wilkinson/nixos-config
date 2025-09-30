@@ -15,7 +15,7 @@ echo "${YELLOW}Starting build...${NC}"
 nix --extra-experimental-features 'nix-command flakes' build --impure .#$FLAKE_SYSTEM --show-trace $@
 
 echo "${YELLOW}Switching to new generation...${NC}"
-./result/sw/bin/darwin-rebuild switch --impure --flake .#${SYSTEM_TYPE} $@
+sudo --preserve-env=NIXPKGS_ALLOW_UNFREE,IMPURITY_PATH ./result/sw/bin/darwin-rebuild switch --impure --flake .#${SYSTEM_TYPE} $@
 
 echo "${YELLOW}Cleaning up...${NC}"
 unlink ./result

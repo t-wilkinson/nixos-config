@@ -24,7 +24,8 @@
       more-waita,
       nix-darwin,
       nix-homebrew,
-      nixpkgs,
+      nixpkgs-nixos,
+      nixpkgs-darwin,
       nixpkgs-unstable,
       thorium,
     }@inputs:
@@ -49,45 +50,53 @@
       #   };
       # };
 
-      mkApp = scriptName: system: {
+      mkApp = pkgs: scriptName: system: {
         type = "app";
         program = "${
-          (nixpkgs.legacyPackages.${system}.writeScriptBin scriptName ''
+          (pkgs.writeScriptBin scriptName ''
             #!/usr/bin/env bash
-            PATH=${nixpkgs.legacyPackages.${system}.git}/bin:$PATH
+            PATH=${pkgs.git}/bin:$PATH
             echo "Running ${scriptName} for ${system}"
             exec ${self}/apps/${system}/${scriptName}
           '')
         }/bin/${scriptName}";
       };
 
-      mkLinuxApps = system: {
-        "apply" = mkApp "apply" system;
-        "b" = mkApp "build-impure" system;
-        "bs" = mkApp "build-switch-impure" system;
-        "build" = mkApp "build" system;
-        "build-impure" = mkApp "build-impure" system;
-        "build-switch" = mkApp "build-switch" system;
-        "build-switch-impure" = mkApp "build-switch-impure" system;
-        "copy-keys" = mkApp "copy-keys" system;
-        "create-keys" = mkApp "create-keys" system;
-        "check-keys" = mkApp "check-keys" system;
-        "install" = mkApp "install" system;
-        "install-with-secrets" = mkApp "install-with-secrets" system;
+      mkLinuxApps = system: 
+      let
+        app = scriptName: mkApp (nixpkgs-nixos.legacyPackages.${system}) scriptName system;
+      in
+      {
+        "apply" = app "apply";
+        "b" = app "build-impure";
+        "bs" = app "build-switch-impure";
+        "build" = app "build";
+        "build-impure" = app "build-impure";
+        "build-switch" = app "build-switch";
+        "build-switch-impure" = app "build-switch-impure";
+        "copy-keys" = app "copy-keys";
+        "create-keys" = app "create-keys";
+        "check-keys" = app "check-keys";
+        "install" = app "install";
+        "install-with-secrets" = app "install-with-secrets";
       };
 
-      mkDarwinApps = system: {
-        "apply" = mkApp "apply" system;
-        "b" = mkApp "build-impure" system;
-        "bs" = mkApp "build-switch-impure" system;
-        "build" = mkApp "build" system;
-        "build-impure" = mkApp "build-impure" system;
-        "build-switch" = mkApp "build-switch" system;
-        "build-switch-impure" = mkApp "build-switch-impure" system;
-        "copy-keys" = mkApp "copy-keys" system;
-        "create-keys" = mkApp "create-keys" system;
-        "check-keys" = mkApp "check-keys" system;
-        "rollback" = mkApp "rollback" system;
+      mkDarwinApps = system: 
+      let
+        app = scriptName: mkApp (nixpkgs-darwin.legacyPackages.${system}) scriptName system;
+      in
+      {
+        "apply" = app "apply";
+        "b" = app "build-impure";
+        "bs" = app "build-switch-impure";
+        "build" = app "build";
+        "build-impure" = app "build-impure";
+        "build-switch" = app "build-switch";
+        "build-switch-impure" = app "build-switch-impure";
+        "copy-keys" = app "copy-keys";
+        "create-keys" = app "create-keys";
+        "check-keys" = app "check-keys";
+        "rollback" = app "rollback";
       };
 
       mkDarwinConfiguration =
@@ -112,7 +121,8 @@
             inherit inputs username;
             hostname = "macos";
             homedir = "/Users/${username}";
-            unstable = import nixpkgs-unstable {
+            # nixpkgs-unstable branch is not build for aarch64-darwin
+            unstable = import nixpkgs-nixos {
               inherit system;
               config.allowUnfree = true;
               config.allowBroken = true;
@@ -160,7 +170,7 @@
 
       mkNixosConfiguration =
         system: extraModules:
-        nixpkgs.lib.nixosSystem {
+        nixpkgs-nixos.lib.nixosSystem {
           inherit system;
           specialArgs = {
             inherit self inputs username;
@@ -202,8 +212,8 @@
     {
       # devShells = forAllSystems devShell;
       apps =
-        nixpkgs.lib.genAttrs linuxSystems mkLinuxApps
-        // nixpkgs.lib.genAttrs darwinSystems mkDarwinApps;
+        nixpkgs-nixos.lib.genAttrs linuxSystems mkLinuxApps
+        // nixpkgs-darwin.lib.genAttrs darwinSystems mkDarwinApps;
 
       darwinConfigurations = allDarwinConfigurations;
 
@@ -211,18 +221,22 @@
     };
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    # NixPkgs
+    # nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs-nixos.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
+
     home-manager = {
-      url = "github:nix-community/home-manager/release-24.11"; # "follows" doesn't seem to work?
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/home-manager/release-25.05"; # "follows" doesn't seem to work?
+      inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
 
     # impurity adds custom module arg named "impurity" which gets overriden when merging @inputs in specialArgs
     impurity_.url = "github:outfoxxed/impurity.nix";
     agenix = {
       url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
     # secrets = {
     #   url = "git+ssh://git@github.com/dustinlyons/nix-secrets.git";
@@ -230,13 +244,13 @@
     # };
     disko = {
       url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
 
     # macOS
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-24.11";
-      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
+      inputs.nixpkgs.follows = "nixpkgs-darwin";
     };
     nix-homebrew = {
       url = "github:zhaofengli-wip/nix-homebrew";
@@ -264,15 +278,15 @@
     thorium.url = "github:end-4/nix-thorium";
     ags = {
       url = "github:Aylur/ags/v1";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
+      inputs.nixpkgs-lib.follows = "nixpkgs-nixos";
     };
     gross = {
       url = "github:fufexan/gross";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-nixos";
       inputs.flake-parts.follows = "flake-parts";
     };
     matugen = {
@@ -289,7 +303,7 @@
     };
     anyrun = {
       url = "github:anyrun-org/anyrun";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
 
     # NixVirt = {

@@ -10,10 +10,10 @@ return {
   -- { "nvim-telescope/telescope.nvim", event = "VimEnter" },
 
   -- { "windwp/nvim-autopairs" },
-  { "echasnovski/mini.pairs", enabled = false },
-  { "echasnovski/mini.ai", enabled = true },
+  { "nvim-mini/mini.pairs", enabled = false },
+  { "nvim-mini/mini.ai", enabled = true },
   {
-    "echasnovski/mini.surround",
+    "nvim-mini/mini.surround",
     keys = function(_, keys)
       -- Populate the keys based on the user's options
       local opts = LazyVim.opts("mini.surround")

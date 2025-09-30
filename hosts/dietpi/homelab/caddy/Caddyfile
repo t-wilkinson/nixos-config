@@ -1,4 +1,5 @@
 ntfy.treywilkinson.com {
+  # websocket
   reverse_proxy ntfy:80
 }
 
@@ -12,6 +13,7 @@ vault.treywilkinson.com {
 
 # cloud.treywilkinson.com {
 #   reverse_proxy nextcloud:80
+#   # caddy hash-password
 #   basic_auth {
 #     Trey ...
 #   }

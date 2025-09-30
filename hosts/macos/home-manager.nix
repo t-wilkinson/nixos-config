@@ -7,6 +7,7 @@
   unstable,
   lib,
   home-manager,
+  homedir,
   username,
   hostname,
   ...
@@ -16,7 +17,7 @@
   users.users.${username} = {
     uid = 501;
     name = username;
-    home = "/Users/${username}";
+    home = homedir;
     isHidden = false;
     shell = pkgs.fish;
   };
@@ -84,7 +85,7 @@
             dockutil
           ];
           file = {
-            ".gnupg/gpg-agent.conf".source = ~/.gnupg/gpg-agent.conf.mac;
+            ".gnupg/gpg-agent.conf".source = "${homedir}/.gnupg/gpg-agent.conf.mac";
           };
 
           stateVersion = "23.11";

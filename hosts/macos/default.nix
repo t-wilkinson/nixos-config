@@ -64,6 +64,7 @@
 
   system = {
     stateVersion = 5;
+    primaryUser = "trey";
 
     # Turn off NIX_PATH warnings because we're using flakes
     checks.verifyNixPath = false;

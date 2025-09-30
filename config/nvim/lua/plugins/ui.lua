@@ -16,7 +16,7 @@ return {
     end,
   },
 
-  { "echasnovski/mini.animate", enabled = false },
+  { "nvim-mini/mini.animate", enabled = false },
 
   {
     "LazyVim/LazyVim",
