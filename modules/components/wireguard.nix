@@ -15,20 +15,20 @@
           # "fdc9:281f:04d7:9ee9::2/64"
         ];
         dns = [
-          "8.8.8.8"
+          "10.0.0.1"
           # "fdc9:281f:04d7:9ee9::1"
         ];
         privateKeyFile = "${homedir}/.keys/wg-dietpi";
 
         peers = [
           {
-            publicKey = "2ookyV13cWI5EHrk63QI07OLd5Kw0A9NmQIf52XFzCE=";
+            publicKey = "nbjRfemHGmJ1xzFPRJ2TATg9cBinwsIYquo4IJX6mWU=";
             # presharedKeyFile = "/root/wireguard-keys/preshared_from_peer0_key";
             allowedIPs = [
               "10.0.0.0/24"
               # "::/0"
             ];
-            endpoint = "pi.treywilkinson.com:51096";
+            endpoint = "lab.treywilkinson.com:51820";
             persistentKeepalive = 25;
           }
         ];

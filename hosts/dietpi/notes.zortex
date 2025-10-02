@@ -1,6 +1,10 @@
 # DietPI
 
 ## Architecture
+Use VPN for connection
+Custom DNS for certain domains
+Auto backup nixos, homelab, and phones
+
 Caddy
     - basic_auth https://caddyserver.com/docs/caddyfile/directives/basic_auth
 ntfy
@@ -256,3 +260,34 @@ https://certbot.org/renewal-setup
 sudo certbot renew --dry-run
 
 
+### WireGuard
+dietpi-software install 172
+forward port 51820 UDP
+systemctl restart wg-quick@wg0
+
+
+modules/components/wireguard.nix
+
+`wg-quick up wg0`
+
+
+### Caddyfile
+
+After using `tls internal`
+docker cp caddy:/data/caddy/pki/authorities/local/root.crt ~/Desktop/root.crt
+double click on the root.crt, add it to login keychain, trust it for everything
+
+### dnsmasq
+apt install dnsmasq -y
+
+```/etc/dnsmasq.d/homelab.conf
+domain=home.lab
+address=/lab.giga.chad/10.0.0.1
+```
+
+```/etc/dnsmasq.d/gigachad.conf
+domain=giga.chad
+address=/.giga.chad/10.0.0.1
+```
+
+systemctl restart dnsmasq
