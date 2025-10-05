@@ -12,6 +12,7 @@
       disko,
       firefox-gnome-theme,
       flake-parts,
+      flake-utils,
       gross,
       home-manager,
       homebrew-bundle,
@@ -52,52 +53,52 @@
 
       mkApp = pkgs: scriptName: system: {
         type = "app";
-        program = "${
-          (pkgs.writeScriptBin scriptName ''
-            #!/usr/bin/env bash
-            PATH=${pkgs.git}/bin:$PATH
-            echo "Running ${scriptName} for ${system}"
-            exec ${self}/apps/${system}/${scriptName}
-          '')
-        }/bin/${scriptName}";
+        program = "${(pkgs.writeScriptBin scriptName ''
+          #!/usr/bin/env bash
+          PATH=${pkgs.git}/bin:$PATH
+          echo "Running ${scriptName} for ${system}"
+          exec ${self}/apps/${system}/${scriptName}
+        '')}/bin/${scriptName}";
       };
 
-      mkLinuxApps = system: 
-      let
-        app = scriptName: mkApp (nixpkgs-nixos.legacyPackages.${system}) scriptName system;
-      in
-      {
-        "apply" = app "apply";
-        "b" = app "build-impure";
-        "bs" = app "build-switch-impure";
-        "build" = app "build";
-        "build-impure" = app "build-impure";
-        "build-switch" = app "build-switch";
-        "build-switch-impure" = app "build-switch-impure";
-        "copy-keys" = app "copy-keys";
-        "create-keys" = app "create-keys";
-        "check-keys" = app "check-keys";
-        "install" = app "install";
-        "install-with-secrets" = app "install-with-secrets";
-      };
+      mkLinuxApps =
+        system:
+        let
+          app = scriptName: mkApp (nixpkgs-nixos.legacyPackages.${system}) scriptName system;
+        in
+        {
+          "apply" = app "apply";
+          "b" = app "build-impure";
+          "bs" = app "build-switch-impure";
+          "build" = app "build";
+          "build-impure" = app "build-impure";
+          "build-switch" = app "build-switch";
+          "build-switch-impure" = app "build-switch-impure";
+          "copy-keys" = app "copy-keys";
+          "create-keys" = app "create-keys";
+          "check-keys" = app "check-keys";
+          "install" = app "install";
+          "install-with-secrets" = app "install-with-secrets";
+        };
 
-      mkDarwinApps = system: 
-      let
-        app = scriptName: mkApp (nixpkgs-darwin.legacyPackages.${system}) scriptName system;
-      in
-      {
-        "apply" = app "apply";
-        "b" = app "build-impure";
-        "bs" = app "build-switch-impure";
-        "build" = app "build";
-        "build-impure" = app "build-impure";
-        "build-switch" = app "build-switch";
-        "build-switch-impure" = app "build-switch-impure";
-        "copy-keys" = app "copy-keys";
-        "create-keys" = app "create-keys";
-        "check-keys" = app "check-keys";
-        "rollback" = app "rollback";
-      };
+      mkDarwinApps =
+        system:
+        let
+          app = scriptName: mkApp (nixpkgs-darwin.legacyPackages.${system}) scriptName system;
+        in
+        {
+          "apply" = app "apply";
+          "b" = app "build-impure";
+          "bs" = app "build-switch-impure";
+          "build" = app "build";
+          "build-impure" = app "build-impure";
+          "build-switch" = app "build-switch";
+          "build-switch-impure" = app "build-switch-impure";
+          "copy-keys" = app "copy-keys";
+          "create-keys" = app "create-keys";
+          "check-keys" = app "check-keys";
+          "rollback" = app "rollback";
+        };
 
       mkDarwinConfiguration =
         system: extraModules:
@@ -152,7 +153,8 @@
               };
             }
             ./hosts/macos
-          ] ++ extraModules;
+          ]
+          ++ extraModules;
         };
 
       allDarwinConfigurations = builtins.listToAttrs (
@@ -192,7 +194,8 @@
               impurity.configRoot = self;
             }
             ./hosts/nixos
-          ] ++ extraModules;
+          ]
+          ++ extraModules;
         };
 
       allNixosConfigurations = builtins.listToAttrs (
@@ -208,6 +211,69 @@
         ]) linuxSystems
       );
 
+      rpi4 = nixpkgs-nixos.lib.nixosSystem {
+        system = "aarch64-linux";
+        specialArgs = { inherit agenix; };
+
+        modules = [
+          "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+          # "${nixpkgs-nixos}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+          # nix build .#nixosConfigurations.rpi4.config.system.build.isoImage
+          agenix.nixosModules.default
+          ./hosts/rpi4/test1.nix
+        ];
+      };
+      # let
+      #   system = "aarch64-linux";
+      # in
+      # nixpkgs-nixos.lib.nixosSystem {
+      #   inherit system;
+      #   modules = [
+      #     agenix.nixosModules.default
+      #     (
+      #       { pkgs, ... }:
+      #       {
+      #         imports = [
+      #           ./hosts/rpi4
+      #           (nixpkgs-nixos + "/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix")
+      #         ];
+
+      #         # Build an sdImage with multiple partitions
+      #         boot.loader.grub.enable = false;
+      #         boot.loader.generic-extlinux-compatible.enable = true;
+
+      #         sdImage = {
+      #           compressImage = false;
+      #           populateFirmwareCommands = ''
+      #             mkdir -p ./files/boot
+      #           '';
+      #           populateRootCommands = ''
+      #             mkdir -p ./files/root
+      #           '';
+      #           # Define custom partitions
+      #           partitions = {
+      #             boot = {
+      #               size = "256M";
+      #               fsType = "vfat";
+      #               mountPoint = "/boot";
+      #             };
+      #             root = {
+      #               size = "20G";
+      #               fsType = "ext4";
+      #               mountPoint = "/";
+      #             };
+      #             data = {
+      #               size = "100%"; # take remaining space
+      #               fsType = "ext4";
+      #               mountPoint = "/data";
+      #             };
+      #           };
+      #         };
+      #       }
+      #     )
+      #   ];
+      # };
+
     in
     {
       # devShells = forAllSystems devShell;
@@ -217,7 +283,16 @@
 
       darwinConfigurations = allDarwinConfigurations;
 
-      nixosConfigurations = allNixosConfigurations;
+      nixosConfigurations = allNixosConfigurations // {
+        rpi4 = rpi4;
+      };
+
+      image.rpi4 = rpi4.config.system.build.sdImage;
+
+      packages = {
+        rpi4 = rpi4.config.system.build.isoImage;
+      };
+
     };
 
   inputs = {
@@ -226,6 +301,8 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-nixos.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
+
+    flake-utils.url = "github:numtide/flake-utils";
 
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05"; # "follows" doesn't seem to work?
