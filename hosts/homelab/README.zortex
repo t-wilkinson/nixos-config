@@ -1,0 +1,348 @@
+# ============================================================================
+# .gitignore - Files to exclude from git
+# ============================================================================
+# Build results
+result
+result-*
+
+# Secret keys (unencrypted)
+*.key
+!*.age
+
+# Temporary files
+*~
+*.swp
+*.swo
+
+# Local configuration
+local.nix
+
+# Container data (should be on Pi only)
+caddy/
+homepage/config/
+
+# NFS mount point
+nfs/
+
+# ============================================================================
+# File structure overview
+# ============================================================================
+
+homelab/
+├── flake.nix                    # Main flake configuration
+├── flake.lock                   # Locked dependencies
+├── configuration.nix            # Main Pi configuration
+├── hardware-configuration.nix   # Hardware-specific config
+├── networking.nix               # Network and WireGuard config
+├── services.nix                 # Container services
+├── secrets.nix                  # agenix secrets configuration
+├── desktop-config.nix           # Desktop configuration snippet
+├── laptop-config.nix            # Laptop configuration snippet
+├── .gitignore                   # Git ignore file
+│
+├── secrets/                     # Encrypted secrets
+│   ├── secrets.nix              # agenix public keys
+│   ├── wireguard-private-key.age
+│   ├── wifi-password.age
+│   ├── nextcloud-admin-password.age
+│   └── vaultwarden-admin-token.age
+│
+├── caddy/
+│   └── Caddyfile                # Caddy reverse proxy config
+│
+├── homepage/
+│   ├── settings.yaml            # Homepage dashboard settings
+│   ├── services.yaml            # Services configuration
+│   ├── widgets.yaml             # Widgets configuration
+│   ├── bookmarks.yaml           # Bookmarks
+│   ├── docker.yaml              # Container integration
+│   └── wol-server.js            # Wake-on-LAN API server
+│
+└── scripts/
+    ├── deploy.sh                # Deployment helper
+    └── setup-secrets.sh         # Secrets setup helper
+
+
+# ============================================================================
+# secrets.nix generation guide
+# ============================================================================
+
+1. Install agenix:
+   nix-shell -p agenix
+
+2. Generate age keys from SSH keys:
+   mkdir -p ~/.config/agenix
+   ssh-keyscan 10.0.0.1 | ssh-to-age | tee ~/.config/agenix/pi.txt
+
+3. Create secrets.nix (for agenix encryption keys):
+
+let
+  pi = "age1..."; # From step 2
+  desktop = "age1..."; # Your desktop's age key
+  laptop = "age1..."; # Your laptop's age key
+in
+{
+  "wireguard-private-key.age".publicKeys = [ pi desktop laptop ];
+  "wifi-password.age".publicKeys = [ pi desktop laptop ];
+  "nextcloud-admin-password.age".publicKeys = [ pi desktop laptop ];
+  "vaultwarden-admin-token.age".publicKeys = [ pi desktop laptop ];
+}
+
+4. Generate secrets:
+   Generate WireGuard keys:
+     wg genkey | agenix -e secrets/wireguard-private-key.age
+   
+   Create WiFi password secret:
+     echo -n "your-wifi-password" | agenix -e secrets/wifi-password.age
+   
+   Create other secrets similarly
+
+5. Commit encrypted secrets to git
+
+# ============================================================================
+# README.md - Setup and deployment instructions
+# ============================================================================
+
+# Raspberry Pi 4 Homelab Setup Guide
+
+## Prerequisites
+
+- Raspberry Pi 4 (4GB+ recommended)
+- SSD with USB adapter
+- Desktop running NixOS
+- Laptop with nix-darwin (optional)
+- Ethernet cable for direct Pi-Desktop connection
+
+## Initial Setup
+
+### 1. Prepare the secrets
+
+```bash
+# Install agenix
+nix-shell -p agenix
+
+# Generate WireGuard keys
+wg genkey | tee pi-private.key | wg pubkey > pi-public.key
+wg genkey | tee desktop-private.key | wg pubkey > desktop-public.key
+wg genkey | tee laptop-private.key | wg pubkey > laptop-public.key
+
+# Create secrets (follow secrets.nix guide above)
+mkdir -p secrets
+echo -n "$(cat pi-private.key)" | agenix -e secrets/wireguard-private-key.age
+echo -n "your-wifi-password" | agenix -e secrets/wifi-password.age
+echo -n "nextcloud-admin-pass" | agenix -e secrets/nextcloud-admin-password.age
+echo -n "$(openssl rand -hex 32)" | agenix -e secrets/vaultwarden-admin-token.age
+```
+
+### 2. Update configurations with your values
+
+Edit the following files:
+- `networking.nix`: Add your WiFi SSID and WireGuard public keys
+- `configuration.nix`: Add your SSH public key
+- `desktop-config.nix`: Add Pi's SSH public key
+- `services.nix`: Update environment variables with secret paths
+
+### 3. Build the SD card image
+
+```bash
+# From your desktop/laptop
+nix build .#images.rpi4
+
+# Flash to SD card
+dd if=result/sd-image/homelab-rpi4.img of=/dev/sdX bs=4M status=progress
+sync
+```
+
+### 4. Prepare the SSD
+
+```bash
+# Partition the SSD (adjust /dev/sdX to your SSD)
+sudo parted /dev/sdX -- mklabel gpt
+sudo parted /dev/sdX -- mkpart primary 512MB 100%
+sudo mkfs.ext4 -L DATA /dev/sdX1
+
+# Optional: Create dedicated backup partition
+# sudo parted /dev/sdX -- mkpart primary 100GB 100%
+# sudo mkfs.ext4 -L BACKUP /dev/sdX2
+```
+
+### 5. Boot the Pi
+
+1. Insert SD card into Pi
+2. Connect SSD via USB 3.0
+3. Connect ethernet cable directly to desktop
+4. Power on Pi
+
+### 6. Initial configuration
+
+```bash
+# SSH into Pi (password: initial password or use your SSH key)
+ssh admin@10.0.0.1
+
+# Verify system
+sudo systemctl status
+
+# Check containers
+podman ps -a
+
+# Verify WireGuard
+sudo wg show
+```
+
+### 7. Setup desktop
+
+```bash
+# On desktop, apply the configuration
+sudo nixos-rebuild switch
+
+# Test connectivity
+ping 10.0.0.1
+
+# Mount NFS (optional, for testing)
+sudo mount -t nfs 10.0.0.2:/nfs/homelab-backup /mnt
+```
+
+### 8. Connect via WireGuard
+
+```bash
+# On desktop
+sudo systemctl start wg-quick-wg0
+
+# Test VPN connectivity
+ping 10.0.1.1
+
+# Access services
+curl -k https://home.homelab.local
+```
+
+### 9. Install Caddy CA certificate
+
+```bash
+# Download CA certificate
+curl http://10.0.1.1:8888/root.crt -o caddy-ca.crt
+
+# On NixOS (desktop):
+# Update desktop-config.nix with the correct SHA256 hash
+nix-hash --type sha256 caddy-ca.crt
+
+# On macOS (laptop):
+# Import to Keychain and trust for SSL
+open caddy-ca.crt
+# Or via command line:
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain caddy-ca.crt
+```
+
+## Remote Deployment
+
+### From Desktop
+
+```bash
+# Rebuild and deploy to Pi
+nixos-rebuild switch --flake .#homelab-pi --target-host admin@10.0.0.1 --use-remote-sudo
+
+# Or build locally and copy
+nix build .#nixosConfigurations.homelab-pi.config.system.build.toplevel
+nix copy --to ssh://admin@10.0.0.1 ./result
+ssh admin@10.0.0.1 "sudo nix-env -p /nix/var/nix/profiles/system --set ./result && sudo ./result/bin/switch-to-configuration switch"
+```
+
+### From Laptop
+
+```bash
+# Same as above, but connect via WireGuard first
+sudo wg-quick up wg0
+nixos-rebuild switch --flake .#homelab-pi --target-host admin@10.0.1.1 --use-remote-sudo
+```
+
+## Maintenance
+
+### Update system
+```bash
+# On Pi (uses desktop as builder)
+sudo nixos-rebuild switch --flake /etc/nixos#homelab-pi
+
+# Or remotely from desktop
+nixos-rebuild switch --flake .#homelab-pi --target-host admin@10.0.0.1 --use-remote-sudo
+```
+
+### Backup manually
+```bash
+sudo systemctl start backup-to-desktop
+```
+
+### Monitor containers
+```bash
+podman ps
+podman logs nextcloud
+podman stats
+```
+
+### Access services
+
+- Homepage Dashboard: https://home.homelab.local
+- Nextcloud: https://nextcloud.homelab.local
+- Vaultwarden: https://vault.homelab.local
+
+## Wake-on-LAN from Pi
+
+The Homepage dashboard includes a WOL button. You can also use:
+
+```bash
+wakeonlan <desktop-mac-address>
+```
+
+## Troubleshooting
+
+### WireGuard not connecting
+```bash
+sudo wg show
+sudo systemctl status wg-quick-wg0
+sudo journalctl -u wg-quick-wg0
+```
+
+### Containers not starting
+```bash
+podman ps -a
+podman logs <container-name>
+sudo systemctl status podman-<container-name>
+```
+
+### No remote build
+```bash
+# Test SSH to builder
+ssh builder@10.0.0.2
+
+# Check nix builder config
+nix show-config | grep builders
+```
+
+### NFS mount issues
+```bash
+# On desktop
+sudo systemctl status nfs-server
+sudo exportfs -v
+
+# On Pi
+showmount -e 10.0.0.2
+```
+
+## Security Notes
+
+1. Change default passwords in secrets
+2. Disable Vaultwarden signups after first user: Set `SIGNUPS_ALLOWED=false`
+3. Keep system updated: `sudo nixos-rebuild switch --upgrade`
+4. Regularly backup /data partition
+5. Monitor logs: `sudo journalctl -f`
+
+## Energy Optimization
+
+The configuration includes several power-saving features:
+- CPU governor set to "ondemand"
+- Aggressive filesystem noatime options
+- Automatic container pruning
+- Swap configured for 2GB (adjust if needed)
+- Low swappiness (10) to prefer RAM
+
+Expected power draw: 3-5W idle, 8-12W under load
+
+

@@ -1,0 +1,19 @@
+{
+  "control": [
+    {
+      "VTOY_DEFAULT_SEARCH_ROOT": "/ISO"
+    },
+    {
+      "VTOY_MENU_TIMEOUT": "5"
+    },
+    {
+      "VTOY_DEFAULT_IMAGE": "/ISO/nixos-custom-x86_64-linux.iso"
+    },
+    {
+      "VTOY_SECONDARY_BOOT_MENU": "1"
+    },
+    {
+      "VTOY_SECONDARY_TIMEOUT": "5"
+    }
+  ]
+}

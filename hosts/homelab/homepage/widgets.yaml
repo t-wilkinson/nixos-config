@@ -1,0 +1,13 @@
+# ============================================================================
+# homepage/widgets.yaml - Homepage widgets configuration
+# ============================================================================
+---
+- resources:
+    cpu: true
+    memory: true
+    disk: /
+    uptime: true
+
+- search:
+    provider: google
+    target: _blank

@@ -1,0 +1,16 @@
+# ============================================================================
+# homepage/settings.yaml - Homepage dashboard settings
+# ============================================================================
+title: Homelab Dashboard
+favicon: https://github.com/walkxcode.png
+
+theme: dark
+color: slate
+
+layout:
+  Services:
+    style: row
+    columns: 3
+  System:
+    style: row
+    columns: 2

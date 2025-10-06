@@ -1,0 +1,13 @@
+# ============================================================================
+# homepage/bookmarks.yaml - Homepage bookmarks
+# ============================================================================
+---
+- Homelab:
+    - Documentation:
+        - abbr: Docs
+          href: https://github.com/yourusername/homelab
+
+- Development:
+    - GitHub:
+        - abbr: GH
+          href: https://github.com

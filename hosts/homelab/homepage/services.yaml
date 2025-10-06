@@ -1,0 +1,39 @@
+# ============================================================================
+# homepage/services.yaml - Homepage services configuration
+# ============================================================================
+---
+- Services:
+    - Nextcloud:
+        icon: nextcloud.png
+        href: https://nextcloud.homelab.local
+        description: Personal cloud storage
+        widget:
+          type: nextcloud
+          url: https://nextcloud.homelab.local
+          key: { { HOMEPAGE_VAR_NEXTCLOUD_API_KEY } }
+
+    - Vaultwarden:
+        icon: vaultwarden.png
+        href: https://vault.homelab.local
+        description: Password manager
+
+    - Router:
+        icon: router.png
+        href: http://192.168.1.1
+        description: Network router
+
+- System:
+    - Desktop:
+        icon: mdi-desktop-tower
+        description: Main workstation
+        widget:
+          type: customapi
+          url: http://10.0.0.2:9090/metrics
+          method: GET
+
+    - Wake Desktop:
+        icon: mdi-power
+        widget:
+          type: customapi
+          url: http://localhost:3000/api/wol/desktop
+          method: POST

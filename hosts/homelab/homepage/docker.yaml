@@ -1,0 +1,7 @@
+# ============================================================================
+# homepage/docker.yaml - Container integration
+# ============================================================================
+---
+# This enables Homepage to monitor podman containers
+# Requires mounting the podman socket
+

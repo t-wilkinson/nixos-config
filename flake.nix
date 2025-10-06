@@ -211,68 +211,55 @@
         ]) linuxSystems
       );
 
-      rpi4 = nixpkgs-nixos.lib.nixosSystem {
-        system = "aarch64-linux";
-        specialArgs = { inherit agenix; };
-
-        modules = [
-          "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-          # "${nixpkgs-nixos}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-          # nix build .#nixosConfigurations.rpi4.config.system.build.isoImage
-          agenix.nixosModules.default
-          ./hosts/rpi4/test1.nix
-        ];
-      };
-      # let
+      # rpi4 = nixpkgs-nixos.lib.nixosSystem {
       #   system = "aarch64-linux";
-      # in
-      # nixpkgs-nixos.lib.nixosSystem {
-      #   inherit system;
+      #   specialArgs = { inherit agenix; };
+
       #   modules = [
+      #     "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+      #     # "${nixpkgs-nixos}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+      #     # nix build .#nixosConfigurations.rpi4.config.system.build.isoImage
       #     agenix.nixosModules.default
-      #     (
-      #       { pkgs, ... }:
-      #       {
-      #         imports = [
-      #           ./hosts/rpi4
-      #           (nixpkgs-nixos + "/nixos/modules/installer/cd-dvd/sd-image-aarch64.nix")
-      #         ];
-
-      #         # Build an sdImage with multiple partitions
-      #         boot.loader.grub.enable = false;
-      #         boot.loader.generic-extlinux-compatible.enable = true;
-
-      #         sdImage = {
-      #           compressImage = false;
-      #           populateFirmwareCommands = ''
-      #             mkdir -p ./files/boot
-      #           '';
-      #           populateRootCommands = ''
-      #             mkdir -p ./files/root
-      #           '';
-      #           # Define custom partitions
-      #           partitions = {
-      #             boot = {
-      #               size = "256M";
-      #               fsType = "vfat";
-      #               mountPoint = "/boot";
-      #             };
-      #             root = {
-      #               size = "20G";
-      #               fsType = "ext4";
-      #               mountPoint = "/";
-      #             };
-      #             data = {
-      #               size = "100%"; # take remaining space
-      #               fsType = "ext4";
-      #               mountPoint = "/data";
-      #             };
-      #           };
-      #         };
-      #       }
-      #     )
+      #     ./hosts/rpi4/test1.nix
       #   ];
       # };
+
+      homelab-pi = nixpkgs-nixos.lib.nixosSystem {
+        system = "aarch64-linux";
+        modules = [
+          agenix.nixosModules.default
+          ./hosts/homelab/configuration.nix
+        ];
+      };
+
+      images = {
+        # rpi4 = rpi4.config.system.build.sdImage;
+        # $ nix build .#nixosConfigurations.exampleIso.config.system.build.isoImage
+        exampleIso = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+
+            ({
+              users.users.nixos = {
+                openssh.authorizedKeys.keys = [
+                  "ssh-ed25519 <YOUR PUBLIC KEY HERE>"
+                ];
+              };
+            })
+          ];
+        };
+        homelab-pi =
+          (homelab-pi.extendModules {
+            modules = [
+              "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+              {
+                sdImage.compressImage = false;
+                sdImage.imageName = "homelab-rpi4.img";
+              }
+            ];
+          }).config.system.build.sdImage;
+      };
 
     in
     {
@@ -284,14 +271,12 @@
       darwinConfigurations = allDarwinConfigurations;
 
       nixosConfigurations = allNixosConfigurations // {
-        rpi4 = rpi4;
+        homelab-pi = homelab-pi;
       };
 
-      image.rpi4 = rpi4.config.system.build.sdImage;
+      images = images;
 
-      packages = {
-        rpi4 = rpi4.config.system.build.isoImage;
-      };
+      packages = images;
 
     };
 
