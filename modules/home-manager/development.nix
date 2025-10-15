@@ -32,7 +32,7 @@ with pkgs;
   unstable.nodePackages.live-server
   unstable.nodePackages.nodemon
   unstable.nodePackages.prettier
-  unstable.nodePackages.npm
+  # unstable.nodePackages.npm # nodejs already includes this?
   unstable.nodePackages.neovim
   # unstable.vimPlugins.nvim-treesitter.withPlugins
   # unstable.neovimUtils.makeNeovim

@@ -153,8 +153,7 @@
               };
             }
             ./hosts/macos
-          ]
-          ++ extraModules;
+          ] ++ extraModules;
         };
 
       allDarwinConfigurations = builtins.listToAttrs (
@@ -194,8 +193,7 @@
               impurity.configRoot = self;
             }
             ./hosts/nixos
-          ]
-          ++ extraModules;
+          ] ++ extraModules;
         };
 
       allNixosConfigurations = builtins.listToAttrs (
@@ -235,30 +233,30 @@
       images = {
         # rpi4 = rpi4.config.system.build.sdImage;
         # $ nix build .#nixosConfigurations.exampleIso.config.system.build.isoImage
-        exampleIso = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
+        # exampleIso = nixpkgs.lib.nixosSystem {
+        #   system = "x86_64-linux";
+        #   modules = [
+        #     "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
 
-            ({
-              users.users.nixos = {
-                openssh.authorizedKeys.keys = [
-                  "ssh-ed25519 <YOUR PUBLIC KEY HERE>"
-                ];
-              };
-            })
-          ];
-        };
-        homelab-pi =
-          (homelab-pi.extendModules {
-            modules = [
-              "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-              {
-                sdImage.compressImage = false;
-                sdImage.imageName = "homelab-rpi4.img";
-              }
-            ];
-          }).config.system.build.sdImage;
+        #     ({
+        #       users.users.nixos = {
+        #         openssh.authorizedKeys.keys = [
+        #           "ssh-ed25519 <YOUR PUBLIC KEY HERE>"
+        #         ];
+        #       };
+        #     })
+        #   ];
+        # };
+        # homelab-pi =
+        #   (homelab-pi.extendModules {
+        #     modules = [
+        #       "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+        #       {
+        #         sdImage.compressImage = false;
+        #         sdImage.imageName = "homelab-rpi4.img";
+        #       }
+        #     ];
+        #   }).config.system.build.sdImage;
       };
 
     in

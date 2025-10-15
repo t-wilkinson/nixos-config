@@ -19,12 +19,12 @@
       incus
 
       # GUI
-      okular # pdf viewer
+      kdePackages.okular # pdf viewer
       # zathura # pdf viewer
       blueberry
       (mpv.override { scripts = [ mpvScripts.mpris ]; })
       d-spy
-      dolphin
+      kdePackages.dolphin
       nautilus # gnome
       icon-library
       dconf-editor # gnome

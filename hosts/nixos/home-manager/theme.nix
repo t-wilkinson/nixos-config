@@ -11,20 +11,17 @@ let
     '';
   };
 
-  nerdfonts = (
-    pkgs.nerdfonts.override {
-      fonts = [
-        "Ubuntu"
-        "UbuntuMono"
-        "CascadiaCode"
-        "FantasqueSansMono"
-        "JetBrainsMono"
-        "FiraCode"
-        "Mononoki"
-        "SpaceMono"
-      ];
-    }
-  );
+  nerdfonts = with pkgs.nerd-fonts; [
+    ubuntu
+    ubuntu-mono
+    caskaydia-cove
+    fantasque-sans-mono
+    jetbrains-mono
+    fira-code
+    mononoki
+    space-mono
+  ];
+
   google-fonts = (
     pkgs.google-fonts.override {
       fonts = [
@@ -42,28 +39,31 @@ let
   cursor-package = pkgs.bibata-cursors;
 in
 {
+  fonts.fontconfig.enable = true;
   home = {
-    packages = with pkgs; [
-      # themes
-      adwaita-qt6
-      adw-gtk3
-      material-symbols
-      nerdfonts
-      noto-fonts
-      noto-fonts-cjk-sans
-      google-fonts
-      moreWaita
-      bibata-cursors
-      # morewaita-icon-theme
-      # papirus-icon-theme
-      # qogir-icon-theme
-      # whitesur-icon-theme
-      # colloid-icon-theme
-      # qogir-theme
-      # yaru-theme
-      # whitesur-gtk-theme
-      # orchis-theme
-    ];
+    packages =
+      with pkgs;
+      [
+        # themes
+        adwaita-qt6
+        adw-gtk3
+        material-symbols
+        noto-fonts
+        noto-fonts-cjk-sans
+        google-fonts
+        moreWaita
+        bibata-cursors
+        # morewaita-icon-theme
+        # papirus-icon-theme
+        # qogir-icon-theme
+        # whitesur-icon-theme
+        # colloid-icon-theme
+        # qogir-theme
+        # yaru-theme
+        # whitesur-gtk-theme
+        # orchis-theme
+      ]
+      ++ nerdfonts;
     sessionVariables = {
       XCURSOR_THEME = cursor-theme;
       XCURSOR_SIZE = "24";
@@ -75,14 +75,14 @@ in
       gtk.enable = true;
     };
     file = {
-      ".local/share/fonts" = {
-        recursive = true;
-        source = "${nerdfonts}/share/fonts/truetype/NerdFonts";
-      };
-      ".fonts" = {
-        recursive = true;
-        source = "${nerdfonts}/share/fonts/truetype/NerdFonts";
-      };
+      # ".local/share/fonts" = {
+      #   recursive = true;
+      #   source = "${nerdfonts}/share/fonts/truetype/NerdFonts";
+      # };
+      # ".fonts" = {
+      #   recursive = true;
+      #   source = "${nerdfonts}/share/fonts/truetype/NerdFonts";
+      # };
       # ".config/gtk-4.0/gtk.css" = {
       #   text = ''
       #     window.messagedialog .response-area > button,

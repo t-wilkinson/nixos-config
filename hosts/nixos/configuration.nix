@@ -112,7 +112,7 @@
     # Run dynamically linked stuff
     firefox = {
       enable = true;
-      nativeMessagingHosts.packages = [ pkgs.plasma5Packages.plasma-browser-integration ];
+      nativeMessagingHosts.packages = [ pkgs.libsForQt5.plasma-browser-integration ];
     };
     nix-ld = {
       enable = true;

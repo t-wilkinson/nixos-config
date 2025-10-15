@@ -1,4 +1,5 @@
-{ inputs, pkgs, ... }: {
+{ inputs, pkgs, ... }:
+{
   home = {
     sessionVariables = {
       BROWSER = "firefox";
@@ -39,7 +40,7 @@
       '';
     };
     nativeMessagingHosts = [
-      pkgs.plasma-browser-integration
+      pkgs.libsForQt5.plasma-browser-integration
       pkgs.browserpass
     ];
   };

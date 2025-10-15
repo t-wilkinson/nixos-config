@@ -4,6 +4,7 @@
   pkgs,
   myLib,
   impurity,
+  homedir,
   username,
   unstable,
   ...
@@ -72,12 +73,19 @@ in
           ]
           // {
             # TODO: add linux-specific gpg-agent later
-            # ".gnupg/gpg-agent.conf".source = "${self}${homeDirectory}/.gnupg/gpg-agent.conf.linux";
+            # ".gnupg/gpg-agent.conf".source = "${homedir}/.gnupg/gpg-agent.conf.linux";
           };
       };
 
       programs = {
         home-manager.enable = true;
+        gpg = {
+          enable = true;
+          # extraConfig = ''
+          #   default-cache-ttl 34560000
+          #   max-cache-ttl 34560000
+          # '';
+        };
         git = {
           enable = true;
           userName = "t-wilkinson";
