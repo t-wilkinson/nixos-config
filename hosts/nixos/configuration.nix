@@ -138,7 +138,7 @@
       # enableExtraSocket = true;
       pinentryPackage = pkgs.pinentry-gnome3;
       settings = {
-        allow-preset-passphrase = true;
+        # allow-preset-passphrase = true;
         # enable-ssh-support
         default-cache-ttl = 34560000;
         default-cache-ttl-ssh = 34560000;
