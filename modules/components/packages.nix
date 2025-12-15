@@ -6,6 +6,7 @@
       # TERMINAL TOOLS
       zellij
       unstable.neovim
+      bc
 
       # SHELLS
       fish

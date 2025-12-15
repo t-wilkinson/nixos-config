@@ -67,7 +67,7 @@
   networking = {
     hostName = "nixos";
     networkmanager.enable = true;
-    defaultGateway = "192.168.1.1";
+    # defaultGateway = "192.168.1.1";
     # interfaces.enp3s0 = {
     #   wakeOnLan.enable = true;
     # };
