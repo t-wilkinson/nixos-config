@@ -25,7 +25,7 @@ return {
         },
 
         server = {
-          enabled = true,
+          enabled = false,
           api_endpoint = "http://127.0.0.1:5000",
           user_id = "default",
           -- api_key = "your-secure-api-key-here", -- Same as in Docker .env
