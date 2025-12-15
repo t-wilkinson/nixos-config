@@ -76,6 +76,7 @@ with pkgs;
   # vault # HashiCorp Vault
   # vsh # HashiCorp Vault Shell
   # asio # c++
+  tree-sitter
 
   # CLOUD/DEVOPS
   awscli2 # marked broken Mar 22
