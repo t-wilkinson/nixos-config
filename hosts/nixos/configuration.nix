@@ -243,7 +243,7 @@
       intel-media-driver
       intel-vaapi-driver
       libvdpau-va-gl
-      mesa.drivers
+      mesa
       libdrm
     ];
   };

@@ -29,7 +29,7 @@ with pkgs;
   unstable.nodejs
   unstable.typescript
   unstable.eslint
-  unstable.nodePackages.live-server
+  # unstable.nodePackages.live-server # removed because it was unmaintained
   unstable.nodePackages.nodemon
   unstable.nodePackages.prettier
   # unstable.nodePackages.npm # nodejs already includes this?

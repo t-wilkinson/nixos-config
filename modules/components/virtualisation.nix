@@ -34,8 +34,8 @@
   ];
 
   environment.systemPackages = with pkgs; [
-    colima # lima with contains (docker, containerd, kubernetes, incus)
-    lima # linux (virtual)machines
+    # colima # lima with contains (docker, containerd, kubernetes, incus)
+    # lima # linux (virtual)machines
     kubernetes
     minikube
     docker

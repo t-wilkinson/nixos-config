@@ -15,7 +15,8 @@
     LC_TIME = "en_US.UTF-8";
   };
   i18n.inputMethod = {
-    enabled = "fcitx5";
+    type = "fcitx5";
+    enable = true;
     fcitx5.addons = with pkgs; [
       fcitx5-unikey
       fcitx5-with-addons
