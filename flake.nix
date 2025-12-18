@@ -9,6 +9,7 @@
       ags,
       anyrun,
       darwin-docker,
+      deploy-rs,
       disko,
       firefox-gnome-theme,
       flake-parts,
@@ -28,6 +29,7 @@
       nixpkgs-nixos,
       nixpkgs-darwin,
       nixpkgs-unstable,
+      sops-nix,
       thorium,
     }@inputs:
     let
@@ -153,7 +155,8 @@
               };
             }
             ./hosts/macos
-          ] ++ extraModules;
+          ]
+          ++ extraModules;
         };
 
       allDarwinConfigurations = builtins.listToAttrs (
@@ -193,7 +196,8 @@
               impurity.configRoot = self;
             }
             ./hosts/nixos
-          ] ++ extraModules;
+          ]
+          ++ extraModules;
         };
 
       allNixosConfigurations = builtins.listToAttrs (
@@ -222,11 +226,12 @@
       #   ];
       # };
 
-      homelab-pi = nixpkgs-nixos.lib.nixosSystem {
+      homelab = nixpkgs-nixos.lib.nixosSystem {
         system = "aarch64-linux";
         modules = [
-          agenix.nixosModules.default
-          ./hosts/homelab/configuration.nix
+          # agenix.nixosModules.default
+          ./hosts/homelab
+          sops-nix.nixosModules.sops
         ];
       };
 
@@ -272,9 +277,20 @@
         homelab-pi = homelab-pi;
       };
 
-      images = images;
+      deploy.nodes.homelab = {
+        hostname = "homelab.lan";
+        sshUser = "root";
+        profiles.system = {
+          user = "root";
+          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.homelab;
+        };
+      };
 
-      packages = images;
+      checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
+
+      # images = images;
+
+      # packages = images;
 
     };
 
@@ -365,6 +381,13 @@
       url = "github:anyrun-org/anyrun";
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
+
+    # homelab
+    deploy-rs = {
+      url = "github:serokell/deploy-rs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    sops-nix.url = "github:Mic92/sops-nix";
 
     # NixVirt = {
     #   url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";

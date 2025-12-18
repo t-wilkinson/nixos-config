@@ -202,12 +202,15 @@
             main = {
               # control = "oneshot(control)";
               capslock = "overload(control, esc)";
-              esc = "`";
+              # esc = "`";
             };
             # Make esc work on my small 60% fn keyboard
-            "esc:S" = {
-              esc = "~";
-            };
+            # "esc:S" = {
+            #   esc = "~";
+            # };
+            # fn = {
+            #   esc = "esc";
+            # };
           };
         };
       };
