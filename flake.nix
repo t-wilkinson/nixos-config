@@ -274,17 +274,17 @@
       darwinConfigurations = allDarwinConfigurations;
 
       nixosConfigurations = allNixosConfigurations // {
-        homelab-pi = homelab-pi;
+        # homelab = homelab;
       };
 
-      deploy.nodes.homelab = {
-        hostname = "homelab.lan";
-        sshUser = "root";
-        profiles.system = {
-          user = "root";
-          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.homelab;
-        };
-      };
+      # deploy.nodes.homelab = {
+      #   hostname = "homelab.lan";
+      #   sshUser = "root";
+      #   profiles.system = {
+      #     user = "root";
+      #     path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.homelab;
+      #   };
+      # };
 
       checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
 
@@ -385,7 +385,7 @@
     # homelab
     deploy-rs = {
       url = "github:serokell/deploy-rs";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
     sops-nix.url = "github:Mic92/sops-nix";
 
