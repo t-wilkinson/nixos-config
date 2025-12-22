@@ -29,7 +29,7 @@ _: [
   # "syncthing"
 
   # Entertainment Tools
-  # "steam"
+  "steam"
   "vlc"
 
   # Productivity Tools
