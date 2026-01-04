@@ -80,11 +80,20 @@
     #     }
     #   ];
     # };
-    firewall.allowedTCPPorts = [
-      22
-      6229 # ssh
-      5900 # vnc
-    ];
+    firewall = rec {
+      allowedTCPPortRanges = [
+        {
+          from = 1714;
+          to = 1764;
+        }
+      ];
+      allowedUDPPortRanges = allowedTCPPortRanges;
+      allowedTCPPorts = [
+        22
+        6229 # ssh
+        5900 # vnc
+      ];
+    };
     # networkmanager.connectionConfig."static-wifi" = {
     #   type = "wifi";
     #   interfaceName = "wlo1";
@@ -105,15 +114,40 @@
     # };
   };
 
+  qt = {
+    enable = true;
+    platformTheme = "gnome";
+    style = "kvantum";
+  };
+
+  environment.systemPackages = with pkgs; [
+    adwaita-qt
+    qt6.qtwayland
+    qt5.qtwayland
+    kdePackages.kdeconnect-kde
+    libsForQt5.qtstyleplugin-kvantum # The engine
+    kdePackages.qtstyleplugin-kvantum # For Qt6 apps
+  ];
+  environment.variables = {
+    QT_QPA_PLATFORM = "wayland";
+  };
+
   programs = {
-    fish.enable = true;
-    zsh.enable = true;
-    dconf.enable = true;
+    kdeconnect = {
+      enable = true;
+      package = pkgs.gnomeExtensions.gsconnect;
+    };
     # Run dynamically linked stuff
     firefox = {
       enable = true;
-      nativeMessagingHosts.packages = [ pkgs.libsForQt5.plasma-browser-integration ];
+      nativeMessagingHosts.packages = [
+        pkgs.libsForQt5.plasma-browser-integration
+        pkgs.gnomeExtensions.gsconnect
+      ];
     };
+    fish.enable = true;
+    zsh.enable = true;
+    dconf.enable = true;
     nix-ld = {
       enable = true;
       libraries = with pkgs; [
@@ -218,6 +252,22 @@
   };
 
   systemd = {
+    user.services.disable-xhci-wakeup = {
+      description = "Disable XHCI ACPI wakeup";
+      wantedBy = [ "multi-user.target" ];
+      after = [ "sysinit.target" ];
+
+      serviceConfig = {
+        Type = "oneshot";
+        ExecStart = ''
+          ${pkgs.coreutils}/bin/sh -euc '
+            if ${pkgs.gnugrep}/bin/grep -q "^XHCI.*enabled" /proc/acpi/wakeup; then
+              echo XHCI > /proc/acpi/wakeup
+            fi
+          '
+        '';
+      };
+    };
     user.services.polkit-gnome-authentication-agent-1 = {
       description = "polkit-gnome-authentication-agent-1";
       wantedBy = [ "graphical-session.target" ];

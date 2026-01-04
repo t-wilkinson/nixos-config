@@ -26,6 +26,7 @@
       more-waita,
       nix-darwin,
       nix-homebrew,
+      nixos-hardware,
       nixpkgs-nixos,
       nixpkgs-darwin,
       nixpkgs-unstable,
@@ -230,12 +231,14 @@
         system = "aarch64-linux";
         modules = [
           # agenix.nixosModules.default
-          ./hosts/homelab
           sops-nix.nixosModules.sops
+          nixos-hardware.nixosModules.raspberry-pi-4
+          ./hosts/homelab
         ];
       };
 
       images = {
+        homelab = homelab.config.system.build.sdImage;
         # rpi4 = rpi4.config.system.build.sdImage;
         # $ nix build .#nixosConfigurations.exampleIso.config.system.build.isoImage
         # exampleIso = nixpkgs.lib.nixosSystem {
@@ -288,7 +291,7 @@
 
       checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
 
-      # images = images;
+      images = images;
 
       # packages = images;
 
@@ -388,6 +391,7 @@
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
     sops-nix.url = "github:Mic92/sops-nix";
+    nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     # NixVirt = {
     #   url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";

@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ lib, pkgs, ... }:
 with lib.hm.gvariant;
 {
   dconf.settings = {
@@ -111,6 +111,9 @@ with lib.hm.gvariant;
     };
 
     "org/gnome/shell" = {
+      enabled-extensions = [
+        pkgs.gnomeExtensions.gsconnect.extensionUuid
+      ];
       favorite-apps = [
         "firefox.desktop"
         "org.gnome.Nautilus.desktop"
