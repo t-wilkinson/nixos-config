@@ -1,0 +1,10 @@
+keys:
+  - &pi_host_key age12knqachghuzjs6mhlm0pk6va3mtxwa4e2efsmcmvn7h660jnsakq20kjft
+  - &user_age_key age1hvr3azukesav7v04gg85fw8t3drc0r6sevl8l70rryq42ckq0p5qvkmgz7
+
+creation_rules:
+  - path_regex: hosts/homelab/secrets.yaml$
+    key_groups:
+      - age:
+          - *user_age_key
+          - *pi_host_key

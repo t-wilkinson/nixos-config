@@ -67,6 +67,16 @@
   networking = {
     hostName = "nixos";
     networkmanager.enable = true;
+
+    interfaces.enp3s0 = {
+      ipv4.addresses = [
+        {
+          address = "10.1.0.1"; # for direct communication to raspberry pi
+          prefixLength = 30;
+        }
+      ];
+    };
+
     # defaultGateway = "192.168.1.1";
     # interfaces.enp3s0 = {
     #   wakeOnLan.enable = true;
@@ -117,7 +127,7 @@
   qt = {
     enable = true;
     platformTheme = "gnome";
-    style = "kvantum";
+    style = "adwaita";
   };
 
   environment.systemPackages = with pkgs; [
@@ -324,6 +334,8 @@
   };
 
   boot = {
+    binfmt.emulatedSystems = [ "aarch64-linux" ];
+
     # Use the systemd-boot EFI boot loader.
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;

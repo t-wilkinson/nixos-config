@@ -33,6 +33,7 @@ with pkgs;
   # TOOLS
   # pandoc
   # acpi
+  age
   aspell
   aspellDicts.en
   bat
@@ -54,6 +55,7 @@ with pkgs;
   lf # terminal file browser
   xdragon # for lf
   file # for lf
+  sops
   starship
   # transmission_4 # bittorrent
   tree-sitter
