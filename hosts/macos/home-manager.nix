@@ -76,6 +76,7 @@
         ...
       }:
       {
+        services.kdeconnect.enable = true;
         # programs.fish.enable = true;
         home = {
           enableNixpkgsReleaseCheck = false;
@@ -83,6 +84,7 @@
           packages = with pkgs; [
             fswatch
             dockutil
+            prismlauncher
           ];
           file = {
             ".gnupg/gpg-agent.conf".source = "${homedir}/.gnupg/gpg-agent.conf.mac";
