@@ -76,7 +76,7 @@
         ...
       }:
       {
-        services.kdeconnect.enable = true;
+        # services.kdeconnect.enable = true;
         # programs.fish.enable = true;
         home = {
           enableNixpkgsReleaseCheck = false;
