@@ -8,6 +8,7 @@ let
   # The static IP for the direct Ethernet link to your PC
   directIp = "10.1.0.2";
   gatewayIp = "10.0.0.1"; # Replace with your actual home Router IP
+  username = "trey";
 in
 {
   imports = [
@@ -29,6 +30,8 @@ in
     fsType = "ext4";
     options = [ "noatime" ];
   };
+
+  users.${username} = 
 
   # ==========================================
   # 2. NETWORKING

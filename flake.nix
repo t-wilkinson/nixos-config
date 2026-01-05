@@ -236,6 +236,22 @@
           sops-nix.nixosModules.sops
           nixos-hardware.nixosModules.raspberry-pi-4
           ./hosts/homelab
+
+          (
+            { pkgs, lib, ... }:
+            {
+              # The generic image asks for 'sun4i-drm', but the RPi4 kernel doesn't have it.
+              # This overlay tells the build to skip missing modules instead of failing.
+              nixpkgs.overlays = [
+                (final: prev: {
+                  makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
+                })
+              ];
+
+              # Or run `zstdcat result/sd-image/nixos-image-*.img.zst | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync`
+              # sdImage.compressImage = false;
+            }
+          )
         ];
       };
 
