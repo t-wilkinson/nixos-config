@@ -31,7 +31,24 @@ in
     options = [ "noatime" ];
   };
 
-  users.${username} = 
+  programs.fish.enable = true;
+  users.mutableUsers = false;
+  users.users.${username} = {
+    isNormalUser = true;
+    shell = pkgs.fish;
+    hashedPassword = "$6$s0hOYqgJDqS8QCfJ$mv6k9qMFLah6uwV35wmSnH8ADB1i8vtaCe4II0bdjv8iB2IZiYTlI3K6IxMfYw0GqD8fdmyOBC9XxACJOzbGI0";
+    extraGroups = [
+      "wheel"
+      "video"
+      "docker"
+      "input"
+      "uinput"
+      "libvirtd"
+    ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
+    ];
+  };
 
   # ==========================================
   # 2. NETWORKING
@@ -43,7 +60,7 @@ in
     # WI-FI (Internet Access)
     wireless = {
       enable = true;
-      networks."YourSSID" = {
+      networks."KOI_POND_2.4G" = {
         pskRaw = "ext:wifi_psk"; # Read from sops secret
       };
       # We read the secret into an environment file for wpa_supplicant
@@ -115,6 +132,11 @@ in
   # ==========================================
   # 4. SERVICES
   # ==========================================
+
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = true; # Explicitly allow password auth for setup
+  };
 
   # Caddy Reverse Proxy (HTTPS / Dashboard)
   services.caddy = {

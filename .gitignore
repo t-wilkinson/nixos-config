@@ -4,4 +4,5 @@ result
 .DS_Store
 result
 nixos.qcow2
+ssh_host_ed25519_key
 .sass-cache

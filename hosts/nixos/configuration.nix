@@ -178,7 +178,7 @@
     # };
     gnupg.agent = {
       enable = true;
-      enableSSHSupport = true;
+      enableSSHSupport = false;
       # enableExtraSocket = true;
       pinentryPackage = pkgs.pinentry-gnome3;
       settings = {

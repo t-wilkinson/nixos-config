@@ -1,5 +1,18 @@
 { pkgs, ... }:
 {
+  networking.networkmanager.ensureProfiles.profiles = {
+    "Wired Homelab" = {
+      connection.type = "ethernet";
+      connection.id = "Wired Homelab";
+      connection.interface-name = "enp3s0";
+      connection.autoconnect = true;
+
+      ipv4.method = "manual";
+      ipv4.addresses = "10.1.0.1/30";
+      ipv4.gateway = "10.0.0.1";
+      ipv4.dns = "10.0.0.1";
+    };
+  };
   # networking.wireguard.enable = true;
   # networking.wireguard.interfaces = {
   #   # "wg0" is the network interface name. You can name the interface arbitrarily.
