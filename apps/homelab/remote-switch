@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+export NIX_SSHOPTS="-t"
+
+nixos-rebuild switch \
+  --flake .#homelab \
+  --target-host homelab \
+  --use-remote-sudo

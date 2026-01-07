@@ -68,15 +68,6 @@
     hostName = "nixos";
     networkmanager.enable = true;
 
-    interfaces.enp3s0 = {
-      ipv4.addresses = [
-        {
-          address = "10.1.0.1"; # for direct communication to raspberry pi
-          prefixLength = 30;
-        }
-      ];
-    };
-
     # defaultGateway = "192.168.1.1";
     # interfaces.enp3s0 = {
     #   wakeOnLan.enable = true;
@@ -104,24 +95,6 @@
         5900 # vnc
       ];
     };
-    # networkmanager.connectionConfig."static-wifi" = {
-    #   type = "wifi";
-    #   interfaceName = "wlo1";
-    #   ipv4 = {
-    #     method = "manual";
-    #     addresses = [
-    #       {
-    #         address = "192.168.1.181";
-    #         prefix = 24;
-    #       }
-    #     ];
-    #     gateway = "192.168.1.1";
-    #     dns = [
-    #       "1.1.1.1"
-    #       "8.8.8.8"
-    #     ];
-    #   };
-    # };
   };
 
   qt = {
@@ -143,6 +116,7 @@
   };
 
   programs = {
+    ssh.startAgent = true;
     kdeconnect = {
       enable = true;
       package = pkgs.gnomeExtensions.gsconnect;

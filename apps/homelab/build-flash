@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+
+echo "Building homelab"
+bash ./apps/homelab/build-image.sh
+
+echo "Flashing image"
+bash ./apps/homelab/flash-image.sh "$1"

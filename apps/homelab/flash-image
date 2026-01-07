@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -e
+
+lsblk -o NAME,SIZE,MODEL,TYPE
+
+if [[ -z $1 ]]; then
+  echo "Please pass the drive name (ex: sda)"
+  exit 1
+fi
+
+read -p "About to overwrite /dev/$1 – are you sure? (yes/no) " ANSWER
+
+if [[ $ANSWER != "yes" ]]; then
+  echo "Aborted – nothing was written."
+  exit 1
+fi
+
+echo "Flashing drive"
+zstdcat result/sd-image/nixos-image-sd-card-25.05.20251229.40ee5e1-aarch64-linux.img.zst | sudo dd of=/dev/$1 bs=4M status=progress conv=fsync
+# sudo dd if=result/sd-image/homelab-rpi4.img of=/dev/$1 bs=4M status=progress conv=fsync

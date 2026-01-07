@@ -5,15 +5,28 @@
   ...
 }:
 let
-  # The static IP for the direct Ethernet link to your PC
-  directIp = "10.1.0.2";
+  directIp = "10.1.0.2"; # The static IP for the direct Ethernet link to your PC
   gatewayIp = "10.0.0.1"; # Replace with your actual home Router IP
+  vpnIP = "10.100.0.1";
   username = "trey";
+  domain = "homelab.lan";
+  # domains = {
+  #   nextcloud = "nextcloud.${domain}";
+  # };
 in
 {
   imports = [
     # Standard hardware config is handled by nixos-hardware module in flake.nix
   ];
+  nix.settings = {
+    trusted-users = [
+      "root"
+      "@wheel"
+    ];
+  };
+
+  documentation.man.generateCaches = false; # Fish enables this by default but it takes a lot of time.
+  security.sudo.wheelNeedsPassword = false; # So remote building doesn't keep asking for passwords
 
   # ==========================================
   # 1. BOOT & HARDWARE
@@ -36,7 +49,9 @@ in
   users.users.${username} = {
     isNormalUser = true;
     shell = pkgs.fish;
-    hashedPassword = "$6$s0hOYqgJDqS8QCfJ$mv6k9qMFLah6uwV35wmSnH8ADB1i8vtaCe4II0bdjv8iB2IZiYTlI3K6IxMfYw0GqD8fdmyOBC9XxACJOzbGI0";
+    # hashedPassword = "$6$s0hOYqgJDqS8QCfJ$mv6k9qMFLah6uwV35wmSnH8ADB1i8vtaCe4II0bdjv8iB2IZiYTlI3K6IxMfYw0GqD8fdmyOBC9XxACJOzbGI0";
+    # initialHashedPassword = "$6$s0hOYqgJDqS8QCfJ$mv6k9qMFLah6uwV35wmSnH8ADB1i8vtaCe4II0bdjv8iB2IZiYTlI3K6IxMfYw0GqD8fdmyOBC9XxACJOzbGI0";
+    initialPassword = "password";
     extraGroups = [
       "wheel"
       "video"
@@ -50,54 +65,108 @@ in
     ];
   };
 
+  # hardware.enableRedistributableFirmware = true;
+  # hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
+
   # ==========================================
   # 2. NETWORKING
   # ==========================================
   networking = {
     hostName = "homelab";
-    useDHCP = false;
-
-    # WI-FI (Internet Access)
-    wireless = {
+    networkmanager = {
       enable = true;
-      networks."KOI_POND_2.4G" = {
-        pskRaw = "ext:wifi_psk"; # Read from sops secret
+      # Declaratively configure connections so they persist on reboot/rebuild
+      ensureProfiles.profiles = {
+        # 1. WI-FI PROFILE (Internet Access)
+        "wifi-connection" = {
+          connection = {
+            id = "KOI_POND_5G";
+            type = "wifi";
+            interface-name = "wlan0";
+            autoconnect = "true";
+          };
+          wifi = {
+            ssid = "KOI_POND_5G";
+            mode = "infrastructure";
+          };
+          wifi-security = {
+            key-mgmt = "wpa-psk";
+            psk = "November13th"; # Note: This exposes the password in the Nix store
+          };
+          ipv4 = {
+            method = "auto";
+          };
+        };
+
+        # 2. ETHERNET PROFILE (Direct Link to PC)
+        "direct-ethernet" = {
+          connection = {
+            id = "direct-ethernet";
+            type = "ethernet";
+            interface-name = "end0";
+          };
+          ipv4 = {
+            method = "manual";
+            address1 = "10.1.0.2/30"; # The Static IP
+
+            # CRITICAL: Prevents the Pi from trying to use this link for Internet
+            never-default = "true";
+          };
+        };
       };
-      # We read the secret into an environment file for wpa_supplicant
-      secretsFile = config.sops.secrets.wifi_psk.path;
     };
 
-    # INTERFACES
-    interfaces = {
-      # Wi-Fi Interface (Gateway to Internet)
-      "wlan0" = {
-        useDHCP = true;
-      };
-
-      # Ethernet (Direct link to PC)
-      "end0" = {
-        ipv4.addresses = [
-          {
-            address = directIp;
-            prefixLength = 30; # Limits subnet to 2 IPs (10.0.0.1 and .2)
-          }
-        ];
-      };
-    };
+    # Disable wpa_supplicant to avoid conflicts with NetworkManager
+    wireless.enable = false;
 
     # Firewall rules
     firewall = {
       enable = true;
       allowedTCPPorts = [
+        53
         80
         443
-        22 # SSH
+        22
+        19999
       ];
       allowedUDPPorts = [
-        51820 # WireGuard
-        9 # WoL
+        51820
+        9
+        53
       ];
-      trustedInterfaces = [ "end0" ]; # Trust the direct link to PC
+      trustedInterfaces = [ "end0" ];
+    };
+  };
+
+  services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
+
+  services.blocky = {
+    enable = true;
+    settings = {
+      ports.dns = 53;
+      upstreams.groups.default = [
+        "https://one.one.one.one/dns-query" # Cloudflare
+        "https://8.8.8.8/dns-query" # Google
+      ];
+
+      # Access your services via these domains
+      customDNS = {
+        customTTL = "1h";
+        mapping = {
+          # Map main domain and all subdomains to the Pi's Direct IP
+          "homelab.lan" = directIp;
+          "*.homelab.lan" = directIp;
+        };
+      };
+
+      # Ad Blocking
+      blocking = {
+        enable = true;
+        blackLists = {
+          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
+        };
+        clientGroupsBlock.default = [ "ads" ];
+      };
     };
   };
 
@@ -142,22 +211,29 @@ in
   services.caddy = {
     enable = true;
     virtualHosts = {
-      # Access via http://homelab.local or http://10.0.0.2
-      ":80" = {
-        extraConfig = ''
-          respond / "Go to /dashboard" 302
-        '';
-      };
-      ":80/dashboard/*" = {
-        extraConfig = "reverse_proxy localhost:8082";
-      };
-      ":80/vault/*" = {
-        extraConfig = "reverse_proxy localhost:8000";
-      };
-      ":80/ntfy/*" = {
-        extraConfig = "reverse_proxy localhost:8080";
-      };
+      "ntfy.${domain}".extraConfig = "reverse_proxy localhost:8083\ntls internal";
+      "dashboard.${domain}".extraConfig = "reverse_proxy localhost:8082\ntls internal";
+      "vault.${domain}".extraConfig = "reverse_proxy localhost:8000\ntls internal";
+      "monitor.${domain}".extraConfig = "reverse_proxy localhost:19999\ntls internal";
+      "nextcloud.${domain}".extraConfig = "reverse_proxy localhost:8081\ntls internal";
     };
+    # virtualHosts = {
+    #   # Access via http://homelab.local or http://10.0.0.2
+    #   ":80" = {
+    #     extraConfig = ''
+    #       respond / "Go to /dashboard" 302
+    #     '';
+    #   };
+    #   ":80/dashboard/*" = {
+    #     extraConfig = "reverse_proxy localhost:8082";
+    #   };
+    #   ":80/vault/*" = {
+    #     extraConfig = "reverse_proxy localhost:8000";
+    #   };
+    #   ":80/ntfy/*" = {
+    #     extraConfig = "reverse_proxy localhost:8080";
+    #   };
+    # };
   };
 
   # Homepage Dashboard
@@ -169,13 +245,13 @@ in
         "My Services" = [
           {
             "Vaultwarden" = {
-              href = "/vault/";
+              href = "https://vault.${domain}";
               description = "Password Manager";
             };
           }
           {
             "Nextcloud" = {
-              href = "http://${directIp}:8081"; # Nextcloud is complex to proxy on subpath without config
+              href = "https://nextcloud.${domain}";
               description = "Files";
             };
           }
@@ -190,16 +266,15 @@ in
     config = {
       ROCKET_PORT = 8000;
       SIGNUPS_ALLOWED = false;
+      DOMAIN = "https://vault.${domain}";
     };
   };
 
-  # Ntfy
-  services.ntfy-sh = {
+  # Netdata (Lightweight real-time monitoring)
+  services.netdata = {
     enable = true;
-    settings = {
-      base-url = "http://${directIp}/ntfy";
-      listen-http = ":8080";
-      auth-default-access = "deny-all";
+    config.global = {
+      "history" = 3600; # 1 hour of history
     };
   };
 
@@ -207,34 +282,90 @@ in
   services.nextcloud = {
     enable = true;
     package = pkgs.nextcloud32;
-    hostName = "homelab.local";
+    hostName = "nextcloud.${domain}";
+    https = true;
+
+    # Tell Nextcloud it's running behind Caddy (Reverse Proxy)
     config = {
       adminuser = "admin";
       dbtype = "sqlite";
       adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
     };
-    settings.trusted_domains = [
-      "localhost"
-      directIp
-      "homelab.local"
-    ];
-  };
 
-  # WireGuard
-  networking.wireguard.interfaces = {
-    wg0 = {
-      ips = [ "10.100.0.1/24" ];
-      listenPort = 51820;
-      privateKeyFile = config.sops.secrets.wireguard_private_key.path;
-      peers = [
-        # Example Peer (Your Phone)
-        {
-          publicKey = "YOUR_PHONE_PUBLIC_KEY";
-          allowedIPs = [ "10.100.0.2/32" ];
-        }
+    settings = {
+      trusted_domains = [ "nextcloud.${domain}" ];
+      # Ensure Nextcloud generates HTTPS links
+      overwriteprotocol = "https";
+      trusted_proxies = [
+        "127.0.0.1"
+        "::1"
       ];
     };
   };
+  # services.nginx.enable = true;
+  # services.nextcloud = {
+  #   enable = true;
+  #   package = pkgs.nextcloud32;
+  #   hostName = "nextcloud.${domain}";
+  #   https = true;
+  #   configureRedis = true;
+  #   config = {
+  #     adminuser = "admin";
+  #     dbtype = "sqlite";
+  #     adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
+  #   };
+  #   settings.trusted_domains = [
+  #     "nextcloud.${domain}"
+  #   ];
+  # };
+  # services.nginx.virtualHosts."nextcloud.${domain}".listen = [
+  #   {
+  #     addr = "127.0.0.1";
+  #     port = 8081;
+  #   }
+  # ];
+
+  # Ntfy
+  services.ntfy-sh = {
+    enable = true;
+    settings = {
+      base-url = "https://ntfy.${domain}";
+      listen-http = ":8083";
+      # auth-default-access = "deny-all";
+    };
+  };
+
+  # WireGuard
+  # networking.nat = {
+  #   enable = true;
+  #   externalInterface = "wlan0";
+  #   internalInterfaces = [ "wg0" ];
+  # };
+
+  # networking.wireguard.interfaces = {
+  #   wg0 = {
+  #     ips = [ "${vpnIP}/24" ];
+  #     listenPort = 51820;
+  #     privateKeyFile = config.sops.secrets.wireguard_private_key.path;
+  #     peers = [
+  #       # Main PC
+  #       {
+  #         publicKey = "DZqoE/m67JIvOtZR0Q06iV1HvMDpVZskUPj6QxL6chY=";
+  #         allowedIPs = [ "10.100.0.2/32" ];
+  #       }
+  #       # MacBook
+  #       {
+  #         publicKey = "PUBLIC_KEY";
+  #         allowedIPs = [ "10.100.0.2/32" ];
+  #       }
+  #       # Phone
+  #       {
+  #         publicKey = "PUBLIC_KEY";
+  #         allowedIPs = [ "10.100.0.2/32" ];
+  #       }
+  #     ];
+  #   };
+  # };
 
   # Wake on LAN util for turning on the PC
   environment.systemPackages = [ pkgs.wol ];

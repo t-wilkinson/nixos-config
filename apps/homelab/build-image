@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -e
+
+nix build .#images.homelab
+echo "Image built at result/"

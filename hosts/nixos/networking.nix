@@ -1,5 +1,8 @@
 { pkgs, ... }:
 {
+  # Use pi DNS for everything
+  # networking.networkmanager.insertNameservers = [ "10.1.0.2" ];
+
   networking.networkmanager.ensureProfiles.profiles = {
     "Wired Homelab" = {
       connection.type = "ethernet";
@@ -9,10 +12,32 @@
 
       ipv4.method = "manual";
       ipv4.addresses = "10.1.0.1/30";
-      ipv4.gateway = "10.0.0.1";
-      ipv4.dns = "10.0.0.1";
+      # ipv4.gateway = "10.0.0.1";
+      ipv4.dns = "10.1.0.2";
+      ipv4.dns-search = "~homelab.lan";
+      ipv4.never-default = "true";
     };
   };
+
+  # networkmanager.connectionConfig."static-wifi" = {
+  #   type = "wifi";
+  #   interfaceName = "wlo1";
+  #   ipv4 = {
+  #     method = "manual";
+  #     addresses = [
+  #       {
+  #         address = "192.168.1.181";
+  #         prefix = 24;
+  #       }
+  #     ];
+  #     gateway = "192.168.1.1";
+  #     dns = [
+  #       "1.1.1.1"
+  #       "8.8.8.8"
+  #     ];
+  #   };
+  # };
+
   # networking.wireguard.enable = true;
   # networking.wireguard.interfaces = {
   #   # "wg0" is the network interface name. You can name the interface arbitrarily.

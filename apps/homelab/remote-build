@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+
+export NIX_SSHOPTS="-t"
+
+nixos-rebuild build \
+  --flake .#homelab \
+  --target-host trey@10.1.0.2

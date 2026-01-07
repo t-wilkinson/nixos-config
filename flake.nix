@@ -67,7 +67,16 @@
       mkLinuxApps =
         system:
         let
-          app = scriptName: mkApp (nixpkgs-nixos.legacyPackages.${system}) scriptName system;
+          pkgs = nixpkgs-nixos.legacyPackages.${system};
+          app = scriptName: mkApp pkgs scriptName system;
+          mkHomelabApp = scriptName: deps: {
+            type = "app";
+            program = "${(pkgs.writeScriptBin scriptName ''
+              #!${pkgs.bash}/bin/bash
+              export PATH="${pkgs.lib.makeBinPath deps}:$PATH"
+              exec ${self}/apps/homelab/${scriptName} "$@"
+            '')}/bin/${scriptName}";
+          };
         in
         {
           "apply" = app "apply";
@@ -82,6 +91,31 @@
           "check-keys" = app "check-keys";
           "install" = app "install";
           "install-with-secrets" = app "install-with-secrets";
+
+          "h-build-image" = mkHomelabApp "build-image" [
+            pkgs.zstd
+            pkgs.coreutils
+            pkgs.nix
+          ];
+          "h-flash-image" = mkHomelabApp "flash-image" [
+            pkgs.zstd
+            pkgs.coreutils
+            pkgs.util-linux
+          ];
+          "h-build-flash" = mkHomelabApp "build-flash" [
+            pkgs.zstd
+            pkgs.coreutils
+            pkgs.util-linux
+            pkgs.nix
+          ];
+          "h-remote-build" = mkHomelabApp "remote-build" [
+            pkgs.openssh
+            pkgs.nixos-rebuild
+          ];
+          "h-remote-switch" = mkHomelabApp "remote-switch" [
+            pkgs.openssh
+            pkgs.nixos-rebuild
+          ];
         };
 
       mkDarwinApps =
@@ -214,19 +248,6 @@
         ]) linuxSystems
       );
 
-      # rpi4 = nixpkgs-nixos.lib.nixosSystem {
-      #   system = "aarch64-linux";
-      #   specialArgs = { inherit agenix; };
-
-      #   modules = [
-      #     "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-      #     # "${nixpkgs-nixos}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-      #     # nix build .#nixosConfigurations.rpi4.config.system.build.isoImage
-      #     agenix.nixosModules.default
-      #     ./hosts/rpi4/test1.nix
-      #   ];
-      # };
-
       homelab = nixpkgs-nixos.lib.nixosSystem {
         system = "aarch64-linux";
         specialArgs = { inherit inputs; };
@@ -236,6 +257,10 @@
           sops-nix.nixosModules.sops
           nixos-hardware.nixosModules.raspberry-pi-4
           ./hosts/homelab
+          ({
+            sdImage.compressImage = false;
+            sdImage.imageName = "homelab-rpi4.img";
+          })
 
           (
             { pkgs, lib, ... }:
@@ -257,32 +282,6 @@
 
       images = {
         homelab = homelab.config.system.build.sdImage;
-        # rpi4 = rpi4.config.system.build.sdImage;
-        # $ nix build .#nixosConfigurations.exampleIso.config.system.build.isoImage
-        # exampleIso = nixpkgs.lib.nixosSystem {
-        #   system = "x86_64-linux";
-        #   modules = [
-        #     "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-
-        #     ({
-        #       users.users.nixos = {
-        #         openssh.authorizedKeys.keys = [
-        #           "ssh-ed25519 <YOUR PUBLIC KEY HERE>"
-        #         ];
-        #       };
-        #     })
-        #   ];
-        # };
-        # homelab-pi =
-        #   (homelab-pi.extendModules {
-        #     modules = [
-        #       "${nixpkgs}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-        #       {
-        #         sdImage.compressImage = false;
-        #         sdImage.imageName = "homelab-rpi4.img";
-        #       }
-        #     ];
-        #   }).config.system.build.sdImage;
       };
 
     in
@@ -295,7 +294,7 @@
       darwinConfigurations = allDarwinConfigurations;
 
       nixosConfigurations = allNixosConfigurations // {
-        # homelab = homelab;
+        homelab = homelab;
       };
 
       # deploy.nodes.homelab = {
@@ -310,9 +309,6 @@
       checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
 
       images = images;
-
-      # packages = images;
-
     };
 
   inputs = {
