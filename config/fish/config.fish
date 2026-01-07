@@ -2,7 +2,6 @@ if test (uname) = Darwin
     set -x TMPDIR (getconf DARWIN_USER_TEMP_DIR)
 end
 
-
 # function fish_prompt -d "Write out the prompt"
 #     # USER@HOST /home/user/ >
 #     printf '%s@%s %s%s%s > ' $USER $hostname \
@@ -80,6 +79,7 @@ alias pamcan=pacman
 alias v=nvim
 alias vim=nvim
 alias fv="nvim \$(fzf)"
+alias gp="git add -A && git commit -m 'made changes' && git push"
 
 alias ls="eza --icons=always --grid"
 # alias ls='eza'
