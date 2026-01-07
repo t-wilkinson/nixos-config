@@ -65,39 +65,6 @@
     };
   };
 
-  networking = {
-    hostName = "nixos";
-    networkmanager.enable = true;
-
-    # defaultGateway = "192.168.1.1";
-    # interfaces.enp3s0 = {
-    #   wakeOnLan.enable = true;
-    # };
-    # interfaces.wlo1 = {
-    #   useDHCP = false;
-    #   ipv4.addresses = [
-    #     {
-    #       address = "192.168.1.181";
-    #       prefixLength = 24;
-    #     }
-    #   ];
-    # };
-    firewall = rec {
-      allowedTCPPortRanges = [
-        {
-          from = 1714;
-          to = 1764;
-        }
-      ];
-      allowedUDPPortRanges = allowedTCPPortRanges;
-      allowedTCPPorts = [
-        22
-        6229 # ssh
-        5900 # vnc
-      ];
-    };
-  };
-
   qt = {
     enable = true;
     platformTheme = "gnome";

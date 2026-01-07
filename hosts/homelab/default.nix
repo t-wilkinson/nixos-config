@@ -218,6 +218,7 @@ in
   services.caddy = {
     enable = true;
     virtualHosts = {
+      "${domain}".extraConfig = "redir https://dashboard.${domain}\ntls internal";
       "ntfy.${domain}".extraConfig = "reverse_proxy localhost:8083\ntls internal";
       "dashboard.${domain}".extraConfig = "reverse_proxy localhost:8082\ntls internal";
       "vault.${domain}".extraConfig = "reverse_proxy localhost:8000\ntls internal";
@@ -230,6 +231,7 @@ in
   services.homepage-dashboard = {
     enable = true;
     listenPort = 8082;
+    allowedHosts = "dashboard.homelab.lan,homelab.lan,localhost,127.0.0.1";
     services = [
       {
         "My Services" = [

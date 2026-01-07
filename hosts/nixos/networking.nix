@@ -1,6 +1,42 @@
 # hosts/nixos/networking.nix
 { pkgs, ... }:
 {
+  networking = {
+    hostName = "nixos";
+    networkmanager = {
+      enable = true;
+      dns = "systemd-resolved";
+    };
+
+    # defaultGateway = "192.168.1.1";
+    # interfaces.enp3s0 = {
+    #   wakeOnLan.enable = true;
+    # };
+    firewall = rec {
+      allowedTCPPortRanges = [
+        {
+          from = 1714;
+          to = 1764;
+        }
+      ];
+      allowedUDPPortRanges = allowedTCPPortRanges;
+      allowedTCPPorts = [
+        22
+        6229 # ssh
+        5900 # vnc
+      ];
+    };
+  };
+
+  services.resolved = {
+    enable = true;
+    domains = [ "~." ];
+    fallbackDns = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
+  };
+
   # Use pi DNS for everything
   # networking.networkmanager.insertNameservers = [ "10.1.0.2" ];
 
