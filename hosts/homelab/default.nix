@@ -1,3 +1,4 @@
+# hosts/homelab/default.nix
 {
   config,
   pkgs,
@@ -65,16 +66,22 @@ in
     ];
   };
 
-  # hardware.enableRedistributableFirmware = true;
-  # hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
+  hardware.enableRedistributableFirmware = true;
+  hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
 
   # ==========================================
   # 2. NETWORKING
   # ==========================================
   networking = {
     hostName = "homelab";
+    nameservers = [
+      "127.0.0.1"
+      "1.1.1.1"
+    ];
     networkmanager = {
       enable = true;
+      dns = "none";
+
       # Declaratively configure connections so they persist on reboot/rebuild
       ensureProfiles.profiles = {
         # 1. WI-FI PROFILE (Internet Access)
@@ -107,9 +114,7 @@ in
           };
           ipv4 = {
             method = "manual";
-            address1 = "10.1.0.2/30"; # The Static IP
-
-            # CRITICAL: Prevents the Pi from trying to use this link for Internet
+            address1 = "10.1.0.2/30";
             never-default = "true";
           };
         };
@@ -139,13 +144,15 @@ in
   };
 
   services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
+  services.resolved.extraConfig = "DNSStubListener=no";
 
   services.blocky = {
     enable = true;
     settings = {
       ports.dns = 53;
+      # ports.http = 4000;
       upstreams.groups.default = [
-        "https://one.one.one.one/dns-query" # Cloudflare
+        "https://1.1.1.1/dns-query" # Cloudflare
         "https://8.8.8.8/dns-query" # Google
       ];
 
@@ -161,7 +168,7 @@ in
 
       # Ad Blocking
       blocking = {
-        enable = true;
+        # enable = true;
         blackLists = {
           ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
         };
@@ -217,23 +224,6 @@ in
       "monitor.${domain}".extraConfig = "reverse_proxy localhost:19999\ntls internal";
       "nextcloud.${domain}".extraConfig = "reverse_proxy localhost:8081\ntls internal";
     };
-    # virtualHosts = {
-    #   # Access via http://homelab.local or http://10.0.0.2
-    #   ":80" = {
-    #     extraConfig = ''
-    #       respond / "Go to /dashboard" 302
-    #     '';
-    #   };
-    #   ":80/dashboard/*" = {
-    #     extraConfig = "reverse_proxy localhost:8082";
-    #   };
-    #   ":80/vault/*" = {
-    #     extraConfig = "reverse_proxy localhost:8000";
-    #   };
-    #   ":80/ntfy/*" = {
-    #     extraConfig = "reverse_proxy localhost:8080";
-    #   };
-    # };
   };
 
   # Homepage Dashboard
@@ -284,6 +274,7 @@ in
     package = pkgs.nextcloud32;
     hostName = "nextcloud.${domain}";
     https = true;
+    configureRedis = true;
 
     # Tell Nextcloud it's running behind Caddy (Reverse Proxy)
     config = {
@@ -302,28 +293,24 @@ in
       ];
     };
   };
+
   # services.nginx.enable = true;
   # services.nextcloud = {
-  #   enable = true;
-  #   package = pkgs.nextcloud32;
-  #   hostName = "nextcloud.${domain}";
-  #   https = true;
-  #   configureRedis = true;
-  #   config = {
-  #     adminuser = "admin";
-  #     dbtype = "sqlite";
-  #     adminpassFile = config.sops.secrets.nextcloud_admin_pass.path;
-  #   };
   #   settings.trusted_domains = [
   #     "nextcloud.${domain}"
   #   ];
   # };
-  # services.nginx.virtualHosts."nextcloud.${domain}".listen = [
-  #   {
-  #     addr = "127.0.0.1";
-  #     port = 8081;
-  #   }
-  # ];
+  services.nginx.virtualHosts."nextcloud.${domain}" = {
+    forceSSL = lib.mkForce false;
+    enableACME = lib.mkForce false;
+
+    listen = [
+      {
+        addr = "127.0.0.1";
+        port = 8081;
+      }
+    ];
+  };
 
   # Ntfy
   services.ntfy-sh = {

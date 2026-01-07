@@ -1,3 +1,4 @@
+# hosts/nixos/configuration.nix
 {
   config,
   inputs,

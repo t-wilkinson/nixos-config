@@ -1,3 +1,4 @@
+# hosts/nixos/networking.nix
 { pkgs, ... }:
 {
   # Use pi DNS for everything
