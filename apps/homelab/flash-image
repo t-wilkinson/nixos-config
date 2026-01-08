@@ -14,6 +14,7 @@ if [[ $ANSWER != "yes" ]]; then
   echo "Aborted – nothing was written."
   exit 1
 fi
+jj
 
 echo "Flashing drive"
 zstdcat result/sd-image/nixos-image-sd-card-25.05.20251229.40ee5e1-aarch64-linux.img.zst | sudo dd of=/dev/$1 bs=4M status=progress conv=fsync

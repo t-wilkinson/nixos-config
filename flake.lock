@@ -972,7 +972,7 @@
         "type": "github"
       }
     },
-    "impurity_": {
+    "impurity-nix": {
       "locked": {
         "lastModified": 1689836741,
         "narHash": "sha256-82KeRg2sAqDXCdzVs8P8GoqVaPsZjkWgrfsj6kgOLTY=",
@@ -1247,7 +1247,7 @@
         "homebrew-core": "homebrew-core",
         "hyprland": "hyprland",
         "hyprland-plugins": "hyprland-plugins",
-        "impurity_": "impurity_",
+        "impurity-nix": "impurity-nix",
         "matugen": "matugen",
         "more-waita": "more-waita",
         "nix-darwin": "nix-darwin",

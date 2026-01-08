@@ -21,14 +21,14 @@
       homebrew-core,
       hyprland,
       hyprland-plugins,
-      impurity_,
+      impurity-nix,
       matugen,
       more-waita,
       nix-darwin,
       nix-homebrew,
       nixos-hardware,
-      nixpkgs-nixos,
       nixpkgs-darwin,
+      nixpkgs-nixos,
       nixpkgs-unstable,
       sops-nix,
       thorium,
@@ -44,115 +44,10 @@
         "x86_64-darwin"
       ];
 
-      # forAllSystems = f: nixpkgs.lib.genAttrs (linuxSystems ++ darwinSystems) f;
-      # devShell = system: let pkgs = nixpkgs.legacyPackages.${system}; in {
-      #   default = with pkgs; mkShell {
-      #     nativeBuildInputs = with pkgs; [ bashInteractive git age age-plugin-yubikey ];
-      #     shellHook = with pkgs; ''
-      #       export EDITOR=vim
-      #     '';
-      #   };
-      # };
-
-      mkApp = pkgs: scriptName: system: {
-        type = "app";
-        program = "${(pkgs.writeScriptBin scriptName ''
-          #!/usr/bin/env bash
-          PATH=${pkgs.git}/bin:$PATH
-          echo "Running ${scriptName} for ${system}"
-          exec ${self}/apps/${system}/${scriptName}
-        '')}/bin/${scriptName}";
-      };
-
-      mkLinuxApps =
-        system:
-        let
-          pkgs = nixpkgs-nixos.legacyPackages.${system};
-          app = scriptName: mkApp pkgs scriptName system;
-          mkHomelabApp = scriptName: deps: {
-            type = "app";
-            program = "${(pkgs.writeScriptBin scriptName ''
-              #!${pkgs.bash}/bin/bash
-              export PATH="${pkgs.lib.makeBinPath deps}:$PATH"
-              exec ${self}/apps/homelab/${scriptName} "$@"
-            '')}/bin/${scriptName}";
-          };
-        in
-        {
-          "apply" = app "apply";
-          "b" = app "build-impure";
-          "bs" = app "build-switch-impure";
-          "build" = app "build";
-          "build-impure" = app "build-impure";
-          "build-switch" = app "build-switch";
-          "build-switch-impure" = app "build-switch-impure";
-          "copy-keys" = app "copy-keys";
-          "create-keys" = app "create-keys";
-          "check-keys" = app "check-keys";
-          "install" = app "install";
-          "install-with-secrets" = app "install-with-secrets";
-
-          "h-build-image" = mkHomelabApp "build-image" [
-            pkgs.zstd
-            pkgs.coreutils
-            pkgs.nix
-          ];
-          "h-flash-image" = mkHomelabApp "flash-image" [
-            pkgs.zstd
-            pkgs.coreutils
-            pkgs.util-linux
-          ];
-          "h-build-flash" = mkHomelabApp "build-flash" [
-            pkgs.zstd
-            pkgs.coreutils
-            pkgs.util-linux
-            pkgs.nix
-          ];
-          "h-remote-build" = mkHomelabApp "remote-build" [
-            pkgs.openssh
-            pkgs.nixos-rebuild
-          ];
-          "h-remote-switch" = mkHomelabApp "remote-switch" [
-            pkgs.openssh
-            pkgs.nixos-rebuild
-          ];
-        };
-
-      mkDarwinApps =
-        system:
-        let
-          app = scriptName: mkApp (nixpkgs-darwin.legacyPackages.${system}) scriptName system;
-        in
-        {
-          "apply" = app "apply";
-          "b" = app "build-impure";
-          "bs" = app "build-switch-impure";
-          "build" = app "build";
-          "build-impure" = app "build-impure";
-          "build-switch" = app "build-switch";
-          "build-switch-impure" = app "build-switch-impure";
-          "copy-keys" = app "copy-keys";
-          "create-keys" = app "create-keys";
-          "check-keys" = app "check-keys";
-          "rollback" = app "rollback";
-        };
+      mkApps = import ./lib/mk-apps.nix { inherit self inputs; };
 
       mkDarwinConfiguration =
         system: extraModules:
-        # let
-        #   pkgs = import nixpkgs {
-        #     inherit system;
-        #     config = {
-        #       allowUnfree = true;
-        #       allowBroken = true;
-        #       allowUnfree = true;
-        #       #cudaSupport = true;
-        #       #cudaCapabilities = ["8.0"];
-        #       allowInsecure = false;
-        #       allowUnsupportedSystem = true;
-        #     };
-        #   };
-        # in
         nix-darwin.lib.darwinSystem {
           inherit system;
           specialArgs = {
@@ -173,7 +68,7 @@
             darwin-docker.darwinModules.docker
             # ./modules/distributed-build.nix
             {
-              imports = [ impurity_.nixosModules.impurity ];
+              imports = [ impurity-nix.nixosModules.impurity ];
               impurity.configRoot = self;
             }
             {
@@ -225,10 +120,8 @@
           modules = [
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            # disko.nixosModules.disko
-            # agenix.nixosModules.default
             {
-              imports = [ impurity_.nixosModules.impurity ];
+              imports = [ impurity-nix.nixosModules.impurity ];
               impurity.configRoot = self;
             }
             ./hosts/nixos
@@ -253,7 +146,6 @@
         system = "aarch64-linux";
         specialArgs = { inherit inputs; };
         modules = [
-          # agenix.nixosModules.default
           "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           sops-nix.nixosModules.sops
           nixos-hardware.nixosModules.raspberry-pi-4
@@ -273,24 +165,16 @@
                   makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
                 })
               ];
-
-              # Or run `zstdcat result/sd-image/nixos-image-*.img.zst | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync`
-              # sdImage.compressImage = false;
             }
           )
         ];
       };
 
-      images = {
-        homelab = homelab.config.system.build.sdImage;
-      };
-
     in
     {
-      # devShells = forAllSystems devShell;
       apps =
-        nixpkgs-nixos.lib.genAttrs linuxSystems mkLinuxApps
-        // nixpkgs-darwin.lib.genAttrs darwinSystems mkDarwinApps;
+        nixpkgs-nixos.lib.genAttrs linuxSystems mkApps.linux
+        // nixpkgs-darwin.lib.genAttrs darwinSystems mkApps.darwin;
 
       darwinConfigurations = allDarwinConfigurations;
 
@@ -298,6 +182,7 @@
         homelab = homelab;
       };
 
+      images.homelab = homelab.config.system.build.sdImage;
       # deploy.nodes.homelab = {
       #   hostname = "homelab.lan";
       #   sshUser = "root";
@@ -308,8 +193,6 @@
       # };
 
       checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
-
-      images = images;
     };
 
   inputs = {
@@ -318,16 +201,16 @@
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     nixpkgs-nixos.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
-
-    flake-utils.url = "github:numtide/flake-utils";
-
     home-manager = {
       url = "github:nix-community/home-manager/release-25.05"; # "follows" doesn't seem to work?
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
 
-    # impurity adds custom module arg named "impurity" which gets overriden when merging @inputs in specialArgs
-    impurity_.url = "github:outfoxxed/impurity.nix";
+    # Utilities
+    flake-utils.url = "github:numtide/flake-utils";
+    sops-nix.url = "github:Mic92/sops-nix";
+    # use "impurity-nix" to avoid overwritting (mergine @inputs in specialArgs) module that impurity injects named "impurity"
+    impurity-nix.url = "github:outfoxxed/impurity.nix";
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs-nixos";
@@ -340,6 +223,11 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
+    # maps directory of nix files into attribute set
+    # haumea = {
+    #   url = "github:nix-community/haumea";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     # macOS
     nix-darwin = {
@@ -405,21 +293,15 @@
       url = "github:serokell/deploy-rs";
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
-    sops-nix.url = "github:Mic92/sops-nix";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
+    # Virtualization
     # NixVirt = {
     #   url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
     # microvm = {
     #   url = "github:astro/microvm.nix";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
-    # maps directory of nix files into attribute set
-    # haumea = {
-    #   url = "github:nix-community/haumea";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
   };
