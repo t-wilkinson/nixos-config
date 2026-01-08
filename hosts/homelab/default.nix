@@ -132,14 +132,17 @@ in
         80
         443
         22
-        19999
+        19999 # netdata
       ];
       allowedUDPPorts = [
-        51820
-        9
-        53
+        51820 # WireGuard
+        9 # WoL
+        53 # dns
       ];
-      trustedInterfaces = [ "end0" ];
+      trustedInterfaces = [
+        "end0"
+        "wg0"
+      ];
     };
   };
 
@@ -189,7 +192,7 @@ in
       wifi_psk = {
         owner = "root";
       };
-      wireguard_private_key = {
+      wg_homelab_private_key = {
         owner = "root";
       };
       nextcloud_admin_pass = {
@@ -325,36 +328,36 @@ in
   };
 
   # WireGuard
-  # networking.nat = {
-  #   enable = true;
-  #   externalInterface = "wlan0";
-  #   internalInterfaces = [ "wg0" ];
-  # };
+  networking.nat = {
+    enable = true;
+    externalInterface = "wlan0";
+    internalInterfaces = [ "wg0" ];
+  };
 
-  # networking.wireguard.interfaces = {
-  #   wg0 = {
-  #     ips = [ "${vpnIP}/24" ];
-  #     listenPort = 51820;
-  #     privateKeyFile = config.sops.secrets.wireguard_private_key.path;
-  #     peers = [
-  #       # Main PC
-  #       {
-  #         publicKey = "DZqoE/m67JIvOtZR0Q06iV1HvMDpVZskUPj6QxL6chY=";
-  #         allowedIPs = [ "10.100.0.2/32" ];
-  #       }
-  #       # MacBook
-  #       {
-  #         publicKey = "PUBLIC_KEY";
-  #         allowedIPs = [ "10.100.0.2/32" ];
-  #       }
-  #       # Phone
-  #       {
-  #         publicKey = "PUBLIC_KEY";
-  #         allowedIPs = [ "10.100.0.2/32" ];
-  #       }
-  #     ];
-  #   };
-  # };
+  networking.wireguard.interfaces = {
+    wg0 = {
+      ips = [ "${vpnIP}/24" ];
+      listenPort = 51820;
+      privateKeyFile = config.sops.secrets.wg_homelab_private_key.path;
+      peers = [
+        # Main PC
+        {
+          publicKey = "DZqoE/m67JIvOtZR0Q06iV1HvMDpVZskUPj6QxL6chY=";
+          allowedIPs = [ "10.100.0.2/32" ];
+        }
+        # MacBook
+        {
+          publicKey = "Jid4uv1OrkFs6CutQw/A0APB0NQ9RAO1LnzmuzeDgmc=";
+          allowedIPs = [ "10.100.0.3/32" ];
+        }
+        # Phone
+        {
+          publicKey = "WGSdzK7EBpPNIYS9CV8j4CdYC82ciPzcnhN6GVz6AEQ=";
+          allowedIPs = [ "10.100.0.4/32" ];
+        }
+      ];
+    };
+  };
 
   # Wake on LAN util for turning on the PC
   environment.systemPackages = [ pkgs.wol ];

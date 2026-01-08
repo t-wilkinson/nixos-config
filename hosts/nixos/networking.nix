@@ -1,5 +1,5 @@
 # hosts/nixos/networking.nix
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   networking = {
     hostName = "nixos";
@@ -71,6 +71,36 @@
   #     dns = [
   #       "1.1.1.1"
   #       "8.8.8.8"
+  #     ];
+  #   };
+  # };
+
+  # networking.wg-quick.interfaces = {
+  #   wg0 = {
+  #     address = [ "10.100.0.2/32" ];
+  #     # The Pi's WireGuard IP acts as the DNS server
+  #     dns = [
+  #       "10.100.0.1"
+  #       "~homelab.lan"
+  #     ];
+  #     privateKeyFile = config.sops.secrets.wg_nixos_private_key.path;
+
+  #     # SPLIT TUNNEL MAGIC:
+  #     # Only route traffic for the VPN subnet (10.100.0.x)
+  #     # AND the Homelab subnet (10.1.0.x) through the tunnel.
+  #     # Everything else goes out your normal internet.
+  #     peers = [
+  #       {
+  #         publicKey = "cvzk8zCBE7o/xkeoyCloC53N116VLBubKQYdAAdYsSo=";
+  #         endpoint = "10.0.0.156:51820"; # wg server endpoint
+  #         persistentKeepalive = 25;
+
+  #         # This determines what goes through the VPN.
+  #         allowedIPs = [
+  #           "10.100.0.0/24"
+  #           # "10.1.0.0/30"
+  #         ];
+  #       }
   #     ];
   #   };
   # };
