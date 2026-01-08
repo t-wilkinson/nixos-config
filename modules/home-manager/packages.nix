@@ -34,6 +34,7 @@ with pkgs;
   # pandoc
   # acpi
   age
+  ssh-to-age
   aspell
   aspellDicts.en
   bat
