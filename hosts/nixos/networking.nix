@@ -1,6 +1,11 @@
 # hosts/nixos/networking.nix
 { pkgs, config, ... }:
 {
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
+  };
+
   services.resolved = {
     enable = true;
     fallbackDns = [

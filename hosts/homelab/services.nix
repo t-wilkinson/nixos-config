@@ -7,10 +7,30 @@
 let
   directIp = "10.1.0.2"; # The static IP for the direct Ethernet link to your PC
   domain = "homelab.lan";
-  services = {
+
+  # services
+  s = {
     monitor = {
-      port = 8090;
-      domain = "monitoring.${domain}";
+      port = 61208;
+      domain = "monitor.${domain}";
+    };
+    ntfy = {
+      port = 8083;
+      domain = "ntfy.${domain}";
+    };
+    vault = {
+      port = 8000;
+      domain = "vault.${domain}";
+    };
+    dashboard = {
+      port = 8082;
+      domain = "dashboard.${domain}";
+    };
+    nextcloud = {
+      port = 8081;
+      domain = "cloud.${domain}";
+    };
+    tailscale = {
     };
   };
 in
@@ -57,45 +77,47 @@ in
   services.caddy = {
     enable = true;
     virtualHosts = {
-      "${domain}".extraConfig = "redir https://dashboard.${domain}\ntls internal";
-      "ntfy.${domain}".extraConfig = "reverse_proxy localhost:8083\ntls internal";
-      "dashboard.${domain}".extraConfig = "reverse_proxy localhost:8082\ntls internal";
-      "vault.${domain}".extraConfig = "reverse_proxy localhost:8000\ntls internal";
-      "${services.monitor.domain}".extraConfig =
-        "reverse_proxy localhost:${services.monitor.port}\ntls internal";
-      "nextcloud.${domain}".extraConfig = "reverse_proxy localhost:8081\ntls internal";
+      "${domain}".extraConfig = "redir https://${toString s.dashboard.domain}\ntls internal";
+      "${s.ntfy.domain}".extraConfig = "reverse_proxy localhost:${toString s.ntfy.port}\ntls internal";
+      "${s.dashboard.domain}".extraConfig =
+        "reverse_proxy localhost:${toString s.dashboard.port}\ntls internal";
+      "${s.vault.domain}".extraConfig = "reverse_proxy localhost:${toString s.vault.port}\ntls internal";
+      "${s.monitor.domain}".extraConfig =
+        "reverse_proxy localhost:${toString s.monitor.port}\ntls internal";
+      "${s.nextcloud.domain}".extraConfig =
+        "reverse_proxy localhost:${toString s.nextcloud.port}\ntls internal";
     };
   };
 
   # Homepage Dashboard
   services.homepage-dashboard = {
     enable = true;
-    listenPort = 8082;
-    allowedHosts = "dashboard.homelab.lan,homelab.lan,localhost,127.0.0.1";
+    listenPort = s.dashboard.port;
+    allowedHosts = "${s.dashboard.domain},${domain},localhost,127.0.0.1";
     services = [
       {
         "My Services" = [
           {
             "Ntfy" = {
-              href = "https://ntfy.${domain}";
+              href = "https://${s.ntfy.domain}";
               description = "Ntfy";
             };
           }
           {
             "Vaultwarden" = {
-              href = "https://vault.${domain}";
+              href = "https://${s.vault.domain}";
               description = "Password Manager";
             };
           }
           {
             "Monitoring" = {
-              href = "https://${services.monitor.domain}";
+              href = "https://${s.monitor.domain}";
               description = "System monitoring";
             };
           }
           {
             "Nextcloud" = {
-              href = "https://monitor.${domain}";
+              href = "https://${s.nextcloud.domain}";
               description = "Files";
             };
           }
@@ -104,40 +126,44 @@ in
     ];
   };
 
-  # Vaultwarden
+  # PASSWORD MANAGER
   services.vaultwarden = {
     enable = true;
     config = {
-      ROCKET_PORT = 8000;
+      ROCKET_PORT = s.vault.port;
       SIGNUPS_ALLOWED = false;
-      DOMAIN = "https://vault.${domain}";
+      DOMAIN = "https://${s.vault.domain}";
     };
   };
 
-  # TODO: use glances?
+  # MONITORING
+  # services.beszel = {
+  #   hub = {
+  #     enable = true;
+  #     port = services.monitor.port;
+  #     environment = {
+  #       AUTO_LOGIN = "trey@homelab.lan";
+  #     };
+  #   };
+  #   agent = {
+  #     enable = true;
+  #     environment = {
+  #       SKIP_GPU = "true";
+  #       # HUB_URL = "http://127.0.0.1";
+  #     };
+  #   };
+  # };
   # https://glances.readthedocs.io/en/latest/quickstart.html
-  services.beszel = {
-    hub = {
-      enable = true;
-      port = services.monitor.port;
-      environment = {
-        AUTO_LOGIN = "trey@homelab.lan";
-      };
-    };
-    agent = {
-      enable = true;
-      environment = {
-        SKIP_GPU = "true";
-        # HUB_URL = "http://127.0.0.1";
-      };
-    };
+  services.glances = {
+    enable = true;
+    extraArgs = [ "-w" ];
   };
 
   # Nextcloud
   services.nextcloud = {
     enable = true;
     package = pkgs.nextcloud32;
-    hostName = "nextcloud.${domain}";
+    hostName = s.nextcloud.domain;
     https = true;
     configureRedis = true;
 
@@ -149,7 +175,7 @@ in
     };
 
     settings = {
-      trusted_domains = [ "nextcloud.${domain}" ];
+      trusted_domains = [ s.nextcloud.domain ];
       # Ensure Nextcloud generates HTTPS links
       overwriteprotocol = "https";
       trusted_proxies = [
@@ -165,14 +191,14 @@ in
   #     "nextcloud.${domain}"
   #   ];
   # };
-  services.nginx.virtualHosts."nextcloud.${domain}" = {
+  services.nginx.virtualHosts."${s.nextcloud.domain}" = {
     forceSSL = lib.mkForce false;
     enableACME = lib.mkForce false;
 
     listen = [
       {
         addr = "127.0.0.1";
-        port = 8081;
+        port = s.nextcloud.port;
       }
     ];
   };
@@ -181,10 +207,15 @@ in
   services.ntfy-sh = {
     enable = true;
     settings = {
-      base-url = "https://ntfy.${domain}";
-      listen-http = ":8083";
+      base-url = "https://${s.ntfy.domain}";
+      listen-http = ":${toString s.ntfy.port}";
       # auth-default-access = "deny-all";
     };
   };
 
+  # Mesh network
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
+  };
 }
