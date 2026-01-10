@@ -7,6 +7,12 @@
 let
   directIp = "10.1.0.2"; # The static IP for the direct Ethernet link to your PC
   domain = "homelab.lan";
+  services = {
+    monitor = {
+      port = 8090;
+      domain = "monitoring.${domain}";
+    };
+  };
 in
 {
   services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
@@ -44,7 +50,7 @@ in
 
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = true; # Explicitly allow password auth for setup
+    settings.PasswordAuthentication = false;
   };
 
   # Caddy Reverse Proxy (HTTPS / Dashboard)
@@ -55,7 +61,8 @@ in
       "ntfy.${domain}".extraConfig = "reverse_proxy localhost:8083\ntls internal";
       "dashboard.${domain}".extraConfig = "reverse_proxy localhost:8082\ntls internal";
       "vault.${domain}".extraConfig = "reverse_proxy localhost:8000\ntls internal";
-      "monitor.${domain}".extraConfig = "reverse_proxy localhost:19999\ntls internal";
+      "${services.monitor.domain}".extraConfig =
+        "reverse_proxy localhost:${services.monitor.port}\ntls internal";
       "nextcloud.${domain}".extraConfig = "reverse_proxy localhost:8081\ntls internal";
     };
   };
@@ -81,9 +88,9 @@ in
             };
           }
           {
-            "NetData" = {
-              href = "https://monitor.${domain}";
-              description = "Network monitoring";
+            "Monitoring" = {
+              href = "https://${services.monitor.domain}";
+              description = "System monitoring";
             };
           }
           {
@@ -107,11 +114,22 @@ in
     };
   };
 
-  # Netdata (Lightweight real-time monitoring)
-  services.netdata = {
-    enable = true;
-    config.global = {
-      "history" = 3600; # 1 hour of history
+  # TODO: use glances?
+  # https://glances.readthedocs.io/en/latest/quickstart.html
+  services.beszel = {
+    hub = {
+      enable = true;
+      port = services.monitor.port;
+      environment = {
+        AUTO_LOGIN = "trey@homelab.lan";
+      };
+    };
+    agent = {
+      enable = true;
+      environment = {
+        SKIP_GPU = "true";
+        # HUB_URL = "http://127.0.0.1";
+      };
     };
   };
 

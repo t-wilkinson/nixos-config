@@ -95,8 +95,7 @@ let
       "create-keys" = app "create-keys";
       "check-keys" = app "check-keys";
       "rollback" = app "rollback";
-    }
-    // mkHomelabApps system pkgs;
+    };
 in
 {
   linux = mkLinuxApps;
