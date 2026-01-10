@@ -4,6 +4,7 @@
 }:
 with inputs;
 let
+  # homelab utilites
   mkHomelabApps =
     system: pkgs:
     let
@@ -16,8 +17,7 @@ let
         '')}/bin/${scriptName}";
       };
     in
-    {
-      # homelab utilites
+    rec {
       "h-build-image" = mkHomelabApp "build-image" [
         pkgs.zstd
         pkgs.coreutils
@@ -38,6 +38,7 @@ let
         pkgs.openssh
         pkgs.nixos-rebuild
       ];
+      "h" = h-remote-switch;
       "h-remote-switch" = mkHomelabApp "remote-switch" [
         pkgs.openssh
         pkgs.nixos-rebuild

@@ -135,7 +135,6 @@ in
         443
         22
         51820 # WireGuard
-        19999 # netdata
       ];
       allowedUDPPorts = [
         51820 # WireGuard

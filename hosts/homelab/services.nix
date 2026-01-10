@@ -69,14 +69,26 @@ in
       {
         "My Services" = [
           {
+            "Ntfy" = {
+              href = "https://ntfy.${domain}";
+              description = "Ntfy";
+            };
+          }
+          {
             "Vaultwarden" = {
               href = "https://vault.${domain}";
               description = "Password Manager";
             };
           }
           {
+            "NetData" = {
+              href = "https://monitor.${domain}";
+              description = "Network monitoring";
+            };
+          }
+          {
             "Nextcloud" = {
-              href = "https://nextcloud.${domain}";
+              href = "https://monitor.${domain}";
               description = "Files";
             };
           }
