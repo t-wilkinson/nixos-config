@@ -1,6 +1,14 @@
 # hosts/nixos/networking.nix
 { pkgs, config, ... }:
 {
+  services.resolved = {
+    enable = true;
+    fallbackDns = [
+      "1.1.1.1"
+      "8.8.8.8"
+    ];
+  };
+
   networking = {
     hostName = "nixos";
     networkmanager = {
@@ -8,38 +16,27 @@
       dns = "systemd-resolved";
     };
 
-    # defaultGateway = "192.168.1.1";
-    # interfaces.enp3s0 = {
-    #   wakeOnLan.enable = true;
-    # };
-    firewall = rec {
-      allowedTCPPortRanges = [
-        {
+    firewall =
+      let
+        kdePortRanges = {
           from = 1714;
           to = 1764;
-        }
-      ];
-      allowedUDPPortRanges = allowedTCPPortRanges;
-      allowedTCPPorts = [
-        22
-        6229 # ssh
-        5900 # vnc
-      ];
-    };
-  };
-
-  services.resolved = {
-    enable = true;
-    domains = [ "~." ];
-    fallbackDns = [
-      "1.1.1.1"
-      "8.8.8.8"
-    ];
+        };
+      in
+      {
+        allowedTCPPortRanges = [ kdePortRanges ];
+        allowedUDPPortRanges = [ kdePortRanges ];
+        allowedTCPPorts = [
+          22
+          6229 # ssh
+          5900 # vnc
+        ];
+      };
   };
 
   # Use pi DNS for everything
   # networking.networkmanager.insertNameservers = [ "10.1.0.2" ];
-
+  # services.wakeonlan.enable = true;
   networking.networkmanager.ensureProfiles.profiles = {
     "Wired Homelab" = {
       connection.type = "ethernet";
@@ -49,10 +46,35 @@
 
       ipv4.method = "manual";
       ipv4.addresses = "10.1.0.1/30";
-      # ipv4.gateway = "10.0.0.1";
+      # ipv4.gateway = "10.1.0.2";
       ipv4.dns = "10.1.0.2";
+      # ipv4.dns-search = "~homelab.lan,homelab.lan";
       ipv4.dns-search = "~homelab.lan";
       ipv4.never-default = "true";
+    };
+  };
+
+  # Split tunnel VPN with homelab
+  networking.wg-quick.interfaces = {
+    wg0 = {
+      address = [ "10.100.0.2/32" ];
+      privateKeyFile = config.sops.secrets.wg_nixos_private_key.path;
+
+      # Split tunnel:
+      # Only route traffic for the VPN subnet (10.100.0.x)
+      # AND the Homelab subnet (10.1.0.x) through the tunnel.
+      peers = [
+        {
+          publicKey = "cvzk8zCBE7o/xkeoyCloC53N116VLBubKQYdAAdYsSo=";
+          endpoint = "10.1.0.2:51820"; # wg server endpoint
+          persistentKeepalive = 25;
+
+          allowedIPs = [
+            "10.100.0.0/24"
+            "10.1.0.0/30"
+          ];
+        }
+      ];
     };
   };
 
@@ -71,36 +93,6 @@
   #     dns = [
   #       "1.1.1.1"
   #       "8.8.8.8"
-  #     ];
-  #   };
-  # };
-
-  # networking.wg-quick.interfaces = {
-  #   wg0 = {
-  #     address = [ "10.100.0.2/32" ];
-  #     # The Pi's WireGuard IP acts as the DNS server
-  #     dns = [
-  #       "10.100.0.1"
-  #       "~homelab.lan"
-  #     ];
-  #     privateKeyFile = config.sops.secrets.wg_nixos_private_key.path;
-
-  #     # SPLIT TUNNEL MAGIC:
-  #     # Only route traffic for the VPN subnet (10.100.0.x)
-  #     # AND the Homelab subnet (10.1.0.x) through the tunnel.
-  #     # Everything else goes out your normal internet.
-  #     peers = [
-  #       {
-  #         publicKey = "cvzk8zCBE7o/xkeoyCloC53N116VLBubKQYdAAdYsSo=";
-  #         endpoint = "10.0.0.156:51820"; # wg server endpoint
-  #         persistentKeepalive = 25;
-
-  #         # This determines what goes through the VPN.
-  #         allowedIPs = [
-  #           "10.100.0.0/24"
-  #           # "10.1.0.0/30"
-  #         ];
-  #       }
   #     ];
   #   };
   # };

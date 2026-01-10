@@ -43,8 +43,34 @@
         "aarch64-darwin"
         "x86_64-darwin"
       ];
-
       mkApps = import ./lib/mk-apps.nix { inherit self inputs; };
+
+      mkImpureConfigurations =
+        mkConfiguration: systems:
+        builtins.listToAttrs (
+          builtins.concatMap (system: [
+            {
+              name = system;
+              value = mkNixosConfiguration system [
+                {
+                  # Is this necessary?
+                  imports = [ impurity-nix.nixosModules.impurity ];
+                  impurity.configRoot = self;
+                }
+              ];
+            }
+            {
+              name = "${system}-impure";
+              value = mkNixosConfiguration system [
+                {
+                  impurity.enable = true;
+                  imports = [ impurity-nix.nixosModules.impurity ];
+                  impurity.configRoot = self;
+                }
+              ];
+            }
+          ]) systems
+        );
 
       mkDarwinConfiguration =
         system: extraModules:
@@ -54,7 +80,7 @@
             inherit inputs username;
             hostname = "macos";
             homedir = "/Users/${username}";
-            # nixpkgs-unstable branch is not build for aarch64-darwin
+            # nixpkgs-unstable branch is not built for aarch64-darwin
             unstable = import nixpkgs-nixos {
               inherit system;
               config.allowUnfree = true;
@@ -67,10 +93,6 @@
             nix-homebrew.darwinModules.nix-homebrew
             darwin-docker.darwinModules.docker
             # ./modules/distributed-build.nix
-            {
-              imports = [ impurity-nix.nixosModules.impurity ];
-              impurity.configRoot = self;
-            }
             {
               nix-homebrew = {
                 user = username;
@@ -88,19 +110,6 @@
           ]
           ++ extraModules;
         };
-
-      allDarwinConfigurations = builtins.listToAttrs (
-        builtins.concatMap (system: [
-          {
-            name = system;
-            value = mkDarwinConfiguration system [ ];
-          }
-          {
-            name = "${system}-impure";
-            value = mkDarwinConfiguration system [ { impurity.enable = true; } ];
-          }
-        ]) darwinSystems
-      );
 
       mkNixosConfiguration =
         system: extraModules:
@@ -120,41 +129,17 @@
           modules = [
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            {
-              imports = [ impurity-nix.nixosModules.impurity ];
-              impurity.configRoot = self;
-            }
             ./hosts/nixos
           ]
           ++ extraModules;
         };
 
-      allNixosConfigurations = builtins.listToAttrs (
-        builtins.concatMap (system: [
-          {
-            name = system;
-            value = mkNixosConfiguration system [ ];
-          }
-          {
-            name = "${system}-impure";
-            value = mkNixosConfiguration system [ { impurity.enable = true; } ];
-          }
-        ]) linuxSystems
-      );
-
       homelab = nixpkgs-nixos.lib.nixosSystem {
         system = "aarch64-linux";
-        specialArgs = { inherit inputs; };
+        specialArgs = { inherit inputs username; };
         modules = [
           "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-          sops-nix.nixosModules.sops
           nixos-hardware.nixosModules.raspberry-pi-4
-          ./hosts/homelab
-          ({
-            sdImage.compressImage = false;
-            sdImage.imageName = "homelab-rpi4.img";
-          })
-
           (
             { pkgs, lib, ... }:
             {
@@ -167,6 +152,13 @@
               ];
             }
           )
+
+          ({
+            sdImage.compressImage = false;
+            sdImage.imageName = "homelab-rpi4.img";
+          })
+          sops-nix.nixosModules.sops
+          ./hosts/homelab
         ];
       };
 
@@ -176,9 +168,9 @@
         nixpkgs-nixos.lib.genAttrs linuxSystems mkApps.linux
         // nixpkgs-darwin.lib.genAttrs darwinSystems mkApps.darwin;
 
-      darwinConfigurations = allDarwinConfigurations;
+      darwinConfigurations = mkImpureConfigurations mkDarwinConfiguration darwinSystems;
 
-      nixosConfigurations = allNixosConfigurations // {
+      nixosConfigurations = mkImpureConfigurations mkNixosConfiguration linuxSystems // {
         homelab = homelab;
       };
 

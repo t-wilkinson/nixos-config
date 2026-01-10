@@ -10,7 +10,7 @@
 }:
 {
   # nix
-  documentation.nixos.enable = false; # .desktop
+  documentation.nixos.enable = false;
   nixpkgs = {
     config = {
       # packageOverrides = pkgs: {

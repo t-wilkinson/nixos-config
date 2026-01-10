@@ -3,13 +3,13 @@
   config,
   pkgs,
   lib,
+  username,
   ...
 }:
 let
   directIp = "10.1.0.2"; # The static IP for the direct Ethernet link to your PC
   gatewayIp = "10.0.0.1"; # Replace with your actual home Router IP
   vpnIP = "10.100.0.1";
-  username = "trey";
   domain = "homelab.lan";
   # domains = {
   #   nextcloud = "nextcloud.${domain}";
@@ -134,6 +134,7 @@ in
         80
         443
         22
+        51820 # WireGuard
         19999 # netdata
       ];
       allowedUDPPorts = [
@@ -148,13 +149,13 @@ in
     };
   };
 
-  # WireGuard
-  networking.nat = {
-    enable = true;
-    externalInterface = "wlan0";
-    internalInterfaces = [ "wg0" ];
+  # Enable IP forwarding for WireGuard
+  boot.kernel.sysctl = {
+    "net.ipv4.ip_forward" = 1;
+    "net.ipv6.conf.all.forwarding" = 1;
   };
 
+  # WireGuard
   networking.wireguard.interfaces = {
     wg0 = {
       ips = [ "${vpnIP}/24" ];

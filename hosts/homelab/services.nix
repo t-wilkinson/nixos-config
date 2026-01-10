@@ -1,4 +1,13 @@
-{ ... }:
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+let
+  directIp = "10.1.0.2"; # The static IP for the direct Ethernet link to your PC
+  domain = "homelab.lan";
+in
 {
   services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
   services.resolved.extraConfig = "DNSStubListener=no";
