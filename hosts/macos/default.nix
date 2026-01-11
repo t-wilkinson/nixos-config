@@ -6,12 +6,22 @@
 }:
 {
   imports = [
-    # "${self}/modules/darwin/secrets.nix"
     ./home-manager.nix
     ../../modules/shared.nix
     ./networking.nix
-    # agenix.darwinModules.default
   ];
+
+  services.openssh.enable = false;
+  sops = {
+    age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
+    defaultSopsFile = ./secrets.yaml;
+    secrets = {
+      wg_macos_private_key = {
+        owner = "root";
+      };
+    };
+    gnupg.sshKeyPaths = [ ];
+  };
 
   nix = {
     package = pkgs.nix;

@@ -51,7 +51,7 @@
           builtins.concatMap (system: [
             {
               name = system;
-              value = mkNixosConfiguration system [
+              value = mkConfiguration system [
                 {
                   # Is this necessary?
                   imports = [ impurity-nix.nixosModules.impurity ];
@@ -61,7 +61,7 @@
             }
             {
               name = "${system}-impure";
-              value = mkNixosConfiguration system [
+              value = mkConfiguration system [
                 {
                   impurity.enable = true;
                   imports = [ impurity-nix.nixosModules.impurity ];
@@ -92,6 +92,8 @@
             home-manager.darwinModules.home-manager
             nix-homebrew.darwinModules.nix-homebrew
             darwin-docker.darwinModules.docker
+            sops-nix.darwinModules.sops
+
             # ./modules/distributed-build.nix
             {
               nix-homebrew = {
