@@ -131,7 +131,8 @@ in
     enable = true;
     config = {
       ROCKET_PORT = s.vault.port;
-      SIGNUPS_ALLOWED = false;
+      SIGNUPS_ALLOWED = true;
+      SHOW_PASSWORD_HINT = false;
       DOMAIN = "https://${s.vault.domain}";
     };
   };
