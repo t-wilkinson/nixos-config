@@ -71,6 +71,11 @@ function set_zellij_tab_title --on-variable PWD
     end
 end
 
+function hgrep
+    # Grep, highlighting the matches, keep the same output
+    grep --color=always -z $argv
+end
+
 function prjcd
     cd $(prj cd "$argv")
 end
