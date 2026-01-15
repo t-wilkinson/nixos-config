@@ -129,6 +129,25 @@ return {
         "xml",
         "yaml",
       },
+      highlight = {
+        enable = true,
+        -- Disable treesitter for noice buffers to prevent "end_row" crashes
+        disable = function(lang, buf)
+          local max_filesize = 100 * 1024 -- 100 KB
+          local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+          if ok and stats and stats.size > max_filesize then
+            return true
+          end
+          -- Specific fix for your crash:
+          local filetype = vim.api.nvim_get_option_value("filetype", { buf = buf })
+          if filetype == "noice" or filetype == "vim" then
+            -- Only disable if it's a floating window (like noice cmdline)
+            if vim.api.nvim_win_get_config(0).relative ~= "" then
+              return true
+            end
+          end
+        end,
+      },
     },
   },
 }
