@@ -4,7 +4,7 @@ _: [
   # "foot"
   "tor-browser"
 
-  "bitwarden"
+  # "bitwarden"
   "homebrew/cask/docker"
   "google-drive"
   # "claude"

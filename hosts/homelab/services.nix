@@ -4,7 +4,6 @@
   lib,
   ...
 }:
-# TODO: *.home.lab
 let
   directIp = "10.100.0.1"; # The static IP for the direct Ethernet link to your PC
   domain = "home.lab";

@@ -73,6 +73,10 @@
       wayvnc
       jq
 
+      # FILES
+      cifs-utils # smb
+      nfs-utils # nfs
+
       # MISC
       # android-file-transfer
       # appimage-run

@@ -91,8 +91,4 @@ with pkgs;
 
   # NETWORK
   tcpdump
-
-  # FILES
-  cifs-utils # smb
-  nfs-utils # nfs
 ]
