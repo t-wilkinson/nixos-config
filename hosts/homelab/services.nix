@@ -4,81 +4,63 @@
   lib,
   ...
 }:
+# TODO: *.home.lab
 let
-  # ==========================================
-  # CONFIGURATION VARIABLES
-  # ==========================================
-  directIp = "10.1.0.2";
+  directIp = "10.100.0.1"; # The static IP for the direct Ethernet link to your PC
   domain = "homelab.lan";
-  publicDomain = "treywilkinson.com";
 
-  # Path to the ACME Wildcard Certificates
-  certPath = "/var/lib/acme/treywilkinson.com/fullchain.pem";
-  keyPath = "/var/lib/acme/treywilkinson.com/key.pem";
-
-  # Standard Caddy TLS config using our real certs
-  tlsConfig = "tls ${certPath} ${keyPath}";
-
-  # Service Definitions
+  # services
   s = {
     monitor = {
       port = 61208;
       domain = "monitor.${domain}";
-      public = "monitor.${publicDomain}";
     };
     ntfy = {
       port = 8083;
       domain = "ntfy.${domain}";
-      public = "ntfy.${publicDomain}";
     };
     vault = {
       port = 8000;
       domain = "vault.${domain}";
-      public = "vault.${publicDomain}";
     };
     dashboard = {
       port = 8082;
-      domain = "home.${domain}";
-      public = "home.${publicDomain}";
+      domain = "dashboard.${domain}";
     };
     nextcloud = {
       port = 8081;
       domain = "cloud.${domain}";
-      public = "cloud.${publicDomain}";
+    };
+    tailscale = {
     };
   };
 in
 {
-  # ==========================================
-  # DNS & BLOCKY
-  # ==========================================
-  services.resolved.enable = false;
+  services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
   services.resolved.extraConfig = "DNSStubListener=no";
-
   services.blocky = {
     enable = true;
     settings = {
       ports.dns = 53;
+      # ports.http = 4000;
       upstreams.groups.default = [
-        "https://1.1.1.1/dns-query"
-        "https://8.8.8.8/dns-query"
+        "https://1.1.1.1/dns-query" # Cloudflare
+        "https://8.8.8.8/dns-query" # Google
       ];
+
+      # Access your services via these domains
       customDNS = {
         customTTL = "1h";
         mapping = {
-          # LAN Domain
+          # Map main domain and all subdomains to the Pi's Direct IP
           "homelab.lan" = directIp;
           "*.homelab.lan" = directIp;
-
-          # SPLIT DNS:
-          # For local/VPN users, resolve public domains to the PRIVATE IP.
-          # This ensures they use the fast direct connection (and our Caddy certs)
-          # instead of going out to the internet and back through Cloudflare Tunnel.
-          "treywilkinson.com" = directIp;
-          "*.treywilkinson.com" = directIp;
         };
       };
+
+      # Ad Blocking
       blocking = {
+        # enable = true;
         blackLists = {
           ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
         };
@@ -87,111 +69,56 @@ in
     };
   };
 
-  # ==========================================
-  # CLOUDFLARE TUNNEL (Public Access)
-  # ==========================================
-  # NOTE: You must create the tunnel first using: `cloudflared tunnel create homelab`
-  # and put the credentials JSON file in the path defined below.
-  services.cloudflared = {
+  services.openssh = {
     enable = true;
-    tunnels = {
-      "homelab-tunnel" = {
-        default = "http_status:404";
-        credentialsFile = config.sops.secrets.cloudflared_creds.path;
-        ingress = {
-          # NEXTCLOUD: Publicly accessible via Tunnel
-          "cloud.${publicDomain}" = {
-            # Point to local Nginx port (HTTP)
-            service = "http://localhost:${toString s.nextcloud.port}";
-          };
-          # All other traffic is denied by the 'default' 404 rule above
-        };
-      };
-    };
+    settings.PasswordAuthentication = false;
   };
 
-  # Secret for the Tunnel credentials
-  sops.secrets.cloudflared_creds = {
-    format = "binary"; # The JSON file is treated as binary blob
-    sopsFile = ./secrets.yaml; # You must encyrpt the json file into your secrets.yaml
-    owner = "cloudflared";
-  };
-
-  # ==========================================
-  # CADDY (Private/Tailscale Access)
-  # ==========================================
+  # Caddy Reverse Proxy (HTTPS / Dashboard)
   services.caddy = {
     enable = true;
     virtualHosts = {
-      # DASHBOARD
-      "${s.dashboard.domain}, ${s.dashboard.public}".extraConfig = ''
-        reverse_proxy localhost:${toString s.dashboard.port}
-        ${tlsConfig}
-      '';
-
-      # ROOT REDIRECT
-      "${domain}, ${publicDomain}".extraConfig = ''
-        redir https://${s.dashboard.public}
-        ${tlsConfig}
-      '';
-
-      # NTFY
-      "${s.ntfy.domain}, ${s.ntfy.public}".extraConfig = ''
-        reverse_proxy localhost:${toString s.ntfy.port}
-        ${tlsConfig}
-      '';
-
-      # VAULTWARDEN (Private Only)
-      "${s.vault.domain}, ${s.vault.public}".extraConfig = ''
-        reverse_proxy localhost:${toString s.vault.port}
-        ${tlsConfig}
-      '';
-
-      # MONITOR
-      "${s.monitor.domain}, ${s.monitor.public}".extraConfig = ''
-        reverse_proxy localhost:${toString s.monitor.port}
-        ${tlsConfig}
-      '';
-
-      # NEXTCLOUD (Private Path)
-      "${s.nextcloud.domain}, ${s.nextcloud.public}".extraConfig = ''
-        reverse_proxy localhost:${toString s.nextcloud.port}
-        ${tlsConfig}
-      '';
+      "${domain}".extraConfig = "redir https://${toString s.dashboard.domain}\ntls internal";
+      "${s.ntfy.domain}".extraConfig = "reverse_proxy localhost:${toString s.ntfy.port}\ntls internal";
+      "${s.dashboard.domain}".extraConfig =
+        "reverse_proxy localhost:${toString s.dashboard.port}\ntls internal";
+      "${s.vault.domain}".extraConfig = "reverse_proxy localhost:${toString s.vault.port}\ntls internal";
+      "${s.monitor.domain}".extraConfig =
+        "reverse_proxy localhost:${toString s.monitor.port}\ntls internal";
+      "${s.nextcloud.domain}".extraConfig =
+        "reverse_proxy localhost:${toString s.nextcloud.port}\ntls internal";
     };
   };
 
-  # ==========================================
-  # HOMEPAGE DASHBOARD
-  # ==========================================
+  # Homepage Dashboard
   services.homepage-dashboard = {
     enable = true;
     listenPort = s.dashboard.port;
-    allowedHosts = [ "all" ]; # Simplified for internal dashboard
+    allowedHosts = "${s.dashboard.domain},${domain},localhost,127.0.0.1";
     services = [
       {
         "My Services" = [
           {
             "Ntfy" = {
-              href = "https://${s.ntfy.public}";
+              href = "https://${s.ntfy.domain}";
               description = "Ntfy";
             };
           }
           {
             "Vaultwarden" = {
-              href = "https://${s.vault.public}";
+              href = "https://${s.vault.domain}";
               description = "Password Manager";
             };
           }
           {
             "Monitoring" = {
-              href = "https://${s.monitor.public}";
+              href = "https://${s.monitor.domain}";
               description = "System monitoring";
             };
           }
           {
             "Nextcloud" = {
-              href = "https://${s.nextcloud.public}";
+              href = "https://${s.nextcloud.domain}";
               description = "Files";
             };
           }
@@ -200,36 +127,49 @@ in
     ];
   };
 
-  # ==========================================
-  # APPLICATIONS
-  # ==========================================
-
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-  };
-
+  # PASSWORD MANAGER
   services.vaultwarden = {
     enable = true;
     config = {
       ROCKET_PORT = s.vault.port;
-      SIGNUPS_ALLOWED = false;
-      DOMAIN = "https://${s.vault.public}";
+      SIGNUPS_ALLOWED = true;
+      SHOW_PASSWORD_HINT = false;
+      DOMAIN = "https://${s.vault.domain}";
     };
   };
 
+  # MONITORING
+  # services.beszel = {
+  #   hub = {
+  #     enable = true;
+  #     port = services.monitor.port;
+  #     environment = {
+  #       AUTO_LOGIN = "trey@homelab.lan";
+  #     };
+  #   };
+  #   agent = {
+  #     enable = true;
+  #     environment = {
+  #       SKIP_GPU = "true";
+  #       # HUB_URL = "http://127.0.0.1";
+  #     };
+  #   };
+  # };
+  # https://glances.readthedocs.io/en/latest/quickstart.html
   services.glances = {
     enable = true;
     extraArgs = [ "-w" ];
   };
 
+  # Nextcloud
   services.nextcloud = {
     enable = true;
     package = pkgs.nextcloud32;
-    hostName = s.nextcloud.public;
+    hostName = s.nextcloud.domain;
     https = true;
     configureRedis = true;
 
+    # Tell Nextcloud it's running behind Caddy (Reverse Proxy)
     config = {
       adminuser = "admin";
       dbtype = "sqlite";
@@ -237,11 +177,8 @@ in
     };
 
     settings = {
-      # Trust both the Local domain and Public domain
-      trusted_domains = [
-        s.nextcloud.domain
-        s.nextcloud.public
-      ];
+      trusted_domains = [ s.nextcloud.domain ];
+      # Ensure Nextcloud generates HTTPS links
       overwriteprotocol = "https";
       trusted_proxies = [
         "127.0.0.1"
@@ -250,10 +187,16 @@ in
     };
   };
 
-  # Configure Nginx (used internally by Nextcloud) to listen on the local port
-  services.nginx.virtualHosts."${s.nextcloud.public}" = {
+  # services.nginx.enable = true;
+  # services.nextcloud = {
+  #   settings.trusted_domains = [
+  #     "nextcloud.${domain}"
+  #   ];
+  # };
+  services.nginx.virtualHosts."${s.nextcloud.domain}" = {
     forceSSL = lib.mkForce false;
     enableACME = lib.mkForce false;
+
     listen = [
       {
         addr = "127.0.0.1";
@@ -262,20 +205,19 @@ in
     ];
   };
 
+  # Ntfy
   services.ntfy-sh = {
     enable = true;
     settings = {
-      base-url = "https://${s.ntfy.public}";
+      base-url = "https://${s.ntfy.domain}";
       listen-http = ":${toString s.ntfy.port}";
+      # auth-default-access = "deny-all";
     };
   };
 
-  # ==========================================
-  # TAILSCALE
-  # ==========================================
+  # Mesh network
   services.tailscale = {
     enable = true;
     openFirewall = true;
-    permitCertUid = "caddy";
   };
 }

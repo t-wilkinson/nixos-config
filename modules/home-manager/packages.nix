@@ -88,4 +88,11 @@ with pkgs;
   # nh
   # nix-output-monitor
   # nvd
+
+  # NETWORK
+  tcpdump
+
+  # FILES
+  cifs-utils # smb
+  nfs-utils # nfs
 ]

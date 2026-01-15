@@ -13,7 +13,6 @@ in
   imports = [
     # Standard hardware config is handled by nixos-hardware module in flake.nix
     ./services.nix
-    ./acme.nix
     ./wireguard.nix
   ];
 
