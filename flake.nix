@@ -178,7 +178,7 @@
 
       images.homelab = homelab.config.system.build.sdImage;
       # deploy.nodes.homelab = {
-      #   hostname = "homelab.lan";
+      #   hostname = "home.lab";
       #   sshUser = "root";
       #   profiles.system = {
       #     user = "root";

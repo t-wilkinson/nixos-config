@@ -48,8 +48,8 @@
       ipv4.addresses = "10.1.0.1/30";
       # ipv4.gateway = "10.1.0.2";
       ipv4.dns = "10.1.0.2";
-      # ipv4.dns-search = "~homelab.lan,homelab.lan";
-      ipv4.dns-search = "~homelab.lan";
+      # ipv4.dns-search = "~home.lab,home.lab";
+      ipv4.dns-search = "~home.lab";
       ipv4.never-default = "true";
     };
   };
@@ -71,7 +71,6 @@
 
           allowedIPs = [
             "10.100.0.0/24"
-            "10.1.0.0/30"
           ];
         }
       ];

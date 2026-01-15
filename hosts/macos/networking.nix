@@ -2,9 +2,9 @@
 {
   services.tailscale.enable = true;
   # Verify with: scutil --dns
-  environment.etc."resolver/homelab.lan".text = ''
+  environment.etc."resolver/home.lab".text = ''
     nameserver 10.100.0.1
-    search homelab.lan
+    search home.lab
     timeout 2
   '';
 
@@ -14,7 +14,7 @@
   services.dnsmasq = {
     enable = true;
     addresses = {
-      "homelab.lan" = "10.100.0.1";
+      "home.lab" = "10.100.0.1";
       # "pi.vpn" = "10.0.0.1";
       # "t.j" = "127.0.0.1";
       # "api.t.j" = "127.0.0.1";

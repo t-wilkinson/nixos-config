@@ -7,7 +7,7 @@
 # TODO: *.home.lab
 let
   directIp = "10.100.0.1"; # The static IP for the direct Ethernet link to your PC
-  domain = "homelab.lan";
+  domain = "home.lab";
 
   # services
   s = {
@@ -53,8 +53,8 @@ in
         customTTL = "1h";
         mapping = {
           # Map main domain and all subdomains to the Pi's Direct IP
-          "homelab.lan" = directIp;
-          "*.homelab.lan" = directIp;
+          "home.lab" = directIp;
+          "*.home.lab" = directIp;
         };
       };
 
@@ -144,7 +144,7 @@ in
   #     enable = true;
   #     port = services.monitor.port;
   #     environment = {
-  #       AUTO_LOGIN = "trey@homelab.lan";
+  #       AUTO_LOGIN = "trey@home.lab";
   #     };
   #   };
   #   agent = {
