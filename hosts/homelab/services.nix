@@ -1,3 +1,4 @@
+# hosts/homelab/services.nix
 {
   config,
   pkgs,
@@ -24,13 +25,19 @@ let
     };
     dashboard = {
       port = 8082;
-      domain = "dashboard.${domain}";
+      domain = "dash.${domain}";
     };
     nextcloud = {
       port = 8081;
       domain = "cloud.${domain}";
     };
-    tailscale = {
+    sync = {
+      port = 8384;
+      domain = "sync.${domain}";
+    };
+    zortex = {
+      port = 5000;
+      domain = "zortex.${domain}";
     };
   };
 in
@@ -78,14 +85,31 @@ in
     enable = true;
     virtualHosts = {
       "${domain}".extraConfig = "redir https://${toString s.dashboard.domain}\ntls internal";
+      "${s.dashboard.domain}".extraConfig = ''
+        # Serve the Root CRT at /root.crt
+        handle /root.crt {
+          root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
+          file_server {
+            hide root.key
+          }
+        }
+
+        # Proxy everything else to Homepage
+        handle {
+          reverse_proxy localhost:${toString s.dashboard.port}
+        }
+
+        tls internal
+      '';
       "${s.ntfy.domain}".extraConfig = "reverse_proxy localhost:${toString s.ntfy.port}\ntls internal";
-      "${s.dashboard.domain}".extraConfig =
-        "reverse_proxy localhost:${toString s.dashboard.port}\ntls internal";
       "${s.vault.domain}".extraConfig = "reverse_proxy localhost:${toString s.vault.port}\ntls internal";
+      "${s.sync.domain}".extraConfig = "reverse_proxy localhost:${toString s.sync.port}\ntls internal";
       "${s.monitor.domain}".extraConfig =
         "reverse_proxy localhost:${toString s.monitor.port}\ntls internal";
       "${s.nextcloud.domain}".extraConfig =
         "reverse_proxy localhost:${toString s.nextcloud.port}\ntls internal";
+      "${s.zortex.domain}".extraConfig =
+        "reverse_proxy localhost:${toString s.zortex.port}\ntls internal";
     };
   };
 
@@ -97,6 +121,13 @@ in
     services = [
       {
         "My Services" = [
+          {
+            "Root Certificate" = {
+              icon = "mdi-file-certificate";
+              href = "https://${s.dashboard.domain}/root.crt";
+              description = "Download to trust HTTPS";
+            };
+          }
           {
             "Ntfy" = {
               href = "https://${s.ntfy.domain}";
@@ -119,6 +150,18 @@ in
             "Nextcloud" = {
               href = "https://${s.nextcloud.domain}";
               description = "Files";
+            };
+          }
+          {
+            "Syncthing" = {
+              href = "https://${s.sync.domain}";
+              description = "Syncthing";
+            };
+          }
+          {
+            "Zortex" = {
+              href = "https://${s.zortex.domain}";
+              description = "Zortex";
             };
           }
         ];
@@ -219,4 +262,61 @@ in
     enable = true;
     openFirewall = true;
   };
+
+  # Zortex
+  # services.zortex = {
+  #   enable = true;
+  #   port = s.zortex.port;
+  #   ntfyUrl = "http://127.0.0.1:${toString s.ntfy.port}";
+  #   ntfyTopic = "zortex-notify";
+  #   dataDir = "/var/lib/zortex";
+  # };
+
+  # Syncthing
+  # systemd.services.syncthing.serviceConfig = {
+  #   StateDirectory = "syncthing";
+  #   StateDirectoryMode = "0750";
+  # };
+  systemd.tmpfiles.rules = [
+    "d /srv/sync 0755 trey users -"
+    "d /srv/sync/personal 0755 trey users -"
+  ];
+  services.syncthing = {
+    enable = true;
+    user = "trey";
+    configDir = "/home/trey/.config/syncthing"; # default folder for new synced files
+    dataDir = "/srv/sync";
+
+    openDefaultPorts = true; # 22000/tcp transfer, 21027/udp discovery
+
+    guiAddress = "127.0.0.1:${toString s.sync.port}";
+
+    settings = {
+      gui.insecureSkipHostcheck = true;
+      options = {
+        # nattEnabled = false;
+      };
+
+      devices = {
+        "nixos" = {
+          id = "X6Q657S-5M3JA3P-MMWO5VX-EPHF7BB-XQI3MPS-NV2NFSA-BCPHPOV-VFCRZAG";
+          # addresses = [ "tcp://10.1.0.1:22000" ];
+          # introducer = true;
+        };
+        "macos" = {
+          id = "MACOS_ID";
+          introducer = true;
+        };
+      };
+
+      folders = {
+        "personal" = {
+          id = "personal"; # remove this line?
+          path = "/srv/sync/personal";
+          devices = [ "nixos" ];
+        };
+      };
+    };
+  };
+
 }

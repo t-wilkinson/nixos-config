@@ -91,4 +91,5 @@ with pkgs;
 
   # NETWORK
   tcpdump
+  syncthing
 ]

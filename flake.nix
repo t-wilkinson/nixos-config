@@ -32,6 +32,7 @@
       nixpkgs-unstable,
       sops-nix,
       thorium,
+      zortex,
     }@inputs:
     let
       username = "trey";
@@ -93,6 +94,7 @@
             nix-homebrew.darwinModules.nix-homebrew
             darwin-docker.darwinModules.docker
             sops-nix.darwinModules.sops
+            zortex.nixosModules.default
 
             # ./modules/distributed-build.nix
             {
@@ -131,6 +133,7 @@
           modules = [
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
+            zortex.nixosModules.default
             ./hosts/nixos
           ]
           ++ extraModules;
@@ -288,6 +291,9 @@
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
+    # zortex
+    zortex.url = "path:/home/trey/dev/t-wilkinson/zortex.nvim";
 
     # Virtualization
     # NixVirt = {

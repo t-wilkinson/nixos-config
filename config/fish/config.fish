@@ -93,6 +93,7 @@ alias ls="eza --icons=always --grid"
 # alias la='eza -lbhHigUmuSa --git --color-scale'
 alias lt='eza --tree --level=2'
 
+set -gx NODE_EXTRA_CA_CERTS "$HOME/dev/t-wilkinson/nixos-config/hosts/homelab/homelab-root.crt" # for bitwarden on local private server
 set -gx EDITOR nvim
 set -gx PAGER less
 set -gx PAGER "bat --paging=always"
@@ -130,3 +131,40 @@ set -Ux FZF_DEFAULT_OPTS "
 # 	--color=pointer:#c4a7e7,marker:#eb6f92,prompt:#908caa"
 
 fish_add_path "$HOME/dev/t-wilkinson/projects/scripts"
+
+# BITWARDEN
+alias bwlogin="bw login trey@home.lab"
+alias bwpass="bw get password $argv"
+# export BW_SESSION=$(bw login trey@home.lab --raw)
+set -gx BW_SERVER "https://vault.home.lab"
+
+function bw-auth
+    # Check if we are already logged in; if not, login first
+    if not bw status | string match -q '*"status":"unlocked"*'
+        # Pass the email directly to skip the prompt
+        set -gx BW_SESSION (bw unlock --raw)
+
+        if test -n "$BW_SESSION"
+            echo "✅ Vault unlocked and BW_SESSION set."
+        else
+            echo "❌ Failed to unlock vault."
+        end
+    else
+        echo "ℹ️ Vault is already unlocked."
+    end
+end
+
+# # Bitwarden Auto-Unlock on Startup
+# if status is-interactive
+#     # Check if BW_SESSION is missing or invalid
+#     if not set -q BW_SESSION; or not bw status | string match -q '*"status":"unlocked"*'
+#         echo "🔐 Bitwarden vault is locked."
+#         # Use --raw to capture the key directly from the password prompt
+#         set -gx BW_SESSION (bw unlock --raw)
+# 
+#         if test -n "$BW_SESSION"
+#             clear # Optional: clears the password entry from view
+#             echo "✅ Vault unlocked."
+#         end
+#     end
+# end

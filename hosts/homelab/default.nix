@@ -48,9 +48,7 @@ in
   users.users.${username} = {
     isNormalUser = true;
     shell = pkgs.fish;
-    # hashedPassword = "$6$s0hOYqgJDqS8QCfJ$mv6k9qMFLah6uwV35wmSnH8ADB1i8vtaCe4II0bdjv8iB2IZiYTlI3K6IxMfYw0GqD8fdmyOBC9XxACJOzbGI0";
-    # initialHashedPassword = "$6$s0hOYqgJDqS8QCfJ$mv6k9qMFLah6uwV35wmSnH8ADB1i8vtaCe4II0bdjv8iB2IZiYTlI3K6IxMfYw0GqD8fdmyOBC9XxACJOzbGI0";
-    initialPassword = "password";
+    hashedPasswordFile = config.sops.secrets.homelab_password_hash.path;
     extraGroups = [
       "wheel"
       "video"
@@ -58,6 +56,7 @@ in
       "input"
       "uinput"
       "libvirtd"
+      "syncthing"
     ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
@@ -188,6 +187,9 @@ in
       wifi_psk = {
         owner = "root";
       };
+      homelab_password_hash = {
+        owner = "root";
+      };
       wg_homelab_private_key = {
         owner = "root";
       };
@@ -208,7 +210,11 @@ in
   # 4. MISC
   # ==========================================
   # Wake on LAN util for turning on the PC
-  environment.systemPackages = [ pkgs.wol ];
+  environment.systemPackages = with pkgs; [
+    wol
+    wireguard-tools
+    syncthing
+  ];
 
   system.stateVersion = "24.11";
 }

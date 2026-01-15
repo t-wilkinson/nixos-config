@@ -1205,6 +1205,22 @@
         "type": "github"
       }
     },
+    "nixpkgs_6": {
+      "locked": {
+        "lastModified": 1768305791,
+        "narHash": "sha256-AIdl6WAn9aymeaH/NvBj0H9qM+XuAuYbGMZaP0zcXAQ=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "1412caf7bf9e660f2f962917c14b1ea1c3bc695e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "pre-commit-hooks": {
       "inputs": {
         "flake-compat": "flake-compat_2",
@@ -1257,7 +1273,8 @@
         "nixpkgs-nixos": "nixpkgs-nixos",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "sops-nix": "sops-nix",
-        "thorium": "thorium"
+        "thorium": "thorium",
+        "zortex": "zortex"
       }
     },
     "sops-nix": {
@@ -1529,6 +1546,21 @@
         "owner": "hyprwm",
         "repo": "xdg-desktop-portal-hyprland",
         "type": "github"
+      }
+    },
+    "zortex": {
+      "inputs": {
+        "nixpkgs": "nixpkgs_6"
+      },
+      "locked": {
+        "lastModified": 1768511742,
+        "narHash": "sha256-wBFOG9UqxdR9i6fi3vtXNzKh3YnNeVdRsU2H7egaqus=",
+        "path": "/home/trey/dev/t-wilkinson/zortex.nvim",
+        "type": "path"
+      },
+      "original": {
+        "path": "/home/trey/dev/t-wilkinson/zortex.nvim",
+        "type": "path"
       }
     }
   },
