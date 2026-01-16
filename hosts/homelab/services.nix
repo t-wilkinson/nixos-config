@@ -304,8 +304,8 @@ in
           # introducer = true;
         };
         "macos" = {
-          id = "MACOS_ID";
-          introducer = true;
+          id = "A6IABFJ-IS7YU6H-RASNO76-KLURNQV-QRU676J-K4GXR2H-6P2733W-ORLEMQU";
+          # introducer = true;
         };
       };
 

@@ -242,6 +242,9 @@ return {
       "rcarriga/nvim-notify",
     },
     opts = function(_, opts)
+      opts.cmdline = { enabled = false }
+      opts.messages = { enabled = false }
+      opts.popupmenu = { enabled = false }
       table.insert(opts.routes, {
         filter = {
           event = "notify",

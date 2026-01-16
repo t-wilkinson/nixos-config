@@ -1553,14 +1553,17 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1768511742,
-        "narHash": "sha256-wBFOG9UqxdR9i6fi3vtXNzKh3YnNeVdRsU2H7egaqus=",
-        "path": "/home/trey/dev/t-wilkinson/zortex.nvim",
-        "type": "path"
+        "lastModified": 1768531243,
+        "narHash": "sha256-5b4yDeCILZD64AzbROKTHnbpGA+A/lOb+nT4N/FTS60=",
+        "owner": "t-wilkinson",
+        "repo": "zortex.nvim",
+        "rev": "2fe6454abba44658c87a78bcf17abed3d1168cc6",
+        "type": "github"
       },
       "original": {
-        "path": "/home/trey/dev/t-wilkinson/zortex.nvim",
-        "type": "path"
+        "owner": "t-wilkinson",
+        "repo": "zortex.nvim",
+        "type": "github"
       }
     }
   },

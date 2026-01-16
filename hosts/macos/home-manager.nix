@@ -93,6 +93,32 @@
           stateVersion = "23.11";
         };
 
+        services.syncthing = {
+          enable = true;
+          # user = "trey";
+          # dataDir = "/Users/trey/.local/state/syncthing"; # Default folder for new synced directories
+          # configDir = "/Users/trey/.config/syncthing";
+
+          # openDefaultPorts = true; # 22000/tcp transfer, 21027/udp discovery
+
+          settings = {
+            devices = {
+              "homelab" = {
+                id = "HIAD4WE-UUAOBRY-KXKOWTA-P5HAXBL-FH3NQKF-BZLSGSO-YKNVFFI-4VUZQQE";
+                # addresses = [ "tcp://10.1.0.2:22000" ];
+              };
+            };
+
+            folders = {
+              "personal" = {
+                id = "personal"; # remove this line?
+                path = "/Users/trey/dev/t-wilkinson/personal";
+                devices = [ "homelab" ];
+              };
+            };
+          };
+        };
+
         # programs = {} // import ../../shared/home-manager.nix { inherit config pkgs lib; };
       };
   };

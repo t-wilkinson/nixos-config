@@ -94,7 +94,6 @@
             nix-homebrew.darwinModules.nix-homebrew
             darwin-docker.darwinModules.docker
             sops-nix.darwinModules.sops
-            zortex.nixosModules.default
 
             # ./modules/distributed-build.nix
             {
@@ -133,7 +132,6 @@
           modules = [
             home-manager.nixosModules.home-manager
             sops-nix.nixosModules.sops
-            zortex.nixosModules.default
             ./hosts/nixos
           ]
           ++ extraModules;
@@ -145,6 +143,7 @@
         modules = [
           "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           nixos-hardware.nixosModules.raspberry-pi-4
+          zortex.nixosModules.default
           (
             { pkgs, lib, ... }:
             {
@@ -293,7 +292,7 @@
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
 
     # zortex
-    zortex.url = "path:/home/trey/dev/t-wilkinson/zortex.nvim";
+    zortex.url = "github:t-wilkinson/zortex.nvim";
 
     # Virtualization
     # NixVirt = {
