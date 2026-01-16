@@ -267,7 +267,7 @@ in
   # services.zortex = {
   #   enable = true;
   #   port = s.zortex.port;
-  #   ntfyUrl = "http://127.0.0.1:${toString s.ntfy.port}";
+  #   ntfyUrl = "https://${s.ntfy.domain}";
   #   ntfyTopic = "zortex-notify";
   #   dataDir = "/var/lib/zortex";
   # };
