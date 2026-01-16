@@ -1209,13 +1209,13 @@
       "locked": {
         "lastModified": 1768305791,
         "narHash": "sha256-AIdl6WAn9aymeaH/NvBj0H9qM+XuAuYbGMZaP0zcXAQ=",
-        "owner": "nixos",
+        "owner": "NixOS",
         "repo": "nixpkgs",
         "rev": "1412caf7bf9e660f2f962917c14b1ea1c3bc695e",
         "type": "github"
       },
       "original": {
-        "owner": "nixos",
+        "owner": "NixOS",
         "ref": "nixos-unstable",
         "repo": "nixpkgs",
         "type": "github"
@@ -1553,11 +1553,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1768531243,
-        "narHash": "sha256-5b4yDeCILZD64AzbROKTHnbpGA+A/lOb+nT4N/FTS60=",
+        "lastModified": 1768588061,
+        "narHash": "sha256-X6OTUDznesPECfT3GoPsPL4/4KIAeso6b0bKMh9kjko=",
         "owner": "t-wilkinson",
         "repo": "zortex.nvim",
-        "rev": "2fe6454abba44658c87a78bcf17abed3d1168cc6",
+        "rev": "aee03a3d14299e2067b28a99a38e0830558bc705",
         "type": "github"
       },
       "original": {

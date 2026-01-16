@@ -45,11 +45,13 @@ in
 
   programs.fish.enable = true;
   users.mutableUsers = false;
+  users.groups.personaldata = { }; # for exposing to synced directory to nextcloud
   users.users.${username} = {
     isNormalUser = true;
     shell = pkgs.fish;
     hashedPasswordFile = config.sops.secrets.homelab_password_hash.path;
     extraGroups = [
+      "personaldata"
       "wheel"
       "video"
       "docker"
@@ -199,6 +201,10 @@ in
       };
     };
   };
+
+  security.pki.certificateFiles = [
+    ./homelab-root.crt
+  ];
 
   # Provision the SSH key generated in Phase 1
   environment.etc."ssh/ssh_host_ed25519_key" = {

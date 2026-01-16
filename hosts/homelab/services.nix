@@ -3,6 +3,7 @@
   config,
   pkgs,
   lib,
+  username,
   ...
 }:
 let
@@ -186,7 +187,7 @@ in
   #     enable = true;
   #     port = services.monitor.port;
   #     environment = {
-  #       AUTO_LOGIN = "trey@home.lab";
+  #       AUTO_LOGIN = "${username}@home.lab";
   #     };
   #   };
   #   agent = {
@@ -204,6 +205,14 @@ in
   };
 
   # Nextcloud
+  fileSystems."/var/lib/nextcloud/data/personal" = {
+    device = "/srv/sync/personal";
+    options = [
+      "bind"
+      "ro"
+    ];
+  };
+  users.users.nextcloud.extraGroups = [ "personaldata" ];
   services.nextcloud = {
     enable = true;
     package = pkgs.nextcloud32;
@@ -227,6 +236,11 @@ in
         "::1"
       ];
     };
+
+    extraAppsEnable = true;
+    # extraApps = {
+    #   inherit (config.services.nextcloud.package.packages.apps) external;
+    # };
   };
 
   # services.nginx.enable = true;
@@ -264,13 +278,13 @@ in
   };
 
   # Zortex
-  # services.zortex = {
-  #   enable = true;
-  #   port = s.zortex.port;
-  #   ntfyUrl = "https://${s.ntfy.domain}";
-  #   ntfyTopic = "zortex-notify";
-  #   dataDir = "/var/lib/zortex";
-  # };
+  services.zortex = {
+    enable = true;
+    port = s.zortex.port;
+    ntfy.url = "https://${s.ntfy.domain}";
+    ntfy.topic = "zortex-notify";
+    # dataDir = "/var/lib/zortex";
+  };
 
   # Syncthing
   # systemd.services.syncthing.serviceConfig = {
@@ -278,13 +292,13 @@ in
   #   StateDirectoryMode = "0750";
   # };
   systemd.tmpfiles.rules = [
-    "d /srv/sync 0755 trey users -"
-    "d /srv/sync/personal 0755 trey users -"
+    "d /srv/sync 0755 ${username} users -"
+    "d /srv/sync/personal 0770 ${username} personaldata -"
   ];
   services.syncthing = {
     enable = true;
-    user = "trey";
-    configDir = "/home/trey/.config/syncthing";
+    user = username;
+    configDir = "/home/${username}/.config/syncthing";
     dataDir = "/srv/sync"; # default folder for new synced files
 
     openDefaultPorts = true; # 22000/tcp transfer, 21027/udp discovery
