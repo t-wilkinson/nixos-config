@@ -47,12 +47,6 @@
           id = "personal"; # remove this line?
           path = "/home/trey/dev/t-wilkinson/personal";
           devices = [ "homelab" ];
-          versioning = {
-            type = "simple";
-            params = {
-              keep = "10";
-            };
-          };
         };
       };
     };

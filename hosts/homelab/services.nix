@@ -284,8 +284,8 @@ in
   services.syncthing = {
     enable = true;
     user = "trey";
-    configDir = "/home/trey/.config/syncthing"; # default folder for new synced files
-    dataDir = "/srv/sync";
+    configDir = "/home/trey/.config/syncthing";
+    dataDir = "/srv/sync"; # default folder for new synced files
 
     openDefaultPorts = true; # 22000/tcp transfer, 21027/udp discovery
 
@@ -314,6 +314,12 @@ in
           id = "personal"; # remove this line?
           path = "/srv/sync/personal";
           devices = [ "nixos" ];
+          versioning = {
+            type = "simple";
+            params = {
+              keep = "10";
+            };
+          };
         };
       };
     };
