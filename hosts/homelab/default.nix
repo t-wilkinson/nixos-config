@@ -222,11 +222,13 @@ in
   # ==========================================
   # 4. MISC
   # ==========================================
-  # Wake on LAN util for turning on the PC
   environment.systemPackages = with pkgs; [
-    wol
+    wol # Wake on LAN util for turning on the PC
     wireguard-tools
     syncthing
+    tree
+    ripgrep
+    fd
   ];
 
   system.stateVersion = "24.11";
@@ -239,4 +241,9 @@ in
       "x-systemd.automount"
     ];
   };
+
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 }
