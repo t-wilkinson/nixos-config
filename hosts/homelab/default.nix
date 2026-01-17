@@ -97,7 +97,8 @@ in
           };
           wifi-security = {
             key-mgmt = "wpa-psk";
-            psk = "November13th"; # Note: This exposes the password in the Nix store
+            psk-file = config.sops.secrets.wifi_psk.path;
+            # psk = ""; # Note: This exposes the password in the Nix store
           };
           ipv4 = {
             method = "auto";
@@ -182,8 +183,8 @@ in
   # ==========================================
   sops = {
     defaultSopsFile = ./secrets.yaml;
-    # We bake the key into the image so it can decrypt on first boot
-    # age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    age.sshKeyPaths = [ ];
+    gnupg.sshKeyPaths = [ ];
     age.keyFile = "/etc/ssh/age.key";
 
     secrets = {
@@ -215,10 +216,10 @@ in
   ];
 
   # Provision the SSH key generated in Phase 1
-  environment.etc."ssh/ssh_host_ed25519_key" = {
-    source = ./ssh_host_ed25519_key;
-    mode = "0600";
-  };
+  # environment.etc."ssh/ssh_host_ed25519_key" = {
+  #   source = ./ssh_host_ed25519_key;
+  #   mode = "0600";
+  # };
 
   # ==========================================
   # 4. MISC

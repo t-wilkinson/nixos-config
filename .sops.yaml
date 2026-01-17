@@ -8,10 +8,9 @@ creation_rules:
   - path_regex: hosts/homelab/secrets.yaml$
     key_groups:
       - age:
-          - *homelab_key
+          - *new_homelab_key
           - *nixos_key
           - *user_key
-          - *new_homelab_key
   - path_regex: hosts/nixos/secrets.yaml$
     key_groups:
       - age:
