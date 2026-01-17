@@ -2,6 +2,7 @@ keys:
   - &homelab_key age12knqachghuzjs6mhlm0pk6va3mtxwa4e2efsmcmvn7h660jnsakq20kjft
   - &nixos_key age1keu95mggykvypgmzctw8waluqh3nhz27g5w4ygrr6dv433dcau3q368cxq
   - &user_key age1hvr3azukesav7v04gg85fw8t3drc0r6sevl8l70rryq42ckq0p5qvkmgz7
+  - &new_homelab_key age16cr2wqda0rrkjg07000ggvck9vnyd3s0tljptffavk0848cflfwqyv8zcw
 
 creation_rules:
   - path_regex: hosts/homelab/secrets.yaml$
@@ -10,6 +11,7 @@ creation_rules:
           - *homelab_key
           - *nixos_key
           - *user_key
+          - *new_homelab_key
   - path_regex: hosts/nixos/secrets.yaml$
     key_groups:
       - age:

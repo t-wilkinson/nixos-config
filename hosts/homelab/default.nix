@@ -183,7 +183,8 @@ in
   sops = {
     defaultSopsFile = ./secrets.yaml;
     # We bake the key into the image so it can decrypt on first boot
-    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    # age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+    age.keyFile = "/etc/ssh/age.key";
 
     secrets = {
       wifi_psk = {
