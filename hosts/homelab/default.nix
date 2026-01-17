@@ -199,6 +199,13 @@ in
         owner = "nextcloud";
         group = "nextcloud";
       };
+      cloudflared_creds = {
+        owner = "root";
+        group = "root";
+      };
+      google_app_password = {
+        owner = "root";
+      };
     };
   };
 
@@ -223,4 +230,13 @@ in
   ];
 
   system.stateVersion = "24.11";
+
+  fileSystems."/mnt/backup" = {
+    device = "/dev/disk/by-uuid/D404BD3804BD1E84";
+    fsType = "ntfs";
+    options = [
+      "nofail"
+      "x-systemd.automount"
+    ];
+  };
 }

@@ -9,6 +9,7 @@
 let
   directIp = "10.100.0.1"; # The static IP for the direct Ethernet link to your PC
   domain = "home.lab";
+  tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # cloudflared tunnel
 
   # services
   s = {
@@ -31,6 +32,7 @@ let
     nextcloud = {
       port = 8081;
       domain = "cloud.${domain}";
+      publicDomain = "cloud.treywilkinson.com";
     };
     sync = {
       port = 8384;
@@ -81,7 +83,30 @@ in
     settings.PasswordAuthentication = false;
   };
 
-  # Caddy Reverse Proxy (HTTPS / Dashboard)
+  # CLOUDFLARE TUNNEL
+  services.cloudflared = {
+    enable = true;
+    tunnels = {
+      "${tunnelId}" = {
+        # Path to the credentials file you generated with 'cloudflared tunnel create'
+        # Since you use sops, you could also point this to
+        # credentialsFile = "/var/lib/cloudflared/creds.json";
+        credentialsFile = config.sops.secrets."cloudflared_creds".path;
+        default = "http_status:404"; # Default Rule: Hide everything else!
+        ingress = {
+          "${s.nextcloud.publicDomain}" = {
+            service = "http://localhost:${toString s.nextcloud.port}";
+            originRequest = {
+              # Trick Nginx into thinking the request is for the internal domain
+              httpHostHeader = s.nextcloud.domain;
+            };
+          };
+        };
+      };
+    };
+  };
+
+  # CADDY Reverse Proxy (HTTPS / Dashboard)
   services.caddy = {
     enable = true;
     virtualHosts = {
@@ -114,7 +139,7 @@ in
     };
   };
 
-  # Homepage Dashboard
+  # HOMEPAGE DASHBOARD
   services.homepage-dashboard = {
     enable = true;
     listenPort = s.dashboard.port;
@@ -181,30 +206,14 @@ in
     };
   };
 
-  # MONITORING
-  # services.beszel = {
-  #   hub = {
-  #     enable = true;
-  #     port = services.monitor.port;
-  #     environment = {
-  #       AUTO_LOGIN = "${username}@home.lab";
-  #     };
-  #   };
-  #   agent = {
-  #     enable = true;
-  #     environment = {
-  #       SKIP_GPU = "true";
-  #       # HUB_URL = "http://127.0.0.1";
-  #     };
-  #   };
-  # };
+  # GLANCES
   # https://glances.readthedocs.io/en/latest/quickstart.html
   services.glances = {
     enable = true;
     extraArgs = [ "-w" ];
   };
 
-  # Nextcloud
+  # NEXTCLOUD
   fileSystems."/var/lib/nextcloud/data/personal" = {
     device = "/srv/sync/personal";
     options = [
@@ -228,13 +237,38 @@ in
     };
 
     settings = {
-      trusted_domains = [ s.nextcloud.domain ];
+      overwritehost = s.nextcloud.publicDomain;
+      trusted_domains = [
+        s.nextcloud.domain
+        s.nextcloud.publicDomain
+      ];
       # Ensure Nextcloud generates HTTPS links
       overwriteprotocol = "https";
       trusted_proxies = [
         "127.0.0.1"
         "::1"
       ];
+
+      # mail_smtpmode = "smtp";
+      # mail_sendmailmode = "smtp";
+
+      # # The email people see when they receive notifications
+      # mail_from_address = "admin";
+      # mail_domain = "treywilkinson.com"; # Combined -> admin@treywilkinson.com
+
+      # # SMTP Connection Settings (Example: Gmail)
+      # # For Gmail: Use "smtp.gmail.com", Port 465, and SSL.
+      # mail_smtphost = "smtp.gmail.com";
+      # mail_smtpport = 465;
+      # mail_smtpsecure = "ssl"; # "ssl" for port 465, "tls" for port 587
+      # mail_smtpauth = true;
+      # mail_smtpname = "winston.trey.wilkinson@gmail.com";
+      # # NOTE: putting the password here means it will be readable in /nix/store
+      # # mail_smtppassword = "your-app-password";
+      # add:
+      # SPF record
+      # DKIM record
+      # Often DMARC (strongly recommended)
     };
 
     extraAppsEnable = true;
@@ -243,12 +277,21 @@ in
     # };
   };
 
-  # services.nginx.enable = true;
-  # services.nextcloud = {
-  #   settings.trusted_domains = [
-  #     "nextcloud.${domain}"
-  #   ];
-  # };
+  systemd.services.nextcloud-set-smtp-pass = {
+    description = "Set Nextcloud SMTP password from sops";
+    after = [ "nextcloud-setup.service" ];
+    wants = [ "nextcloud-setup.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      User = "nextcloud";
+    };
+    script = ''
+      ${config.services.nextcloud.occ}/bin/occ \
+        config:system:set mail_smtppassword \
+        --value "$(cat ${config.sops.secrets.google_app_password.path})"
+    '';
+  };
+
   services.nginx.virtualHosts."${s.nextcloud.domain}" = {
     forceSSL = lib.mkForce false;
     enableACME = lib.mkForce false;
@@ -261,7 +304,7 @@ in
     ];
   };
 
-  # Ntfy
+  # NTFY
   services.ntfy-sh = {
     enable = true;
     settings = {
@@ -271,13 +314,13 @@ in
     };
   };
 
-  # Mesh network
+  # TAILSCALE: Mesh network
   services.tailscale = {
     enable = true;
     openFirewall = true;
   };
 
-  # Zortex
+  # ZORTEX: notes, calendar, etc.
   services.zortex = {
     enable = true;
     port = s.zortex.port;
@@ -286,7 +329,7 @@ in
     # dataDir = "/var/lib/zortex";
   };
 
-  # Syncthing
+  # SYNCTHING
   # systemd.services.syncthing.serviceConfig = {
   #   StateDirectory = "syncthing";
   #   StateDirectoryMode = "0750";
@@ -339,4 +382,50 @@ in
     };
   };
 
+  # BORG backup
+  services.borgbackup.jobs."homelab-backup" = {
+    # Define what to backup
+    paths = [
+      "/var/lib/nextcloud" # Example: Nextcloud data
+      "/srv/sync"
+    ];
+
+    # Exclude temporary junk
+    exclude = [
+      "*.pyc"
+      "/home/*/.cache"
+      "*/nextcloud.db-wal"
+      "*/nextcloud.db-shm"
+    ];
+
+    # The location on the USB drive
+    repo = "/mnt/backup/borg";
+
+    # Encryption: 'none' is easiest for a physical drive at home,
+    # but 'repokey' is safer if the drive is lost.
+    encryption = {
+      mode = "none";
+    };
+
+    # Compression (zstd is fast and efficient)
+    compression = "auto,zstd";
+
+    # Schedule: Run daily at 3:00 AM
+    startAt = "daily";
+
+    # Pruning: Keep a "git-log" style history
+    prune.keep = {
+      daily = 7;
+      weekly = 4;
+      monthly = 6;
+    };
+
+    # This prevents the backup from creating a messy folder if the drive isn't there.
+    preHook = ''
+      if ! ${pkgs.util-linux}/bin/mountpoint -q /mnt/backup; then
+        echo "Backup drive not mounted. Skipping backup."
+        exit 0
+      fi
+    '';
+  };
 }
