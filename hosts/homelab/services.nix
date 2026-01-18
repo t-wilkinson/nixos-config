@@ -7,7 +7,7 @@
   ...
 }:
 let
-  directIp = "10.100.0.1"; # The static IP for the direct Ethernet link to your PC
+  vpnIp = "10.100.0.1";
   domain = "home.lab";
   tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # cloudflared tunnel
 
@@ -20,10 +20,14 @@ let
     ntfy = {
       port = 8083;
       domain = "ntfy.${domain}";
+      description = "Ntfy";
+      name = "Ntfy";
     };
     vault = {
       port = 8000;
       domain = "vault.${domain}";
+      name = "Vaultwarden";
+      description = "Password manager";
     };
     dashboard = {
       port = 8082;
@@ -33,83 +37,89 @@ let
       port = 8081;
       domain = "cloud.${domain}";
       publicDomain = "cloud.treywilkinson.com";
+      name = "Nextcloud";
+      description = "Files";
     };
     sync = {
       port = 8384;
       domain = "sync.${domain}";
+      name = "Syncthing";
+      description = "Syncthing";
     };
     zortex = {
       port = 5000;
       domain = "zortex.${domain}";
+      name = "Zortex";
+      description = "Zortex";
+    };
+    prometheus = {
+      name = "Prometheus";
+      port = 9090;
+      domain = "metrics.${domain}";
+    };
+    grafana = {
+      port = 3000;
+      domain = "grafana.${domain}";
+      name = "Grafana";
+    };
+    immich = {
+      port = 2283;
+      domain = "photos.${domain}";
+      publicDomain = "photos.treywilkinson.com";
     };
   };
+
+  mkProxy = name: {
+    name = s.${name}.domain;
+    value = {
+      extraConfig = ''
+        reverse_proxy localhost:${toString s.${name}.port} {
+          header_up X-Real-IP {http.request.remote.host}
+        }
+        tls internal
+      '';
+    };
+  };
+
+  simpleHosts = builtins.listToAttrs (
+    map mkProxy [
+      "ntfy"
+      "vault"
+      "monitor"
+      "nextcloud"
+      "zortex"
+      "sync"
+      "grafana"
+      "prometheus"
+      "immich"
+    ]
+  );
+
+  mkHomepage = name: {
+    ${s.${name}.name or name} = {
+      description = s.${name}.description or "";
+      href = "https://${s.${name}.domain}";
+    };
+  };
+
+  simpleHomepages = map mkHomepage [
+    "ntfy"
+    "vault"
+    "monitor"
+    "nextcloud"
+    "sync"
+    "zortex"
+    "grafana"
+    "prometheus"
+    "immich"
+  ];
+
 in
 {
-  services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
-  services.resolved.extraConfig = "DNSStubListener=no";
-  services.blocky = {
-    enable = true;
-    settings = {
-      ports.dns = 53;
-      # ports.http = 4000;
-      upstreams.groups.default = [
-        "https://1.1.1.1/dns-query" # Cloudflare
-        "https://8.8.8.8/dns-query" # Google
-      ];
-
-      # Access your services via these domains
-      customDNS = {
-        customTTL = "1h";
-        mapping = {
-          # Map main domain and all subdomains to the Pi's Direct IP
-          "home.lab" = directIp;
-          "*.home.lab" = directIp;
-        };
-      };
-
-      # Ad Blocking
-      blocking = {
-        # enable = true;
-        blackLists = {
-          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
-        };
-        clientGroupsBlock.default = [ "ads" ];
-      };
-    };
-  };
-
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = false;
-  };
-
-  # CLOUDFLARE TUNNEL
-  services.cloudflared = {
-    enable = true;
-    tunnels = {
-      "${tunnelId}" = {
-        # Path to the credentials file you generated with 'cloudflared tunnel create'
-        # Since you use sops, you could also point this to
-        # credentialsFile = "/var/lib/cloudflared/creds.json";
-        credentialsFile = config.sops.secrets."cloudflared_creds".path;
-        default = "http_status:404"; # Default Rule: Hide everything else!
-        ingress = {
-          "${s.nextcloud.publicDomain}" = {
-            service = "http://localhost:${toString s.nextcloud.port}";
-            originRequest = {
-              # Trick Nginx into thinking the request is for the internal domain
-              httpHostHeader = s.nextcloud.domain;
-            };
-          };
-        };
-      };
-    };
-  };
-
   # CADDY Reverse Proxy (HTTPS / Dashboard)
   services.caddy = {
     enable = true;
-    virtualHosts = {
+    virtualHosts = simpleHosts // {
       "${domain}".extraConfig = "redir https://${toString s.dashboard.domain}\ntls internal";
       "${s.dashboard.domain}".extraConfig = ''
         # Serve the Root CRT at /root.crt
@@ -127,15 +137,6 @@ in
 
         tls internal
       '';
-      "${s.ntfy.domain}".extraConfig = "reverse_proxy localhost:${toString s.ntfy.port}\ntls internal";
-      "${s.vault.domain}".extraConfig = "reverse_proxy localhost:${toString s.vault.port}\ntls internal";
-      "${s.sync.domain}".extraConfig = "reverse_proxy localhost:${toString s.sync.port}\ntls internal";
-      "${s.monitor.domain}".extraConfig =
-        "reverse_proxy localhost:${toString s.monitor.port}\ntls internal";
-      "${s.nextcloud.domain}".extraConfig =
-        "reverse_proxy localhost:${toString s.nextcloud.port}\ntls internal";
-      "${s.zortex.domain}".extraConfig =
-        "reverse_proxy localhost:${toString s.zortex.port}\ntls internal";
     };
   };
 
@@ -154,45 +155,80 @@ in
               description = "Download to trust HTTPS";
             };
           }
-          {
-            "Ntfy" = {
-              href = "https://${s.ntfy.domain}";
-              description = "Ntfy";
-            };
-          }
-          {
-            "Vaultwarden" = {
-              href = "https://${s.vault.domain}";
-              description = "Password Manager";
-            };
-          }
-          {
-            "Monitoring" = {
-              href = "https://${s.monitor.domain}";
-              description = "System monitoring";
-            };
-          }
-          {
-            "Nextcloud" = {
-              href = "https://${s.nextcloud.domain}";
-              description = "Files";
-            };
-          }
-          {
-            "Syncthing" = {
-              href = "https://${s.sync.domain}";
-              description = "Syncthing";
-            };
-          }
-          {
-            "Zortex" = {
-              href = "https://${s.zortex.domain}";
-              description = "Zortex";
-            };
-          }
-        ];
+        ]
+        ++ simpleHomepages;
       }
     ];
+  };
+
+  # BLOCY
+  services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
+  services.resolved.extraConfig = "DNSStubListener=no";
+  services.blocky = {
+    enable = true;
+    settings = {
+      ports.dns = 53;
+      # ports.http = 4000;
+      upstreams.groups.default = [
+        "https://1.1.1.1/dns-query" # Cloudflare
+        "https://8.8.8.8/dns-query" # Google
+      ];
+
+      # Access your services via these domains
+      customDNS = {
+        customTTL = "1h";
+        mapping = {
+          # Map main domain and all subdomains to the Pi's Direct IP
+          "home.lab" = vpnIp;
+          "*.home.lab" = vpnIp;
+        };
+      };
+
+      # Ad Blocking
+      blocking = {
+        # enable = true;
+        blackLists = {
+          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
+        };
+        clientGroupsBlock.default = [ "ads" ];
+      };
+    };
+  };
+
+  # OPENSSH
+  services.openssh = {
+    enable = true;
+    settings.PasswordAuthentication = false;
+  };
+
+  # CLOUDFLARE TUNNEL
+  services.cloudflared = {
+    enable = true;
+    tunnels = {
+      "${tunnelId}" = {
+        # Path to the credentials file you generated with 'cloudflared tunnel create'
+        # Since you use sops, you could also point this to
+        # credentialsFile = "/var/lib/cloudflared/creds.json";
+        credentialsFile = config.sops.secrets."cloudflared_creds".path;
+        default = "http_status:404"; # Default Rule: Hide everything else!
+        ingress = {
+          "${s.immich.publicDomain}" = {
+            service = "http://localhost:${toString s.immich.port}";
+            originRequest = {
+              # Trick Nginx into thinking the request is for the internal domain
+              httpHostHeader = s.immich.domain;
+            };
+          };
+          "${s.nextcloud.publicDomain}" = {
+            service = "http://localhost:${toString s.nextcloud.port}";
+            originRequest = {
+              # Trick Nginx into thinking the request is for the internal domain
+              httpHostHeader = s.nextcloud.domain;
+            };
+          };
+        };
+      };
+    };
   };
 
   # PASSWORD MANAGER
@@ -222,6 +258,7 @@ in
     ];
   };
   users.users.nextcloud.extraGroups = [ "personaldata" ];
+  services.postgresql.enable = true;
   services.nextcloud = {
     enable = true;
     package = pkgs.nextcloud32;
@@ -428,4 +465,129 @@ in
       fi
     '';
   };
+
+  # FAIL2BAN
+  environment.etc = {
+    # Nextcloud
+    "fail2ban/filter.d/nextcloud.conf".text = pkgs.lib.mkDefault (
+      pkgs.lib.mkAfter ''
+        [Definition]
+        _groupsre = (?:(?:,?\s*"\w+":(?:"[^"]+"|\w+))*)
+        failregex = ^\{%(_groupsre)s,?\s*"remoteAddr":"<HOST>"%(_groupsre)s,?\s*"message":"Login failed:
+                    ^\{%(_groupsre)s,?\s*"remoteAddr":"<HOST>"%(_groupsre)s,?\s*"message":"Trusted domain error.
+        datepattern = ,?\s*"time"\s*:\s*"%%Y-%%m-%%d[T ]%%H:%%M:%%S(%%z)?"
+      ''
+    );
+
+    # Vaultwarden Filter
+    "fail2ban/filter.d/vaultwarden.conf".text = ''
+      [Definition]
+      # Matches: [INFO] (login_attempt) Failed login attempt. IP: 192.168.1.50
+      failregex = .*Failed login attempt. IP: <HOST>.*
+                  .*Invalid admin token. IP: <HOST>.*
+    '';
+  };
+
+  services.fail2ban = {
+    enable = true;
+    bantime = "24h";
+
+    ignoreIP = [
+      "10.100.0.0/24"
+      "192.168.1.0/24"
+      "10.1.0.1"
+    ];
+
+    jails = {
+      # SSH (Standard jail)
+      # sshd = ''
+      #   enabled = true
+      #   mode = aggressive
+      # '';
+
+      # Nextcloud
+      # Converted to string to avoid "backend option does not exist" error
+      nextcloud = ''
+        enabled = true
+        backend = auto
+        port = 80,443
+        protocol = tcp
+        filter = nextcloud
+        maxretry = 3
+        bantime = 86400
+        findtime = 43200
+      '';
+      # logpath = /var/lib/nextcloud/data/nextcloud.log
+
+      # Vaultwarden
+      vaultwarden = ''
+        enabled = true
+        backend = systemd
+        filter = vaultwarden
+        maxretry = 3
+        bantime = 86400
+        findtime = 14400
+      '';
+    };
+  };
+
+  services.prometheus = {
+    enable = true;
+    port = s.prometheus.port;
+    exporters = {
+      node = {
+        enable = true;
+        enabledCollectors = [ "systemd" ];
+        port = 9100;
+      };
+    };
+    # Scrape locally
+    scrapeConfigs = [
+      {
+        job_name = "homelab";
+        static_configs = [
+          {
+            targets = [ "127.0.0.1:9100" ];
+          }
+        ];
+      }
+    ];
+  };
+
+  services.grafana = {
+    enable = true;
+    settings = {
+      server = {
+        http_addr = "127.0.0.1";
+        http_port = s.grafana.port;
+        domain = s.grafana.domain;
+      };
+    };
+    # Automatically add Prometheus as a data source
+    provision.datasources.settings.datasources = [
+      {
+        name = "Prometheus";
+        type = "prometheus";
+        access = "proxy";
+        url = "http://127.0.0.1:${toString s.prometheus.port}";
+      }
+    ];
+  };
+
+  # IMMICH Photos viewer
+  services.immich = {
+    enable = true;
+    port = s.immich.port;
+    host = "127.0.0.1";
+
+    # Point the main internal database/upload storage here.
+    # Note: This is NOT where your existing photos live; this is for Immich metadata.
+    mediaLocation = "/var/lib/immich";
+
+    # DISABLE ML to save the Pi 4 from melting
+    machine-learning.enable = false;
+  };
+
+  # GRANT PERMISSION: Allow Immich to read your Sync folder
+  users.users.immich.extraGroups = [ "personaldata" ];
 }

@@ -37,6 +37,8 @@ in
   # Enable binfmt emulation so you can build this locally on x86
   nixpkgs.hostPlatform = "aarch64-linux";
 
+  zramSwap.enable = true;
+
   fileSystems."/" = {
     device = "/dev/disk/by-label/NIXOS_SD";
     fsType = "ext4";
