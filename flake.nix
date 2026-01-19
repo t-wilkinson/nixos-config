@@ -144,6 +144,7 @@
           "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           nixos-hardware.nixosModules.raspberry-pi-4
           zortex.nixosModules.default
+          ./modules/my-lab.nix
           (
             { pkgs, lib, ... }:
             {

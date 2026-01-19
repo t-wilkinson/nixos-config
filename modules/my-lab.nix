@@ -1,0 +1,85 @@
+{ lib, config, ... }:
+with lib;
+let
+  cfg = config.my-lab;
+  capitalizeFirst = s:
+    if builtins.stringLength s == 0 then
+      ""
+    else
+      (lib.toUpper (builtins.substring 0 1 s)) + (builtins.substring 1 (builtins.stringLength s - 1) s);
+in
+{
+  options.my-lab = {
+    vpnNetwork = mkOption {
+      type = types.str;
+      default = "10.100.0";
+    };
+    vpnIP = mkOption {
+      type = types.str;
+      default = "10.100.0.1";
+    };
+    domain = mkOption {
+      type = types.str;
+      default = "home.lab";
+    };
+    publicDomain = mkOption {
+      type = types.str;
+      default = null;
+    };
+
+    services = mkOption {
+      type = types.attrsOf (
+        types.submodule ({name, config, ...}: {
+          options = {
+            port = mkOption { type = types.int; };
+
+            expose = mkOption {
+              type = types.bool;
+              default = true;
+            };
+
+            subdomain = mkOption {
+              type = types.str;
+              default = name;
+            };
+            domain = mkOption {
+              type = types.str;
+              default = config.expose && "${config.subdomain}.${cfg.domain}";
+            };
+
+            isPublic = mkOption {
+              type = types.bool;
+              default = false;
+            };
+            publicSubdomain = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+            };
+            publicDomain = mkOption {
+              type = types.nullOr types.str;
+              default = let
+                defaultDomain = "${config.subdomain}.${cfg.publicDomain}";
+                publicDomain = "${config.publicSubdomain}.${cfg.publicDomain}";
+              in 
+                if config.publicSubdomain && cfg.publicDomain
+                then publicDomain
+                else if isPublic && cfg.publicDomain
+                then defaultDomain
+                else null;
+            };
+
+            name = mkOption {
+              type = types.str;
+              default = capitalizeFirst name;
+              description = "Pretty name for Dashboard";
+            };
+            description = mkOption { 
+              type = types.str; 
+              default = ""; 
+            };
+          };
+        });
+      );
+    };
+  };
+}
