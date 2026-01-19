@@ -179,14 +179,14 @@
       };
 
       images.homelab = homelab.config.system.build.sdImage;
-      # deploy.nodes.homelab = {
-      #   hostname = "home.lab";
-      #   sshUser = "root";
-      #   profiles.system = {
-      #     user = "root";
-      #     path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.homelab;
-      #   };
-      # };
+      deploy.nodes.homelab = {
+        hostname = "10.100.0.1";
+        profiles.system = {
+          user = "root";
+          sshUser = "trey";
+          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.homelab;
+        };
+      };
 
       checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
     };
