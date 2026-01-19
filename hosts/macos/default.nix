@@ -25,7 +25,7 @@
 
   nix = {
     package = pkgs.nix;
-    # linux-builder.enable = true;
+    linux-builder.enable = true;
     optimise.automatic = true;
 
     settings = {

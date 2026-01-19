@@ -43,7 +43,8 @@ let
         pkgs.openssh
         pkgs.nixos-rebuild
       ];
-    };
+    }
+    // mkHomelabApps system pkgs;
 
   mkApp = pkgs: scriptName: system: {
     type = "app";
