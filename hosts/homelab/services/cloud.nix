@@ -148,6 +148,8 @@ in
       { ... }:
       {
         users.users.immich.extraGroups = [ "personaldata" ];
+        users.groups.personaldata.gid = 987;
+
         networking.firewall.allowedTCPPorts = [ services.immich.port ];
 
         services.immich = {
