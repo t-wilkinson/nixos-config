@@ -27,6 +27,14 @@ in
       };
     };
 
+    # forwardPorts = [
+    #   {
+    #     containerPort = services.nextcloud.port;
+    #     hostPort = services.nextcloud.port;
+    #     protocol = "tcp";
+    #   }
+    # ];
+
     config =
       {
         config,
@@ -36,9 +44,23 @@ in
       }:
       {
         networking.firewall.allowedTCPPorts = [ services.nextcloud.port ];
-
+        users.groups.personaldata.gid = 987;
         users.users.nextcloud.extraGroups = [ "personaldata" ];
+
         services.postgresql.enable = false;
+
+        services.nginx.virtualHosts."${services.nextcloud.domain}" = {
+          forceSSL = lib.mkForce false;
+          enableACME = lib.mkForce false;
+
+          listen = [
+            {
+              addr = "0.0.0.0";
+              port = services.nextcloud.port;
+            }
+          ];
+        };
+
         services.nextcloud = {
           enable = true;
           package = pkgs.nextcloud32;
@@ -94,32 +116,20 @@ in
           # };
         };
 
-        systemd.services.nextcloud-set-smtp-pass = {
-          description = "Set Nextcloud SMTP password from sops";
-          after = [ "nextcloud-setup.service" ];
-          wants = [ "nextcloud-setup.service" ];
-          serviceConfig = {
-            Type = "oneshot";
-            User = "nextcloud";
-          };
-          script = ''
-            ${config.services.nextcloud.occ}/bin/occ \
-            config:system:set mail_smtppassword \
-            --value "$(cat ${secrets.google_app_password.path})"
-          '';
-        };
-
-        services.nginx.virtualHosts."${services.nextcloud.domain}" = {
-          forceSSL = lib.mkForce false;
-          enableACME = lib.mkForce false;
-
-          listen = [
-            {
-              addr = "127.0.0.1";
-              port = services.nextcloud.port;
-            }
-          ];
-        };
+        # systemd.services.nextcloud-set-smtp-pass = {
+        #   description = "Set Nextcloud SMTP password from sops";
+        #   after = [ "nextcloud-setup.service" ];
+        #   wants = [ "nextcloud-setup.service" ];
+        #   serviceConfig = {
+        #     Type = "oneshot";
+        #     User = "nextcloud";
+        #   };
+        #   script = ''
+        #     ${config.services.nextcloud.occ}/bin/occ \
+        #     config:system:set mail_smtppassword \
+        #     --value "$(cat ${secrets.google_app_password.path})"
+        #   '';
+        # };
         system.stateVersion = "24.11";
       };
   };

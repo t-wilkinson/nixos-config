@@ -44,8 +44,8 @@
   zramSwap.enable = true;
 
   systemd.tmpfiles.rules = [
-    "d /srv/sync/personal/drive 2770 ${username} personaldata - -"
-    "Z /srv/sync/personal/drive - ${username} personaldata -"
+    "d /srv/sync/personal/drive 0770 ${username} personaldata - -"
+    "Z /srv/sync/personal/drive 0770 ${username} personaldata - -"
   ];
 
   fileSystems."/" = {
