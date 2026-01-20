@@ -1,5 +1,15 @@
 # hosts/nixos/networking.nix
-{ pkgs, config, ... }:
+{
+  pkgs,
+  config,
+  lib,
+  username,
+  ...
+}:
+let
+  mcServerPort = 25565;
+  rconPort = 25575;
+in
 {
   services.resolved = {
     enable = true;
@@ -16,6 +26,7 @@
       dns = "systemd-resolved";
     };
 
+    interfaces.enp3s0.wakeOnLan.enable = true;
     firewall =
       let
         kdePortRanges = {
@@ -26,10 +37,15 @@
       {
         allowedTCPPortRanges = [ kdePortRanges ];
         allowedUDPPortRanges = [ kdePortRanges ];
+        allowedUDPPorts = [
+          9 # wol
+        ];
         allowedTCPPorts = [
+          mcServerPort
+          rconPort
           22
-          6229 # ssh
-          5900 # vnc
+          # 6229 # ssh
+          # 5900 # vnc
         ];
       };
   };
@@ -43,6 +59,7 @@
       connection.id = "Wired Homelab";
       connection.interface-name = "enp3s0";
       connection.autoconnect = true;
+      "802-3-ethernet".wake-on-lan = "magic"; # sudo ethtool -s enp3s0 wol gp (magic physical)
 
       ipv4.method = "manual";
       ipv4.addresses = "10.1.0.1/30";
@@ -132,4 +149,42 @@
   #     ];
   #   };
   # };
+
+  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "minecraft-server" ];
+  environment.systemPackages = [ pkgs.mcrcon ];
+  systemd.services.minecraft-server = {
+    after = [ "var-lib-minecraft.mount" ];
+    requires = [ "var-lib-minecraft.mount" ];
+  };
+  users.users.${username} = {
+    extraGroups = [ "serverdata" ];
+  };
+  users.groups.serverdata = {
+    gid = 980; # MUST match the Pi's GID for this group [cite: 16]
+  };
+  users.users.minecraft = {
+    extraGroups = [ "serverdata" ];
+  };
+
+  services.minecraft-server = {
+    enable = true;
+    eula = true;
+    openFirewall = true;
+    declarative = false;
+    serverProperties = {
+      server-port = mcServerPort;
+      gamemode = "survival";
+      motd = "Welcome to the Wilkinson's Homelab!";
+      white-list = false;
+      online-mode = false;
+      allow-cheats = true;
+
+      enable-rcon = true;
+      "rcon.password" = "password";
+      "rcon.port" = rconPort;
+    };
+    jvmOpts = "-Xms2048M -Xmx4096M";
+  };
+  systemd.services.minecraft-server.serviceConfig.Restart = "always";
+
 }

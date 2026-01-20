@@ -79,6 +79,7 @@
     libsForQt5.qtstyleplugin-kvantum # The engine
     kdePackages.qtstyleplugin-kvantum # For Qt6 apps
   ];
+
   environment.variables = {
     QT_QPA_PLATFORM = "wayland";
   };
@@ -281,6 +282,27 @@
     # Use the systemd-boot EFI boot loader.
     loader.systemd-boot.enable = true;
     loader.efi.canTouchEfiVariables = true;
+  };
+
+  fileSystems."/mnt/homelab/personal" = {
+    device = "10.1.0.2:/srv/sync/personal";
+    fsType = "nfs";
+    options = [
+      "x-systemd.automount"
+      "noauto"
+      "bg"
+    ]; # Only mount when accessed
+  };
+  fileSystems."/var/lib/minecraft" = {
+    device = "10.1.0.2:/var/lib/minecraft";
+    fsType = "nfs";
+    options = [
+      "rw"
+      "soft"
+      "bg"
+      "x-systemd.automount"
+      "noauto"
+    ]; # Only mount when accessed
   };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released

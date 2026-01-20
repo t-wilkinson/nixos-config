@@ -110,10 +110,41 @@ in
   services.homepage-dashboard = {
     enable = true;
     listenPort = services.dashboard.port;
-    # TODO: are these necessary?
     allowedHosts = "${services.dashboard.domain},${config.my-lab.domain},localhost,127.0.0.1";
+    widgets = [
+      {
+        resources = {
+          cpu = true;
+          memory = true;
+          disk = "/";
+        };
+      }
+      # {
+      #   # New Widget: Wake PC
+      #   search = {
+      #     provider = "custom";
+      #     url = "http://10.1.0.1:8000"; # Optional: if you run a status agent on PC
+      #     target = "_blank";
+      #   };
+      # }
+    ];
     services = [
       {
+        # "Compute Node" = [
+        #   {
+        #     "My Gaming PC" = {
+        #       icon = "mdi-desktop-tower";
+        #       # Ping the PC to see if it's online
+        #       ping = "10.1.0.1";
+        #       widget = {
+        #         type = "glances";
+        #         url = "http://10.1.0.1:61208"; # Glances on PC
+        #       };
+        #       # The Magic Button
+        #       siteMonitor = "http://10.1.0.1:61208";
+        #     };
+        #   }
+        # ];
         "My Services" = [
           {
             "Root Certificate" = {
@@ -129,6 +160,33 @@ in
       }
     ];
   };
+
+  # NFS
+  services.nfs.server = {
+    enable = true;
+    # Fixed ports for firewall stability
+    lockdPort = 4001;
+    mountdPort = 4002;
+    statdPort = 4000;
+    exports = ''
+      /srv/sync/personal 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
+      /var/lib/minecraft 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
+    '';
+  };
+  networking.firewall.allowedTCPPorts = [
+    111
+    2049
+    4000
+    4001
+    4002
+  ];
+  networking.firewall.allowedUDPPorts = [
+    111
+    2049
+    4000
+    4001
+    4002
+  ];
 
   # OPENSSH
   services.openssh = {
@@ -232,7 +290,7 @@ in
 
   # MINECRAFT SERVER
   # services.borgbackup.jobs."minecraft-backup" = {
-  #   paths = [ "/var/lib/minecraft-data" ];
+  #   paths = [ "/var/lib/minecraft" ];
   #   encryption.mode = "none"; # Or "repokey" if sending to remote
   #   repo = "/var/lib/backups/minecraft"; # Or your remote ssh repo
   #   compression = "auto,zstd";
@@ -250,60 +308,58 @@ in
   #   '';
   # };
 
-  systemd.tmpfiles.rules = [
-    "d /var/lib/minecraft-data 0775 ${username} serverdata - -"
-  ];
-  containers.mc-server = {
-    autoStart = true;
-    privateNetwork = false;
-    # forwardPorts = [
-    #   {
-    #     containerPort = services.mc-server.port;
-    #     hostPort = services.mc-server.port;
-    #     protocol = "tcp";
-    #   }
-    # ];
+  # containers.mc-server = {
+  #   autoStart = true;
+  #   privateNetwork = false;
+  #   # forwardPorts = [
+  #   #   {
+  #   #     containerPort = services.mc-server.port;
+  #   #     hostPort = services.mc-server.port;
+  #   #     protocol = "tcp";
+  #   #   }
+  #   # ];
 
-    bindMounts = {
-      # Bind mount data to host for easy Borg backups
-      "/var/lib/minecraft" = {
-        hostPath = "/var/lib/minecraft-data";
-        isReadOnly = false;
-      };
-    };
+  #   bindMounts = {
+  #     # Bind mount data to host for easy Borg backups
+  #     "/var/lib/minecraft" = {
+  #       hostPath = "/var/lib/minecraft";
+  #       isReadOnly = false;
+  #     };
+  #   };
 
-    config =
-      { ... }:
-      let
-        rconPort = 25575;
-      in
-      {
-        networking.firewall.allowedTCPPorts = [
-          services.mc-server.port
-          rconPort
-        ];
-        nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "minecraft-server" ];
-        environment.systemPackages = [ pkgs.mcrcon ];
-        users.groups.serverdata.gid = 980;
-        services.minecraft-server = {
-          enable = true;
-          eula = true;
-          openFirewall = true;
-          declarative = false;
-          serverProperties = {
-            server-port = services.mc-server.port;
-            gamemode = "survival";
-            motd = "Welcome to the Wilkinson's Homelab!";
-            white-list = false;
-            online-mode = false;
+  #   config =
+  #     { ... }:
+  #     let
+  #       rconPort = 25575;
+  #     in
+  #     {
+  #       networking.firewall.allowedTCPPorts = [
+  #         services.mc-server.port
+  #         rconPort
+  #       ];
+  #       nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "minecraft-server" ];
+  #       environment.systemPackages = [ pkgs.mcrcon ];
+  #       users.groups.serverdata.gid = 980;
+  #       services.minecraft-server = {
+  #         enable = true;
+  #         eula = true;
+  #         openFirewall = true;
+  #         declarative = false;
+  #         serverProperties = {
+  #           server-port = services.mc-server.port;
+  #           gamemode = "survival";
+  #           motd = "Welcome to the Wilkinson's Homelab!";
+  #           white-list = false;
+  #           online-mode = false;
+  #           allow-cheats = true;
 
-            enable-rcon = true;
-            "rcon.password" = "password";
-            "rcon.port" = rconPort;
-          };
-          jvmOpts = "-Xms2048M -Xmx4096M";
-        };
-        systemd.services.minecraft-server.serviceConfig.Restart = "always";
-      };
-  };
+  #           enable-rcon = true;
+  #           "rcon.password" = "password";
+  #           "rcon.port" = rconPort;
+  #         };
+  #         jvmOpts = "-Xms2048M -Xmx4096M";
+  #       };
+  #       systemd.services.minecraft-server.serviceConfig.Restart = "always";
+  #     };
+  # };
 }

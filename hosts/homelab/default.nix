@@ -47,6 +47,8 @@
   systemd.tmpfiles.rules = [
     "d /srv/sync/personal/drive 0770 ${username} personaldata - -"
     "Z /srv/sync/personal/drive 0770 ${username} personaldata - -"
+    "d /var/lib/minecraft 0775 ${username} serverdata - -"
+    "Z /var/lib/minecraft 0775 ${username} serverdata - -"
   ];
 
   fileSystems."/" = {
@@ -89,6 +91,7 @@
     shell = pkgs.fish;
     hashedPasswordFile = config.sops.secrets.homelab_password_hash.path;
     extraGroups = [
+      "serverdata"
       "personaldata"
       "wheel"
       "video"
@@ -116,6 +119,7 @@
     tree
     ripgrep
     fd
+    wakeonlan
   ];
 
   nix.settings.experimental-features = [

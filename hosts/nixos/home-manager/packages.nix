@@ -77,6 +77,9 @@
       cifs-utils # smb
       nfs-utils # nfs
 
+      # NETWORKING
+      ethtool
+
       # MISC
       # android-file-transfer
       # appimage-run
