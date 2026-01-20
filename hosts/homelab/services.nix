@@ -7,7 +7,6 @@
   ...
 }:
 let
-  tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # cloudflared tunnel
   services = config.my-lab.services;
 
   mkCaddyProxy = name: service: {
@@ -49,6 +48,12 @@ in
     };
     zortex = {
       port = 5000;
+    };
+    mc-server = {
+      port = 25565;
+      subdomain = "mc";
+      isPublic = true;
+      expose = false;
     };
 
     # Monitor
@@ -118,85 +123,17 @@ in
             };
           }
         ]
-        ++ (lib.mapAttrsToList mkHomepageEntry (lib.filterAttrs (n: v: n != "dashboard") services));
+        ++ (lib.mapAttrsToList mkHomepageEntry (
+          lib.filterAttrs (n: v: n != "dashboard" && v.expose) services
+        ));
       }
     ];
-  };
-
-  # BLOCY
-  services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
-  services.resolved.extraConfig = "DNSStubListener=no";
-  services.blocky = {
-    enable = true;
-    settings = {
-      ports.dns = 53;
-      # ports.http = 4000;
-      upstreams.groups.default = [
-        "https://1.1.1.1/dns-query" # Cloudflare
-        "https://8.8.8.8/dns-query" # Google
-      ];
-
-      # Access your services via these domains
-      customDNS = {
-        customTTL = "1h";
-        mapping = {
-          # Map main domain and all subdomains to the Pi's Direct IP
-          "home.lab" = config.my-lab.vpnIP;
-          "*.home.lab" = config.my-lab.vpnIP;
-        };
-      };
-
-      # Ad Blocking
-      blocking = {
-        # enable = true;
-        blackLists = {
-          ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
-        };
-        clientGroupsBlock.default = [ "ads" ];
-      };
-    };
   };
 
   # OPENSSH
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = false;
-  };
-
-  # TAILSCALE: Mesh network
-  services.tailscale = {
-    enable = true;
-    openFirewall = true;
-  };
-
-  # CLOUDFLARE TUNNEL
-  services.cloudflared = {
-    enable = true;
-    tunnels = {
-      "${tunnelId}" = {
-        # Path to the credentials file you generated with 'cloudflared tunnel create'
-        # Since you use sops, you could also point this to
-        # credentialsFile = "/var/lib/cloudflared/creds.json";
-        credentialsFile = config.sops.secrets."cloudflared_creds".path;
-        default = "http_status:404"; # Default Rule: Hide everything else!
-        ingress = {
-          "${services.immich.publicDomain}" = {
-            service = "http://localhost:${toString services.immich.port}";
-            originRequest = {
-              # Trick Nginx into thinking the request is for the internal domain
-              httpHostHeader = services.immich.domain;
-            };
-          };
-          "${services.nextcloud.publicDomain}" = {
-            service = "http://localhost:${toString services.nextcloud.port}";
-            originRequest = {
-              # Trick Nginx into thinking the request is for the internal domain
-              httpHostHeader = services.nextcloud.domain;
-            };
-          };
-        };
-      };
-    };
   };
 
   # PASSWORD MANAGER
@@ -293,4 +230,80 @@ in
     };
   };
 
+  # MINECRAFT SERVER
+  # services.borgbackup.jobs."minecraft-backup" = {
+  #   paths = [ "/var/lib/minecraft-data" ];
+  #   encryption.mode = "none"; # Or "repokey" if sending to remote
+  #   repo = "/var/lib/backups/minecraft"; # Or your remote ssh repo
+  #   compression = "auto,zstd";
+  #   startAt = "daily";
+  #
+  #   # Optional: Stop server during backup to ensure data consistency
+  #   # (Minecraft handles live backups okay mostly, but this is safest)
+  #   preHook = ''
+  #     ${pkgs.systemd}/bin/systemctl stop container@mc-server
+  #     sleep 5
+  #   '';
+  #
+  #   postHook = ''
+  #     ${pkgs.systemd}/bin/systemctl start container@mc-server
+  #   '';
+  # };
+
+  systemd.tmpfiles.rules = [
+    "d /var/lib/minecraft-data 0775 ${username} serverdata - -"
+  ];
+  containers.mc-server = {
+    autoStart = true;
+    privateNetwork = false;
+    # forwardPorts = [
+    #   {
+    #     containerPort = services.mc-server.port;
+    #     hostPort = services.mc-server.port;
+    #     protocol = "tcp";
+    #   }
+    # ];
+
+    bindMounts = {
+      # Bind mount data to host for easy Borg backups
+      "/var/lib/minecraft" = {
+        hostPath = "/var/lib/minecraft-data";
+        isReadOnly = false;
+      };
+    };
+
+    config =
+      { ... }:
+      let
+        rconPort = 25575;
+      in
+      {
+        networking.firewall.allowedTCPPorts = [
+          services.mc-server.port
+          rconPort
+        ];
+        nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "minecraft-server" ];
+        environment.systemPackages = [ pkgs.mcrcon ];
+        users.groups.serverdata.gid = 980;
+        services.minecraft-server = {
+          enable = true;
+          eula = true;
+          openFirewall = true;
+          declarative = false;
+          serverProperties = {
+            server-port = services.mc-server.port;
+            gamemode = "survival";
+            motd = "Welcome to the Wilkinson's Homelab!";
+            white-list = false;
+            online-mode = false;
+
+            enable-rcon = true;
+            "rcon.password" = "password";
+            "rcon.port" = rconPort;
+          };
+          jvmOpts = "-Xms2048M -Xmx4096M";
+        };
+        systemd.services.minecraft-server.serviceConfig.Restart = "always";
+      };
+  };
 }

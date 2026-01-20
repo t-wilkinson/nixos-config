@@ -22,6 +22,7 @@
     # ./services/caddy.nix
     ./services/cloud.nix
     ./services/monitoring.nix
+    ./services/network.nix
   ];
 
   nix.settings = {
@@ -75,7 +76,14 @@
 
   programs.fish.enable = true;
   users.mutableUsers = false;
-  users.groups.personaldata = { }; # for exposing to synced directory to nextcloud
+
+  users.groups.personaldata = {
+    gid = 987;
+  }; # for exposing to synced directory to services
+  users.groups.serverdata = {
+    gid = 980;
+  }; # for exposing server files to services
+
   users.users.${username} = {
     isNormalUser = true;
     shell = pkgs.fish;

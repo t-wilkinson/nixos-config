@@ -3,15 +3,14 @@ let
   services = config.my-lab.services;
 in
 {
-
   containers.monitor = {
-  autoStart = true;
-    bindMounts = [
+    autoStart = true;
+    bindMounts = {
       "/var/log" = {
         hostPath = "/var/log";
         isReadOnly = true;
       };
-    ];
+    };
 
     config = {
       # GLANCES

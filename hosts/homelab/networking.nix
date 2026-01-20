@@ -1,6 +1,6 @@
 { config, hostname, ... }:
 let
-  directIP = "10.1.0.2";
+  directIP = "10.1.0.2"; # IP from direct ethernet connection to PC
 in
 {
 
@@ -66,6 +66,7 @@ in
         443
         22
         51820 # WireGuard
+        25565
       ];
       allowedUDPPorts = [
         51820 # WireGuard

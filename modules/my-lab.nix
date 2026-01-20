@@ -43,11 +43,11 @@ in
               };
 
               subdomain = mkOption {
-                type = types.str;
+                type = types.nullOr types.str;
                 default = if config.expose then name else null;
               };
               domain = mkOption {
-                type = types.str;
+                type = types.nullOr types.str;
                 default = if config.expose then "${config.subdomain}.${cfg.domain}" else null;
               };
 
