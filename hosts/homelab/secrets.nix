@@ -22,8 +22,8 @@
         owner = "root";
       };
       nextcloud_admin_pass = {
-        owner = "nextcloud";
-        group = "nextcloud";
+        owner = "root";
+        group = "root";
       };
       cloudflared_creds = {
         owner = "root";

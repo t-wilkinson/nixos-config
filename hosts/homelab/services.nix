@@ -76,7 +76,7 @@ in
   # CADDY Reverse Proxy (HTTPS / Dashboard)
   services.caddy = {
     enable = true;
-    virtualHosts = (lib.mapAttrs' mkCaddyReverseProxy (lib.filterAttrs (n: v: v.expose) services)) // {
+    virtualHosts = (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose) services)) // {
       "${config.my-lab.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
       "${services.dashboard.domain}".extraConfig = ''
         # Serve the Root CRT at /root.crt

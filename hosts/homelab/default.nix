@@ -19,9 +19,9 @@
     ./secrets.nix
     ./services.nix
     ./services/backups.nix
-    ./services/caddy.nix
+    # ./services/caddy.nix
     ./services/cloud.nix
-    ./services/monitoring.nix
+    # ./services/monitoring.nix
   ];
 
   nix.settings = {

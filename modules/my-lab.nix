@@ -2,7 +2,8 @@
 with lib;
 let
   cfg = config.my-lab;
-  capitalizeFirst = s:
+  capitalizeFirst =
+    s:
     if builtins.stringLength s == 0 then
       ""
     else
@@ -23,62 +24,70 @@ in
       default = "home.lab";
     };
     publicDomain = mkOption {
-      type = types.str;
+      type = types.nullOr types.str;
       default = null;
+      description = "Base public domain (e.g., example.com)";
     };
 
     services = mkOption {
       type = types.attrsOf (
-        types.submodule ({name, config, ...}: {
-          options = {
-            port = mkOption { type = types.int; };
+        types.submodule (
+          { name, config, ... }:
+          {
+            options = {
+              port = mkOption { type = types.int; };
 
-            expose = mkOption {
-              type = types.bool;
-              default = true;
-            };
+              expose = mkOption {
+                type = types.bool;
+                default = true;
+              };
 
-            subdomain = mkOption {
-              type = types.str;
-              default = name;
-            };
-            domain = mkOption {
-              type = types.str;
-              default = config.expose && "${config.subdomain}.${cfg.domain}";
-            };
+              subdomain = mkOption {
+                type = types.str;
+                default = if config.expose then name else null;
+              };
+              domain = mkOption {
+                type = types.str;
+                default = if config.expose then "${config.subdomain}.${cfg.domain}" else null;
+              };
 
-            isPublic = mkOption {
-              type = types.bool;
-              default = false;
-            };
-            publicSubdomain = mkOption {
-              type = types.nullOr types.str;
-              default = null;
-            };
-            publicDomain = mkOption {
-              type = types.nullOr types.str;
-              default = let
-                defaultDomain = "${config.subdomain}.${cfg.publicDomain}";
-                publicDomain = "${config.publicSubdomain}.${cfg.publicDomain}";
-              in 
-                if config.publicSubdomain && cfg.publicDomain
-                then publicDomain
-                else if isPublic && cfg.publicDomain
-                then defaultDomain
-                else null;
-            };
+              isPublic = mkOption {
+                type = types.bool;
+                default = false;
+              };
+              publicSubdomain = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+              };
+              publicDomain = mkOption {
+                type = types.nullOr types.str;
+                default =
+                  let
+                    defaultDomain = "${config.subdomain}.${cfg.publicDomain}";
+                    publicDomain = "${config.publicSubdomain}.${cfg.publicDomain}";
+                  in
+                  if cfg.publicDomain != null && config.publicSubdomain != null then
+                    # public subdomain . public domain
+                    "${config.publicSubdomain}.${cfg.publicDomain}"
+                  else if cfg.publicDomain != null && config.isPublic then
+                    # subdomain . public domain
+                    "${config.subdomain}.${cfg.publicDomain}"
+                  else
+                    null;
+              };
 
-            name = mkOption {
-              type = types.str;
-              default = capitalizeFirst name;
-              description = "Pretty name for Dashboard";
+              name = mkOption {
+                type = types.str;
+                default = capitalizeFirst name;
+                description = "Pretty name for Dashboard";
+              };
+              description = mkOption {
+                type = types.str;
+                default = "";
+              };
             };
-            description = mkOption { 
-              type = types.str; 
-              default = ""; 
-            };
-          };
-        });
+          }
+        )
       );
     };
   };

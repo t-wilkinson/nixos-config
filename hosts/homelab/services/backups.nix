@@ -1,4 +1,9 @@
-{ username, pkgs, ... }:
+{
+  username,
+  pkgs,
+  config,
+  ...
+}:
 {
   # SYNCTHING
   # systemd.services.syncthing.serviceConfig = {
@@ -17,7 +22,7 @@
 
     openDefaultPorts = true; # 22000/tcp transfer, 21027/udp discovery
 
-    guiAddress = "127.0.0.1:${toString s.sync.port}";
+    guiAddress = "127.0.0.1:${toString config.my-lab.services.sync.port}";
 
     settings = {
       gui.insecureSkipHostcheck = true;
