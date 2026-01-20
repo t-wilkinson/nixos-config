@@ -32,18 +32,14 @@
     ];
   };
 
-  documentation.man.generateCaches = false; # Fish enables this by default but it takes a lot of time.
-  security.sudo.wheelNeedsPassword = false; # So remote building doesn't keep asking for passwords
-
-  # Use generic extlinux compatible bootloader (standard for Pi images)
-  boot.loader.grub.enable = false;
-  boot.loader.generic-extlinux-compatible.enable = true;
-
-  # Enable binfmt emulation so you can build this locally on x86
-  nixpkgs.hostPlatform = "aarch64-linux";
-
-  zramSwap.enable = true;
-
+  users.groups.personaldata = {
+    # for exposing to synced directory to services
+    gid = 987;
+  };
+  users.groups.serverdata = {
+    # for exposing server files to services
+    gid = 980;
+  };
   systemd.tmpfiles.rules = [
     "d /srv/sync/personal/drive 0770 ${username} personaldata - -"
     "Z /srv/sync/personal/drive 0770 ${username} personaldata - -"
@@ -73,18 +69,23 @@
   #   ];
   # };
 
+  documentation.man.generateCaches = false; # Fish enables this by default but it takes a lot of time.
+  security.sudo.wheelNeedsPassword = false; # So remote building doesn't keep asking for passwords
+
+  # Use generic extlinux compatible bootloader (standard for Pi images)
+  boot.loader.grub.enable = false;
+  boot.loader.generic-extlinux-compatible.enable = true;
+
+  # Enable binfmt emulation so you can build this locally on x86
+  nixpkgs.hostPlatform = "aarch64-linux";
+
+  zramSwap.enable = true;
+
   hardware.enableRedistributableFirmware = true;
   hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
 
   programs.fish.enable = true;
   users.mutableUsers = false;
-
-  users.groups.personaldata = {
-    gid = 987;
-  }; # for exposing to synced directory to services
-  users.groups.serverdata = {
-    gid = 980;
-  }; # for exposing server files to services
 
   users.users.${username} = {
     isNormalUser = true;
@@ -105,12 +106,6 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
     ];
   };
-
-  # Provision the SSH key generated in Phase 1
-  # environment.etc."ssh/ssh_host_ed25519_key" = {
-  #   source = ./ssh_host_ed25519_key;
-  #   mode = "0600";
-  # };
 
   environment.systemPackages = with pkgs; [
     wol # Wake on LAN util for turning on the PC through ethernet

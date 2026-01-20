@@ -1,9 +1,15 @@
 { ... }:
 {
-  # From Caddy
+  # Caddy certificate
   security.pki.certificateFiles = [
     ./homelab-root.crt
   ];
+
+  # Provision the SSH key generated in Phase 1
+  # environment.etc."ssh/ssh_host_ed25519_key" = {
+  #   source = ./ssh_host_ed25519_key;
+  #   mode = "0600";
+  # };
 
   sops = {
     defaultSopsFile = ./secrets.yaml;
