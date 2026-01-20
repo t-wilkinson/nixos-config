@@ -21,7 +21,7 @@
     ./services/backups.nix
     # ./services/caddy.nix
     ./services/cloud.nix
-    # ./services/monitoring.nix
+    ./services/monitoring.nix
   ];
 
   nix.settings = {

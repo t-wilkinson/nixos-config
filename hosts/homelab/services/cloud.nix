@@ -12,6 +12,7 @@ in
 {
   # NEXTCLOUD
   containers.nextcloud = {
+    autoStart = true;
     bindMounts = {
       "/var/lib/nextcloud/data/personal" = {
         hostPath = "/srv/sync/personal";

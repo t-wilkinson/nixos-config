@@ -31,9 +31,6 @@ let
 in
 {
   my-lab.services = {
-    monitor = {
-      port = 61208;
-    };
     ntfy = {
       port = 8083;
     };
@@ -53,6 +50,8 @@ in
     zortex = {
       port = 5000;
     };
+
+    # Monitor
     prometheus = {
       name = "Prometheus";
       port = 9090;
@@ -61,6 +60,11 @@ in
     grafana = {
       port = 3000;
     };
+    monitor = {
+      port = 61208;
+    };
+
+    # Cloud
     nextcloud = {
       port = 8081;
       subdomain = "cloud";
@@ -159,6 +163,12 @@ in
     settings.PasswordAuthentication = false;
   };
 
+  # TAILSCALE: Mesh network
+  services.tailscale = {
+    enable = true;
+    openFirewall = true;
+  };
+
   # CLOUDFLARE TUNNEL
   services.cloudflared = {
     enable = true;
@@ -200,13 +210,6 @@ in
     };
   };
 
-  # GLANCES
-  # https://glances.readthedocs.io/en/latest/quickstart.html
-  services.glances = {
-    enable = true;
-    extraArgs = [ "-w" ];
-  };
-
   # NTFY
   services.ntfy-sh = {
     enable = true;
@@ -215,12 +218,6 @@ in
       listen-http = ":${toString services.ntfy.port}";
       # auth-default-access = "deny-all";
     };
-  };
-
-  # TAILSCALE: Mesh network
-  services.tailscale = {
-    enable = true;
-    openFirewall = true;
   };
 
   # ZORTEX: notes, calendar, etc.
@@ -259,8 +256,7 @@ in
     bantime = "24h";
 
     ignoreIP = [
-      "10.100.0.0/24"
-      "192.168.1.0/24"
+      "${config.my-lab.vpnNetwork}.0/24"
       "10.1.0.1"
     ];
 
@@ -295,49 +291,6 @@ in
         findtime = 14400
       '';
     };
-  };
-
-  services.prometheus = {
-    enable = true;
-    port = services.prometheus.port;
-    exporters = {
-      node = {
-        enable = true;
-        enabledCollectors = [ "systemd" ];
-        port = 9100;
-      };
-    };
-    # Scrape locally
-    scrapeConfigs = [
-      {
-        job_name = "homelab";
-        static_configs = [
-          {
-            targets = [ "127.0.0.1:9100" ];
-          }
-        ];
-      }
-    ];
-  };
-
-  services.grafana = {
-    enable = true;
-    settings = {
-      server = {
-        http_addr = "127.0.0.1";
-        http_port = services.grafana.port;
-        domain = services.grafana.domain;
-      };
-    };
-    # Automatically add Prometheus as a data source
-    provision.datasources.settings.datasources = [
-      {
-        name = "Prometheus";
-        type = "prometheus";
-        access = "proxy";
-        url = "http://127.0.0.1:${toString services.prometheus.port}";
-      }
-    ];
   };
 
 }

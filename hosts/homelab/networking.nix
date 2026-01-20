@@ -1,8 +1,14 @@
-{ config, ... }:
+{ config, hostname, ... }:
+let
+  directIP = "10.1.0.2";
+in
 {
 
   networking = {
-    hostName = "homelab";
+    hostName = hostname;
+    # Disable wpa_supplicant to avoid conflicts with NetworkManager
+    wireless.enable = false;
+
     nameservers = [
       "127.0.0.1"
       "1.1.1.1"
@@ -44,15 +50,12 @@
           };
           ipv4 = {
             method = "manual";
-            address1 = "10.1.0.2/30";
+            address1 = "${directIP}/30";
             never-default = "true";
           };
         };
       };
     };
-
-    # Disable wpa_supplicant to avoid conflicts with NetworkManager
-    wireless.enable = false;
 
     # Firewall rules
     firewall = {

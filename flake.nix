@@ -139,7 +139,10 @@
 
       homelab = nixpkgs-nixos.lib.nixosSystem {
         system = "aarch64-linux";
-        specialArgs = { inherit inputs username; };
+        specialArgs = {
+          inherit inputs username;
+          hostname = "pi";
+        };
         modules = [
           "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
           nixos-hardware.nixosModules.raspberry-pi-4
