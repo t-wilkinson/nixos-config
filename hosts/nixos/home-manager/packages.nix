@@ -80,6 +80,9 @@
       # NETWORKING
       ethtool
 
+      # GAMES
+      prismlauncher
+
       # MISC
       # android-file-transfer
       # appimage-run

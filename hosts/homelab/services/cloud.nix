@@ -27,14 +27,16 @@ in
         isReadOnly = true;
       };
     };
-
-    # forwardPorts = [
-    #   {
-    #     containerPort = services.nextcloud.port;
-    #     hostPort = services.nextcloud.port;
-    #     protocol = "tcp";
-    #   }
-    # ];
+    privateNetwork = true;
+    hostAddress = "192.168.100.10";
+    localAddress = "192.168.100.11";
+    forwardPorts = [
+      {
+        hostPort = services.nextcloud.port;
+        containerPort = services.nextcloud.port;
+        protocol = "tcp";
+      }
+    ];
 
     config =
       {
@@ -48,7 +50,7 @@ in
         users.groups.personaldata.gid = 987;
         users.users.nextcloud.extraGroups = [ "personaldata" ];
 
-        services.postgresql.enable = false;
+        services.postgresql.enable = true;
 
         services.nginx.virtualHosts."${services.nextcloud.domain}" = {
           forceSSL = lib.mkForce false;
@@ -69,10 +71,9 @@ in
           https = true;
           configureRedis = true;
 
-          # Tell Nextcloud it's running behind Caddy (Reverse Proxy)
           config = {
             adminuser = "admin";
-            dbtype = "sqlite";
+            dbtype = "pgsql";
             adminpassFile = secrets.nextcloud_admin_pass.path;
           };
 
