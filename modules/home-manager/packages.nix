@@ -92,4 +92,7 @@ with pkgs;
   # NETWORK
   tcpdump
   syncthing
+
+  # Office-tools
+  libreoffice
 ]
