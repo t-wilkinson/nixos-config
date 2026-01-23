@@ -9,6 +9,12 @@ in
     # Disable wpa_supplicant to avoid conflicts with NetworkManager
     wireless.enable = false;
 
+    nat = {
+      enable = true;
+      internalInterfaces = [ "ve-+" ];
+      externalInterface = "wlan0";
+    };
+
     nameservers = [
       "127.0.0.1"
       "1.1.1.1"

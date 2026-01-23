@@ -28,6 +28,14 @@ in
       default = null;
       description = "Base public domain (e.g., example.com)";
     };
+    containerNetwork = mkOption {
+      type = types.str;
+      default = "192.168.100";
+    };
+    hostContainerIP = mkOption {
+      type = types.str;
+      default = "${cfg.containerNetwork}.1";
+    };
 
     services = mkOption {
       type = types.attrsOf (
@@ -36,6 +44,18 @@ in
           {
             options = {
               port = mkOption { type = types.int; };
+
+              id = mkOption {
+                type = types.nullOr types.int;
+                default = null;
+              };
+              containerIP = mkOption {
+                readOnly = true;
+                default =
+                  if config.id != null then "${cfg.containerNetwork}.${toString config.id}" else "127.0.0.1";
+                type = types.str;
+                description = "The calculated internal IP address.";
+              };
 
               expose = mkOption {
                 type = types.bool;
@@ -90,5 +110,16 @@ in
         )
       );
     };
+  };
+  config.my-lab.lib = {
+    mkRoMount = secret: {
+      "${secret.path}" = {
+        hostPath = secret.path;
+        isReadOnly = true;
+      };
+    };
+
+    mkSecretMounts =
+      secretsList: foldl' (acc: s: acc // (config.my-lab.lib.mkRoMount s)) { } secretsList;
   };
 }

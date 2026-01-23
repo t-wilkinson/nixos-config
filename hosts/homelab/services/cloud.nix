@@ -18,6 +18,10 @@ in
         hostPath = "/srv/sync/personal";
         isReadOnly = false;
       };
+      ${secrets.nextcloud_database_pass.path} = {
+        hostPath = secrets.nextcloud_database_pass.path;
+        isReadOnly = true;
+      };
       ${secrets.nextcloud_admin_pass.path} = {
         hostPath = secrets.nextcloud_admin_pass.path;
         isReadOnly = true;
@@ -28,8 +32,8 @@ in
       };
     };
     privateNetwork = true;
-    hostAddress = "192.168.100.10";
-    localAddress = "192.168.100.11";
+    hostAddress = config.my-lab.hostContainerIP;
+    localAddress = services.nextcloud.containerIP;
     forwardPorts = [
       {
         hostPort = services.nextcloud.port;
@@ -50,9 +54,20 @@ in
         users.groups.personaldata.gid = 987;
         users.users.nextcloud.extraGroups = [ "personaldata" ];
 
-        services.postgresql.enable = true;
+        services.postgresql = {
+          enable = true;
+          ensureDatabases = [ "nextcloud" ];
+          enableTCPIP = false;
+          ensureUsers = [
+            {
+              name = "nextcloud";
+              ensureDBOwnership = true;
+            }
+          ];
+        };
 
         services.nginx.virtualHosts."${services.nextcloud.domain}" = {
+          serverAliases = [ services.nextcloud.publicDomain ];
           forceSSL = lib.mkForce false;
           enableACME = lib.mkForce false;
 
@@ -64,30 +79,43 @@ in
           ];
         };
 
+        systemd.services.nextcloud-setup = {
+          after = [ "postgresql.service" ];
+          requires = [ "postgresql.service" ];
+        };
+
         services.nextcloud = {
           enable = true;
           package = pkgs.nextcloud32;
           hostName = services.nextcloud.domain;
           https = true;
           configureRedis = true;
+          database.createLocally = true;
 
           config = {
             adminuser = "admin";
-            dbtype = "pgsql";
             adminpassFile = secrets.nextcloud_admin_pass.path;
+
+            dbtype = "pgsql";
+            dbname = "nextcloud";
+            dbuser = "nextcloud";
+            # dbhost = "localhost";
+            dbhost = "/run/postgresql";
+            # dbpassFile = secrets.nextcloud_database_pass.path;
           };
 
           settings = {
-            overwritehost = services.nextcloud.publicDomain;
+            # overwritehost = services.nextcloud.publicDomain;
+            overwriteprotocol = "https";
+
             trusted_domains = [
+              config.my-lab.containerIP
               services.nextcloud.domain
               services.nextcloud.publicDomain
             ];
-            # Ensure Nextcloud generates HTTPS links
-            overwriteprotocol = "https";
             trusted_proxies = [
               "127.0.0.1"
-              "::1"
+              config.my-lab.hostContainerIP
             ];
 
             # mail_smtpmode = "smtp";

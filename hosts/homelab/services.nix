@@ -71,6 +71,7 @@ in
 
     # Cloud
     nextcloud = {
+      id = 10;
       port = 8081;
       subdomain = "cloud";
       isPublic = true;
@@ -87,6 +88,18 @@ in
     enable = true;
     virtualHosts = (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose) services)) // {
       "${config.my-lab.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
+      "${services.nextcloud.publicDomain}".extraConfig = ''
+        reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
+          header_up X-Real-IP {http.request.remote.host}
+        }
+        tls internal
+      '';
+      "${services.nextcloud.domain}".extraConfig = ''
+        reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
+          header_up X-Real-IP {http.request.remote.host}
+        }
+        tls internal
+      '';
       "${services.dashboard.domain}".extraConfig = ''
         # Serve the Root CRT at /root.crt
         handle /root.crt {

@@ -17,27 +17,22 @@
     gnupg.sshKeyPaths = [ ];
     age.keyFile = "/etc/ssh/age.key";
 
-    secrets = {
-      wifi_psk = {
-        owner = "root";
+    secrets =
+      let
+        root = {
+          owner = "root";
+          group = "root";
+        };
+      in
+      {
+        wifi_psk = root;
+        homelab_password_hash = root;
+        wg_homelab_private_key = root;
+        cloudflared_creds = root;
+        google_app_password = root;
+
+        nextcloud_admin_pass = root;
+        nextcloud_database_pass = root;
       };
-      homelab_password_hash = {
-        owner = "root";
-      };
-      wg_homelab_private_key = {
-        owner = "root";
-      };
-      nextcloud_admin_pass = {
-        owner = "root";
-        group = "root";
-      };
-      cloudflared_creds = {
-        owner = "root";
-        group = "root";
-      };
-      google_app_password = {
-        owner = "root";
-      };
-    };
   };
 }

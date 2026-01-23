@@ -66,7 +66,7 @@ in
             };
           };
           "${services.nextcloud.publicDomain}" = {
-            service = "http://localhost:${toString services.nextcloud.port}";
+            service = "http://${services.nextcloud.containerIP}:${toString services.nextcloud.port}";
             originRequest = {
               httpHostHeader = services.nextcloud.domain;
             };
