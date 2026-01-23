@@ -1,7 +1,7 @@
 { lib, config, ... }:
 with lib;
 let
-  cfg = config.my-lab;
+  cfg = config.homelab;
   capitalizeFirst =
     s:
     if builtins.stringLength s == 0 then
@@ -10,7 +10,13 @@ let
       (lib.toUpper (builtins.substring 0 1 s)) + (builtins.substring 1 (builtins.stringLength s - 1) s);
 in
 {
-  options.my-lab = {
+  options.homelab = {
+    lib = mkOption {
+      type = types.attrs;
+      default = { };
+      description = "Library of helper functions for homelab";
+    };
+
     vpnNetwork = mkOption {
       type = types.str;
       default = "10.100.0";
@@ -44,6 +50,11 @@ in
           {
             options = {
               port = mkOption { type = types.int; };
+              extraPorts = mkOption {
+                type = types.listOf types.int;
+                default = [ ];
+                description = "Additional ports to forward in container";
+              };
 
               id = mkOption {
                 type = types.nullOr types.int;
@@ -111,15 +122,33 @@ in
       );
     };
   };
-  config.my-lab.lib = {
-    mkRoMount = secret: {
-      "${secret.path}" = {
-        hostPath = secret.path;
-        isReadOnly = true;
-      };
-    };
 
-    mkSecretMounts =
-      secretsList: foldl' (acc: s: acc // (config.my-lab.lib.mkRoMount s)) { } secretsList;
+  config = {
+    containers =
+      let
+        containerServices = filterAttrs (n: v: v.id != null) cfg.services;
+      in
+      mapAttrs (n: v: {
+        privateNetwork = true;
+        hostAddress = cfg.hostContainerIP;
+        localAddress = v.containerIP;
+        forwardPorts = lib.mkDefault (
+          map (p: {
+            protocol = "tcp";
+            hostPort = v.port;
+            containerPort = v.port;
+          }) ([ v.port ] ++ v.extraPorts)
+        );
+      }) containerServices;
+    homelab.lib = {
+      mkRoMount = path: {
+        "${path}" = {
+          hostPath = path;
+          isReadOnly = true;
+        };
+      };
+
+      mkSecretMounts = secretsList: foldl' (acc: s: acc // (cfg.lib.mkRoMount s.path)) { } secretsList;
+    };
   };
 }

@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  services = config.my-lab.services;
+  services = config.homelab.services;
 in
 {
   containers.monitor = {

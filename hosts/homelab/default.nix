@@ -7,7 +7,7 @@
   ...
 }:
 {
-  my-lab = {
+  homelab = {
     domain = "home.lab";
     vpnIP = "10.100.0.1";
     vpnNetwork = "10.100.0";

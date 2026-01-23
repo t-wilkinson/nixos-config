@@ -1,7 +1,7 @@
 { config, ... }:
 let
   tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # cloudflared tunnel
-  services = config.my-lab.services;
+  services = config.homelab.services;
 in
 {
   # BLOCY
@@ -22,8 +22,8 @@ in
         customTTL = "1h";
         mapping = {
           # Map main domain and all subdomains to the Pi's Direct IP
-          "home.lab" = config.my-lab.vpnIP;
-          "*.home.lab" = config.my-lab.vpnIP;
+          "home.lab" = config.homelab.vpnIP;
+          "*.home.lab" = config.homelab.vpnIP;
         };
       };
 
@@ -68,7 +68,7 @@ in
           "${services.nextcloud.publicDomain}" = {
             service = "http://${services.nextcloud.containerIP}:${toString services.nextcloud.port}";
             originRequest = {
-              httpHostHeader = services.nextcloud.domain;
+              httpHostHeader = services.nextcloud.publicDomain;
             };
           };
         };

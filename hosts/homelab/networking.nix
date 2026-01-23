@@ -95,24 +95,24 @@ in
   # WireGuard
   networking.wireguard.interfaces = {
     wg0 = {
-      ips = [ "${config.my-lab.vpnIP}/24" ];
+      ips = [ "${config.homelab.vpnIP}/24" ];
       listenPort = 51820;
       privateKeyFile = config.sops.secrets.wg_homelab_private_key.path;
       peers = [
         # Main PC
         {
           publicKey = "DZqoE/m67JIvOtZR0Q06iV1HvMDpVZskUPj6QxL6chY=";
-          allowedIPs = [ "${config.my-lab.vpnNetwork}.2/32" ];
+          allowedIPs = [ "${config.homelab.vpnNetwork}.2/32" ];
         }
         # MacBook
         {
           publicKey = "Jid4uv1OrkFs6CutQw/A0APB0NQ9RAO1LnzmuzeDgmc=";
-          allowedIPs = [ "${config.my-lab.vpnNetwork}.3/32" ];
+          allowedIPs = [ "${config.homelab.vpnNetwork}.3/32" ];
         }
         # Phone
         {
           publicKey = "WGSdzK7EBpPNIYS9CV8j4CdYC82ciPzcnhN6GVz6AEQ=";
-          allowedIPs = [ "${config.my-lab.vpnNetwork}.4/32" ];
+          allowedIPs = [ "${config.homelab.vpnNetwork}.4/32" ];
         }
       ];
     };

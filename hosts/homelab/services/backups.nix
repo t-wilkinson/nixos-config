@@ -22,7 +22,7 @@
 
     openDefaultPorts = true; # 22000/tcp transfer, 21027/udp discovery
 
-    guiAddress = "127.0.0.1:${toString config.my-lab.services.sync.port}";
+    guiAddress = "127.0.0.1:${toString config.homelab.services.sync.port}";
 
     settings = {
       gui.insecureSkipHostcheck = true;

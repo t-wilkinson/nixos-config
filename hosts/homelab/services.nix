@@ -7,7 +7,7 @@
   ...
 }:
 let
-  services = config.my-lab.services;
+  services = config.homelab.services;
 
   mkCaddyProxy = name: service: {
     name = service.domain;
@@ -29,7 +29,7 @@ let
   };
 in
 {
-  my-lab.services = {
+  homelab.services = {
     ntfy = {
       port = 8083;
     };
@@ -87,7 +87,7 @@ in
   services.caddy = {
     enable = true;
     virtualHosts = (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose) services)) // {
-      "${config.my-lab.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
+      "${config.homelab.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
       "${services.nextcloud.publicDomain}".extraConfig = ''
         reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
           header_up X-Real-IP {http.request.remote.host}
@@ -123,7 +123,7 @@ in
   services.homepage-dashboard = {
     enable = true;
     listenPort = services.dashboard.port;
-    allowedHosts = "${services.dashboard.domain},${config.my-lab.domain},localhost,127.0.0.1";
+    allowedHosts = "${services.dashboard.domain},${config.homelab.domain},localhost,127.0.0.1";
     widgets = [
       {
         resources = {
@@ -264,7 +264,7 @@ in
     bantime = "24h";
 
     ignoreIP = [
-      "${config.my-lab.vpnNetwork}.0/24"
+      "${config.homelab.vpnNetwork}.0/24"
       "10.1.0.1"
     ];
 

@@ -6,7 +6,7 @@
   ...
 }:
 let
-  services = config.my-lab.services;
+  services = config.homelab.services;
   secrets = config.sops.secrets;
 in
 {
@@ -18,31 +18,27 @@ in
         hostPath = "/srv/sync/personal";
         isReadOnly = false;
       };
-      ${secrets.nextcloud_database_pass.path} = {
-        hostPath = secrets.nextcloud_database_pass.path;
-        isReadOnly = true;
-      };
-      ${secrets.nextcloud_admin_pass.path} = {
-        hostPath = secrets.nextcloud_admin_pass.path;
-        isReadOnly = true;
-      };
-      ${secrets.google_app_password.path} = {
-        hostPath = secrets.google_app_password.path;
-        isReadOnly = true;
-      };
-    };
-    privateNetwork = true;
-    hostAddress = config.my-lab.hostContainerIP;
-    localAddress = services.nextcloud.containerIP;
-    forwardPorts = [
-      {
-        hostPort = services.nextcloud.port;
-        containerPort = services.nextcloud.port;
-        protocol = "tcp";
-      }
+    }
+    // config.homelab.lib.mkSecretMounts [
+      secrets.nextcloud_database_pass
+      secrets.nextcloud_admin_pass
+      secrets.google_app_password
     ];
+    # privateNetwork = true;
+    # hostAddress = config.homelab.hostContainerIP;
+    # localAddress = services.nextcloud.containerIP;
+    # forwardPorts = [
+    #   {
+    #     hostPort = services.nextcloud.port;
+    #     containerPort = services.nextcloud.port;
+    #     protocol = "tcp";
+    #   }
+    # ];
 
     config =
+      let
+        hostConfig = config;
+      in
       {
         config,
         pkgs,
@@ -105,17 +101,17 @@ in
           };
 
           settings = {
-            # overwritehost = services.nextcloud.publicDomain;
+            overwritehost = services.nextcloud.publicDomain;
             overwriteprotocol = "https";
 
             trusted_domains = [
-              config.my-lab.containerIP
+              services.nextcloud.containerIP
               services.nextcloud.domain
               services.nextcloud.publicDomain
             ];
             trusted_proxies = [
               "127.0.0.1"
-              config.my-lab.hostContainerIP
+              hostConfig.homelab.hostContainerIP
             ];
 
             # mail_smtpmode = "smtp";
