@@ -17,6 +17,11 @@ in
       description = "Library of helper functions for homelab";
     };
 
+    containerStateVersion = mkOption {
+      type = types.str;
+      default = config.system.stateVersion;
+    };
+
     vpnNetwork = mkOption {
       type = types.str;
       default = "10.100.0";
@@ -42,6 +47,11 @@ in
       type = types.str;
       default = "${cfg.containerNetwork}.1";
     };
+    groups = mkOption {
+      type = types.attrsOf types.int;
+      default = { };
+      description = "group name -> gid. Helps with permissions across containers.";
+    };
 
     services = mkOption {
       type = types.attrsOf (
@@ -59,6 +69,7 @@ in
               id = mkOption {
                 type = types.nullOr types.int;
                 default = null;
+                description = "Marks service as a container with private network. The container's ip address becomes containerNetwork.id. It will automatically forward the service's declared port.";
               };
               containerIP = mkOption {
                 readOnly = true;
@@ -129,6 +140,7 @@ in
         containerServices = filterAttrs (n: v: v.id != null) cfg.services;
       in
       mapAttrs (n: v: {
+        config.system.stateVersion = lib.mkDefault cfg.containerStateVersion;
         privateNetwork = true;
         hostAddress = cfg.hostContainerIP;
         localAddress = v.containerIP;

@@ -13,6 +13,7 @@
     vpnNetwork = "10.100.0";
     publicDomain = "treywilkinson.com";
     containerNetwork = "192.168.100";
+    containerStateVersion = "24.11";
   };
 
   imports = [

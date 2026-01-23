@@ -24,16 +24,6 @@ in
       secrets.nextcloud_admin_pass
       secrets.google_app_password
     ];
-    # privateNetwork = true;
-    # hostAddress = config.homelab.hostContainerIP;
-    # localAddress = services.nextcloud.containerIP;
-    # forwardPorts = [
-    #   {
-    #     hostPort = services.nextcloud.port;
-    #     containerPort = services.nextcloud.port;
-    #     protocol = "tcp";
-    #   }
-    # ];
 
     config =
       let
@@ -156,7 +146,6 @@ in
         #     --value "$(cat ${secrets.google_app_password.path})"
         #   '';
         # };
-        system.stateVersion = "24.11";
       };
   };
 
@@ -190,7 +179,6 @@ in
           # DISABLE ML to save the Pi 4 from melting
           machine-learning.enable = false;
         };
-        system.stateVersion = "24.11";
       };
   };
 }
