@@ -2,7 +2,6 @@
 {
   config,
   pkgs,
-  lib,
   username,
   ...
 }:
@@ -14,6 +13,11 @@
     publicDomain = "treywilkinson.com";
     containerNetwork = "192.168.100";
     containerStateVersion = "24.11";
+
+    groups = {
+      personaldata = 987; # for exposing to synced directory to services
+      serverdata = 980; # for exposing server files to services
+    };
   };
 
   imports = [
@@ -34,20 +38,16 @@
     ];
   };
 
-  users.groups.personaldata = {
-    # for exposing to synced directory to services
-    gid = 987;
-  };
-  users.groups.serverdata = {
-    # for exposing server files to services
-    gid = 980;
-  };
-  systemd.tmpfiles.rules = [
-    "d /srv/sync/personal/drive 0770 ${username} personaldata - -"
-    "Z /srv/sync/personal/drive 0770 ${username} personaldata - -"
-    "d /var/lib/minecraft 0775 ${username} serverdata - -"
-    "Z /var/lib/minecraft 0775 ${username} serverdata - -"
-  ];
+  systemd.tmpfiles.rules =
+    let
+      groups = config.home.lab.groups;
+    in
+    [
+      "d /srv/sync/personal/drive 0770 ${username} ${groups.personaldata} - -"
+      "Z /srv/sync/personal/drive 0770 ${username} ${groups.personaldata} - -"
+      "d /var/lib/minecraft 0775 ${username} ${groups.serverdata} - -"
+      "Z /var/lib/minecraft 0775 ${username} ${groups.serverdata} - -"
+    ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-label/NIXOS_SD";
@@ -111,12 +111,12 @@
 
   environment.systemPackages = with pkgs; [
     wol # Wake on LAN util for turning on the PC through ethernet
+    wakeonlan
     wireguard-tools
     syncthing
     tree
     ripgrep
     fd
-    wakeonlan
   ];
 
   nix.settings.experimental-features = [

@@ -16,6 +16,22 @@ in
       default = { };
       description = "Library of helper functions for homelab";
     };
+    groups = mkOption {
+      type = types.attrsOf types.int;
+      default = { };
+      description = "group name -> gid. Helps with permissions across containers.";
+      example = {
+        personaldata = 987;
+      };
+    };
+    # drives = mkOption {
+    #   type = types.attrsOf types.str;
+    #   default = { };
+    #   example = {
+    #     backup = "/mnt/backup";
+    #   };
+    #   description = "drive name -> path.";
+    # };
 
     containerStateVersion = mkOption {
       type = types.str;
@@ -46,11 +62,6 @@ in
     hostContainerIP = mkOption {
       type = types.str;
       default = "${cfg.containerNetwork}.1";
-    };
-    groups = mkOption {
-      type = types.attrsOf types.int;
-      default = { };
-      description = "group name -> gid. Helps with permissions across containers.";
     };
 
     services = mkOption {
@@ -135,12 +146,15 @@ in
   };
 
   config = {
+    users.groups = mapAttrs (name: gid: { inherit gid; }) cfg.groups;
     containers =
       let
         containerServices = filterAttrs (n: v: v.id != null) cfg.services;
       in
       mapAttrs (n: v: {
         config.system.stateVersion = lib.mkDefault cfg.containerStateVersion;
+        users.groups = mapAttrs (name: gid: { inherit gid; }) cfg.groups;
+
         privateNetwork = true;
         hostAddress = cfg.hostContainerIP;
         localAddress = v.containerIP;
@@ -152,6 +166,7 @@ in
           }) ([ v.port ] ++ v.extraPorts)
         );
       }) containerServices;
+
     homelab.lib = {
       mkRoMount = path: {
         "${path}" = {

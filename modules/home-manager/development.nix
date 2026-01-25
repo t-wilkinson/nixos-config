@@ -21,7 +21,8 @@ with pkgs;
   # nuget # C#
   # boost
   ghc
-  haskell-language-server
+  # haskell-language-server
+  # haskellPackages.ghcup
   nil # nix
 
   # NODE.JS DEVELOPMENT TOOLS

@@ -88,6 +88,9 @@
       # appimage-run
       # texliveFull
 
+      # Office-tools
+      libreoffice
+
       # (writeShellScriptBin "hello-bro" ''
       #   echo "Hello, ${config.home.username}!"
       # '')

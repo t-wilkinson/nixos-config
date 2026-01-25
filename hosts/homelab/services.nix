@@ -3,7 +3,6 @@
   config,
   pkgs,
   lib,
-  username,
   ...
 }:
 let
@@ -13,7 +12,7 @@ let
     name = service.domain;
     value = {
       extraConfig = ''
-        reverse_proxy localhost:${toString service.port} {
+        reverse_proxy ${service.containerIP or "localhost"}:${toString service.port} {
           header_up X-Real-IP {http.request.remote.host}
         }
         tls internal
@@ -88,18 +87,18 @@ in
     enable = true;
     virtualHosts = (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose) services)) // {
       "${config.homelab.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
-      "${services.nextcloud.publicDomain}".extraConfig = ''
-        reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
-          header_up X-Real-IP {http.request.remote.host}
-        }
-        tls internal
-      '';
-      "${services.nextcloud.domain}".extraConfig = ''
-        reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
-          header_up X-Real-IP {http.request.remote.host}
-        }
-        tls internal
-      '';
+      # "${services.nextcloud.publicDomain}".extraConfig = ''
+      #   reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
+      #     header_up X-Real-IP {http.request.remote.host}
+      #   }
+      #   tls internal
+      # '';
+      # "${services.nextcloud.domain}".extraConfig = ''
+      #   reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
+      #     header_up X-Real-IP {http.request.remote.host}
+      #   }
+      #   tls internal
+      # '';
       "${services.dashboard.domain}".extraConfig = ''
         # Serve the Root CRT at /root.crt
         handle /root.crt {
@@ -259,47 +258,47 @@ in
     '';
   };
 
-  services.fail2ban = {
-    enable = true;
-    bantime = "24h";
+  # services.fail2ban = {
+  #   enable = true;
+  #   bantime = "24h";
 
-    ignoreIP = [
-      "${config.homelab.vpnNetwork}.0/24"
-      "10.1.0.1"
-    ];
+  #   ignoreIP = [
+  #     "${config.homelab.vpnNetwork}.0/24"
+  #     "10.1.0.1"
+  #   ];
 
-    jails = {
-      # SSH (Standard jail)
-      # sshd = ''
-      #   enabled = true
-      #   mode = aggressive
-      # '';
+  #   jails = {
+  #     # SSH (Standard jail)
+  #     # sshd = ''
+  #     #   enabled = true
+  #     #   mode = aggressive
+  #     # '';
 
-      # Nextcloud
-      # Converted to string to avoid "backend option does not exist" error
-      nextcloud = ''
-        enabled = true
-        backend = auto
-        port = 80,443
-        protocol = tcp
-        filter = nextcloud
-        maxretry = 3
-        bantime = 86400
-        findtime = 43200
-      '';
-      # logpath = /var/lib/nextcloud/data/nextcloud.log
+  #     # Nextcloud
+  #     # Converted to string to avoid "backend option does not exist" error
+  #     nextcloud = ''
+  #       enabled = true
+  #       backend = auto
+  #       port = 80,443
+  #       protocol = tcp
+  #       filter = nextcloud
+  #       maxretry = 3
+  #       bantime = 86400
+  #       findtime = 43200
+  #     '';
+  #     # logpath = /var/lib/nextcloud/data/nextcloud.log
 
-      # Vaultwarden
-      vaultwarden = ''
-        enabled = true
-        backend = systemd
-        filter = vaultwarden
-        maxretry = 3
-        bantime = 86400
-        findtime = 14400
-      '';
-    };
-  };
+  #     # Vaultwarden
+  #     vaultwarden = ''
+  #       enabled = true
+  #       backend = systemd
+  #       filter = vaultwarden
+  #       maxretry = 3
+  #       bantime = 86400
+  #       findtime = 14400
+  #     '';
+  #   };
+  # };
 
   # MINECRAFT SERVER
   # services.borgbackup.jobs."minecraft-backup" = {

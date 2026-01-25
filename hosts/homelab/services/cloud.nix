@@ -37,7 +37,6 @@ in
       }:
       {
         networking.firewall.allowedTCPPorts = [ services.nextcloud.port ];
-        users.groups.personaldata.gid = 987;
         users.users.nextcloud.extraGroups = [ "personaldata" ];
 
         services.postgresql = {
@@ -163,7 +162,6 @@ in
       { ... }:
       {
         users.users.immich.extraGroups = [ "personaldata" ];
-        users.groups.personaldata.gid = 987;
 
         networking.firewall.allowedTCPPorts = [ services.immich.port ];
 
