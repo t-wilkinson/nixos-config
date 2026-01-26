@@ -24,14 +24,18 @@ in
         personaldata = 987;
       };
     };
-    # drives = mkOption {
-    #   type = types.attrsOf types.str;
-    #   default = { };
-    #   example = {
-    #     backup = "/mnt/backup";
-    #   };
-    #   description = "drive name -> path.";
-    # };
+    drives = mkOption {
+      type = types.attrsOf types.str;
+      default = { };
+      example = {
+        backup = "/mnt/backup";
+      };
+      description = "drive name -> path.";
+    };
+    enableServices = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+    };
 
     containerStateVersion = mkOption {
       type = types.str;
@@ -70,6 +74,22 @@ in
           { name, config, ... }:
           {
             options = {
+              enable = mkOption {
+                type = types.bool;
+                default = false;
+              };
+
+              data = mkOption {
+                type = types.submodule {
+                  freeformType = types.attrsOf types.anything;
+                  options = {
+                    # global options
+                  };
+                };
+                default = { };
+                description = "Additional information to be used by service";
+              };
+
               port = mkOption { type = types.int; };
               extraPorts = mkOption {
                 type = types.listOf types.int;
@@ -148,7 +168,7 @@ in
   config = {
     containers =
       let
-        containerServices = filterAttrs (n: v: v.id != null) cfg.services;
+        containerServices = filterAttrs (n: v: v.id != null && v.enable) cfg.services;
       in
       mapAttrs (n: v: {
         config =
@@ -171,6 +191,9 @@ in
         );
       }) containerServices;
 
+    homelab.services = lib.genAttrs cfg.enableServices (name: {
+      enable = true;
+    });
     homelab.lib = {
       mkRoMount = path: {
         "${path}" = {

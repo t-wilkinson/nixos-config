@@ -149,42 +149,4 @@ in
   #     ];
   #   };
   # };
-
-  nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "minecraft-server" ];
-  environment.systemPackages = [ pkgs.mcrcon ];
-  systemd.services.minecraft-server = {
-    after = [ "var-lib-minecraft.mount" ];
-    requires = [ "var-lib-minecraft.mount" ];
-  };
-  users.users.${username} = {
-    extraGroups = [ "serverdata" ];
-  };
-  users.groups.serverdata = {
-    gid = 980; # MUST match the Pi's GID for this group [cite: 16]
-  };
-  users.users.minecraft = {
-    extraGroups = [ "serverdata" ];
-  };
-
-  services.minecraft-server = {
-    enable = true;
-    eula = true;
-    openFirewall = true;
-    declarative = false;
-    serverProperties = {
-      server-port = mcServerPort;
-      gamemode = "survival";
-      motd = "Welcome to the Wilkinson's Homelab!";
-      white-list = false;
-      online-mode = false;
-      allow-cheats = true;
-
-      enable-rcon = true;
-      "rcon.password" = "password";
-      "rcon.port" = rconPort;
-    };
-    jvmOpts = "-Xms2048M -Xmx4096M";
-  };
-  systemd.services.minecraft-server.serviceConfig.Restart = "always";
-
 }

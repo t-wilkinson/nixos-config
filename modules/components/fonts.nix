@@ -1,13 +1,17 @@
-{ pkgs, ...}:
+{ pkgs, ... }:
 {
   environment.systemPackages = with pkgs; [
+    fira-code
     font-awesome
     hack-font
     meslo-lgs-nf
     noto-fonts
     noto-fonts-emoji
+    liberation_ttf
   ];
 
+  # # pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; });
+  # fonts = {
   # fonts = {
   #   packages = with pkgs; [
   #     fira-code
@@ -19,9 +23,14 @@
   #     source-han-sans-japanese
   #     source-han-serif-japanese
   #   ];
-  #   fontconfig.defaultFonts = {
-  #     serif = [ "Noto Serif" "Source Han Serif" ];
-  #     sansSerif = [ "Noto Sans" "Source Han Sans" ];
+  #   fontconfig = {
+  #     enable = true;
+  #     defaultFonts = {
+  #       # sansSerif = [ "Inter" "Roboto" "Ubuntu" "DejaVu Sans" ];
+  #       # serif     = [ "DejaVu Serif" ];
+  #       # monospace = [ "Fira Code" ];
+  #       # emoji     = [ "Noto Color Emoji" ];
+  #     };
   #   };
   # };
 }

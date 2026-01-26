@@ -10,7 +10,29 @@
     ./locale.nix
     ./gnome.nix
     ../../modules/shared.nix
+    ../../modules/homelab.nix
+    ../../modules/services
   ];
+
+  homelab = {
+    domain = "home.lab";
+    vpnIP = "10.100.0.1";
+    vpnNetwork = "10.100.0";
+    publicDomain = "treywilkinson.com";
+    containerNetwork = "192.168.100";
+    containerStateVersion = "24.11";
+    enableServices = [
+      "mc-server"
+    ];
+    drives = {
+      minecraft = "/var/lib/minecraft";
+    };
+
+    groups = {
+      personaldata = 987; # for exposing to synced directory to services
+      serverdata = 980; # for exposing server files to services
+    };
+  };
 
   security.pki.certificateFiles = [
     ../homelab/homelab-root.crt

@@ -39,6 +39,20 @@
     ];
   };
 
+  homelab.enableServices = [
+    "ntfy"
+    "vault"
+    "dashboard"
+    "sync"
+    "zortex"
+    "monitor"
+    "nextcloud"
+    "immich"
+    # "mc-server"
+    # "prometheus"
+    # "grafana"
+  ];
+
   systemd.tmpfiles.rules =
     let
       groups = lib.mapAttrs (n: v: toString v) config.homelab.groups;
