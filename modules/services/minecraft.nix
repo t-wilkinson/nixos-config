@@ -1,9 +1,20 @@
-{ ... }:
+{ lib, config, ... }:
+let
+  homelab = config.homelab;
+  service = homelab.services.minecraft;
+in
 {
+  options = with lib; {
+    enable = mkOption {
+      type = types.bool;
+      default = false;
+    };
+  };
+
   mc-server =
     { self, ... }:
     {
-      port = 25565;
+      port = service.port;
       container = {
         autoStart = true;
         privateNetwork = false;

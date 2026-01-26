@@ -146,14 +146,18 @@ in
   };
 
   config = {
-    users.groups = mapAttrs (name: gid: { inherit gid; }) cfg.groups;
     containers =
       let
         containerServices = filterAttrs (n: v: v.id != null) cfg.services;
       in
       mapAttrs (n: v: {
-        config.system.stateVersion = lib.mkDefault cfg.containerStateVersion;
-        users.groups = mapAttrs (name: gid: { inherit gid; }) cfg.groups;
+        config =
+          { config, ... }:
+          {
+            system.stateVersion = lib.mkDefault cfg.containerStateVersion;
+            users.groups = mapAttrs (name: gid: { inherit gid; }) cfg.groups;
+            networking.firewall.allowedTCPPorts = [ v.port ] ++ v.extraPorts;
+          };
 
         privateNetwork = true;
         hostAddress = cfg.hostContainerIP;

@@ -3,6 +3,7 @@
   config,
   pkgs,
   username,
+  lib,
   ...
 }:
 {
@@ -40,7 +41,7 @@
 
   systemd.tmpfiles.rules =
     let
-      groups = config.home.lab.groups;
+      groups = lib.mapAttrs (n: v: toString v) config.homelab.groups;
     in
     [
       "d /srv/sync/personal/drive 0770 ${username} ${groups.personaldata} - -"
