@@ -2,11 +2,25 @@
 {
   imports = [
     ./mc-server.nix
+    ./nextcloud.nix
   ];
 
   homelab = {
+    domain = "home.lab";
+    vpnIP = "10.100.0.1";
+    vpnNetwork = "10.100.0";
+    publicDomain = "treywilkinson.com";
+    containerNetwork = "192.168.100";
+    containerStateVersion = "24.11";
     drives = {
       minecraft = "/var/lib/minecraft";
+      googledrive = "/srv/sync/personal/drive";
+      personal = "/srv/sync/personal";
+    };
+
+    groups = {
+      personaldata = 987; # for exposing to synced directory to services
+      serverdata = 980; # for exposing server files to services
     };
 
     services = {

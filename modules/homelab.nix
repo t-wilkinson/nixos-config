@@ -166,6 +166,7 @@ in
   };
 
   config = {
+    users.groups = mapAttrs (name: gid: { inherit gid; }) cfg.groups;
     containers =
       let
         containerServices = filterAttrs (n: v: v.id != null && v.enable) cfg.services;

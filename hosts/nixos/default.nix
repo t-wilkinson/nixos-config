@@ -1,5 +1,5 @@
 # hosts/nixos/default.nix
-{ ... }:
+{ username, ... }:
 {
   imports = [
     ./home-manager
@@ -9,29 +9,23 @@
     ./audio.nix
     ./locale.nix
     ./gnome.nix
+    ./services.nix
     ../../modules/shared.nix
     ../../modules/homelab.nix
     ../../modules/services
   ];
 
   homelab = {
-    domain = "home.lab";
-    vpnIP = "10.100.0.1";
-    vpnNetwork = "10.100.0";
-    publicDomain = "treywilkinson.com";
-    containerNetwork = "192.168.100";
-    containerStateVersion = "24.11";
     enableServices = [
       "mc-server"
     ];
-    drives = {
-      minecraft = "/var/lib/minecraft";
-    };
+  };
 
-    groups = {
-      personaldata = 987; # for exposing to synced directory to services
-      serverdata = 980; # for exposing server files to services
-    };
+  users.users.${username} = {
+    extraGroups = [
+      "serverdata"
+      "personaldata"
+    ];
   };
 
   security.pki.certificateFiles = [
@@ -44,32 +38,6 @@
     secrets = {
       wg_nixos_private_key = {
         owner = "root";
-      };
-    };
-  };
-
-  services.syncthing = {
-    enable = true;
-    user = "trey";
-    dataDir = "/home/trey/.local/state/syncthing"; # Default folder for new synced directories
-    configDir = "/home/trey/.config/syncthing";
-
-    openDefaultPorts = true; # 22000/tcp transfer, 21027/udp discovery
-
-    settings = {
-      devices = {
-        "homelab" = {
-          id = "HIAD4WE-UUAOBRY-KXKOWTA-P5HAXBL-FH3NQKF-BZLSGSO-YKNVFFI-4VUZQQE";
-          # addresses = [ "tcp://10.1.0.2:22000" ];
-        };
-      };
-
-      folders = {
-        "personal" = {
-          id = "personal"; # remove this line?
-          path = "/home/trey/dev/t-wilkinson/personal";
-          devices = [ "homelab" ];
-        };
       };
     };
   };

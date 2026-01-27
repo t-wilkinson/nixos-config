@@ -23,9 +23,6 @@ in
 
     (lib.mkIf cfg.enable {
 
-      users.users.${username} = {
-        extraGroups = [ "serverdata" ];
-      };
       containers.mc-server = {
         autoStart = true;
         privateNetwork = false;

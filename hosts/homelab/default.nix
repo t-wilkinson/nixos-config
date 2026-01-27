@@ -30,6 +30,7 @@
     ./services/cloud.nix
     ./services/monitoring.nix
     ./services/network.nix
+    ../../modules/services
   ];
 
   nix.settings = {
