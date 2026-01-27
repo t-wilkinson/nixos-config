@@ -6,17 +6,17 @@
   ...
 }:
 let
-  services = config.homelab.services;
-  secrets = config.sops.secrets;
+  homelab = config.homelab;
+  cfg = config.homelab.services.immich;
 in
 {
   # IMMICH Photos viewer
-  containers.immich = {
+  containers.immich = lib.mkIf cfg.enable {
     autoStart = true;
     # Bind mount the persistent data from the host into the container
     bindMounts = {
       "/mnt/media/drive" = {
-        hostPath = "/srv/sync/personal/drive";
+        hostPath = homelab.drives.googledrive;
         isReadOnly = false;
       };
     };
@@ -25,11 +25,11 @@ in
       {
         users.users.immich.extraGroups = [ "personaldata" ];
 
-        networking.firewall.allowedTCPPorts = [ services.immich.port ];
+        networking.firewall.allowedTCPPorts = [ cfg.port ];
 
         services.immich = {
           enable = true;
-          port = services.immich.port;
+          port = cfg.port;
           host = "127.0.0.1";
 
           # Point the main internal database/upload storage here.

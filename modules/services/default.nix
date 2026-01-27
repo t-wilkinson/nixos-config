@@ -3,6 +3,8 @@
   imports = [
     ./mc-server.nix
     ./nextcloud.nix
+    ./immich.nix
+    ./monitoring.nix
   ];
 
   homelab = {

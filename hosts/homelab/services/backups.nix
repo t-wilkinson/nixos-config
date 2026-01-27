@@ -62,7 +62,7 @@
   services.borgbackup.jobs."homelab-backup" = {
     # Define what to backup
     paths = [
-      "/var/lib/nextcloud" # Example: Nextcloud data
+      "/var/lib/nextcloud"
       "/srv/sync"
     ];
 

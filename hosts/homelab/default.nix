@@ -133,6 +133,7 @@
     tree
     ripgrep
     fd
+    lsof
   ];
 
   nix.settings.experimental-features = [
