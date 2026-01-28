@@ -66,6 +66,7 @@ in
                 white-list = false;
                 online-mode = false;
                 allow-cheats = true;
+                view-distance = 18;
 
                 enable-rcon = true;
                 "rcon.password" = "password";
