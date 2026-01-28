@@ -71,7 +71,7 @@ in
                 "rcon.password" = "password";
                 "rcon.port" = cfg.data.rconPort;
               };
-              jvmOpts = "-Xms2048M -Xmx4096M";
+              jvmOpts = "-Xms4096 -Xmx8192";
             };
             systemd.services.minecraft-server.serviceConfig.Restart = "always";
           };
