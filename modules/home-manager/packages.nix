@@ -54,7 +54,6 @@ with pkgs;
   # inxi
   # jq
   lf # terminal file browser
-  xdragon # for lf
   file # for lf
   sops
   starship

@@ -61,7 +61,7 @@
       grafana = {
         port = 3000;
       };
-      monitor = {
+      glances = {
         port = 61208;
       };
 

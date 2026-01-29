@@ -1,13 +1,13 @@
 { pkgs, ... }:
 {
   environment.systemPackages = with pkgs; [
-    fira-code
+    # fira-code
     font-awesome
     hack-font
     meslo-lgs-nf
     noto-fonts
     noto-fonts-emoji
-    liberation_ttf
+    # liberation_ttf
   ];
 
   # # pkgs.nerdfonts.override { fonts = [ "FiraCode" ]; });

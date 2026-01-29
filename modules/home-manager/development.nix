@@ -16,7 +16,10 @@ with pkgs;
   gcc
   go
   # mono5 # C#
-  # php
+  php
+  php84Packages.composer
+  # php84Packages.php-cs-fixer
+
   rustup # rust version manager
   # nuget # C#
   # boost

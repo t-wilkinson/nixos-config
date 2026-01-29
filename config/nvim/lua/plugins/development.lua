@@ -10,6 +10,15 @@ return {
     },
   },
 
+  {
+    "stevearc/conform.nvim",
+    opts = {
+      formatters_by_ft = {
+        php = { "php_cs_fixer" },
+      },
+    },
+  },
+
   { "mason-org/mason-lspconfig.nvim", version = "^1.0.0" },
   {
     "mason-org/mason.nvim",
@@ -42,6 +51,7 @@ return {
         "markdownlint-cli2",
         "marksman",
         "neocmakelsp",
+        "php-cs-fixer",
         "prettier",
         "pyright",
         "ruff",

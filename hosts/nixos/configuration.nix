@@ -78,6 +78,23 @@
     kdePackages.kdeconnect-kde
     libsForQt5.qtstyleplugin-kvantum # The engine
     kdePackages.qtstyleplugin-kvantum # For Qt6 apps
+    xdragon # for lf
+
+    # inputs.agenix.packages."${config.system}".default
+    # inputs.agenix.packages."x86_64-linux".default
+    nix-ld
+    gtk3
+    efibootmgr
+    iproute2
+    psmisc # tools that use /proc
+    usbutils
+    stdenv.cc.cc.lib
+
+    # need the following for file uploads to work
+    dbus
+    nss
+    gnutls
+    libglvnd
   ];
 
   environment.variables = {

@@ -194,7 +194,8 @@ n() {
 steal() {
     setopt -s dotglob
     mv "$1"/* "${2:-.}"/
-    rm -r "$1"
+    mv "$1"/.* "${2:-.}"/
+    rmdir "$1"
 }
 
 # swap two files/folders

@@ -27,8 +27,8 @@
     ./services.nix
     ./services/backups.nix
     # ./services/caddy.nix
-    ./services/cloud.nix
-    ./services/monitoring.nix
+    # ./services/cloud.nix
+    # ./services/monitoring.nix
     ./services/network.nix
     ../../modules/services
   ];
