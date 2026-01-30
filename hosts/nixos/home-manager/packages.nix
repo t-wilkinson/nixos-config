@@ -91,6 +91,8 @@
       # Office-tools
       libreoffice
 
+      php
+
       # (writeShellScriptBin "hello-bro" ''
       #   echo "Hello, ${config.home.username}!"
       # '')
