@@ -2,11 +2,11 @@
 {
   services.tailscale.enable = true;
   # Verify with: scutil --dns
-  environment.etc."resolver/home.lab".text = ''
-    nameserver 10.100.0.1
-    search home.lab
-    timeout 2
-  '';
+  # environment.etc."resolver/home.lab".text = ''
+  #   nameserver 100.112.52.7
+  #   search home.lab
+  #   timeout 2
+  # '';
 
   environment.systemPackages = with pkgs; [
     dnsmasq
@@ -21,21 +21,21 @@
   #   };
   # };
 
-  networking.wg-quick.interfaces.wg0 = {
-    address = [ "10.100.0.3/32" ];
-    privateKeyFile = config.sops.secrets.wg_macos_private_key.path;
+  # networking.wg-quick.interfaces.wg0 = {
+  #   address = [ "10.100.0.3/32" ];
+  #   privateKeyFile = config.sops.secrets.wg_macos_private_key.path;
 
-    peers = [
-      {
-        publicKey = "cvzk8zCBE7o/xkeoyCloC53N116VLBubKQYdAAdYsSo=";
-        # TODO: use tailscale ip
-        endpoint = "100.112.52.7:51820";
-        persistentKeepalive = 25;
+  #   peers = [
+  #     {
+  #       publicKey = "cvzk8zCBE7o/xkeoyCloC53N116VLBubKQYdAAdYsSo=";
+  #       # TODO: use tailscale ip
+  #       endpoint = "100.112.52.7:51820";
+  #       persistentKeepalive = 25;
 
-        allowedIPs = [
-          "10.100.0.0/24"
-        ];
-      }
-    ];
-  };
+  #       allowedIPs = [
+  #         "10.100.0.0/24"
+  #       ];
+  #     }
+  #   ];
+  # };
 }

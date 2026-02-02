@@ -80,7 +80,6 @@ in
         53 # dns
       ];
       trustedInterfaces = [
-        "tailscale0"
         "end0"
         "wg0"
       ];
