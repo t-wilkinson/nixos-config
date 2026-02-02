@@ -2,6 +2,7 @@
 let
   tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # cloudflared tunnel
   services = config.homelab.services;
+  tailscaleVpnIP = "100.112.52.7";
 in
 {
   # BLOCY
@@ -22,8 +23,8 @@ in
         customTTL = "1h";
         mapping = {
           # Map main domain and all subdomains to the Pi's Direct IP
-          "home.lab" = config.homelab.vpnIP;
-          "*.home.lab" = config.homelab.vpnIP;
+          "home.lab" = tailscaleVpnIP;
+          "*.home.lab" = tailscaleVpnIP;
         };
       };
 

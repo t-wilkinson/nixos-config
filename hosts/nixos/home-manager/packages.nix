@@ -11,9 +11,6 @@
       bitwarden-cli
       gimp
 
-      minecraft
-      unstable.lunar-client
-
       # VIRTUALIZATION
       k3s
       incus
@@ -82,6 +79,7 @@
 
       # GAMES
       prismlauncher
+      unstable.lunar-client
 
       # MISC
       # android-file-transfer

@@ -9,6 +9,8 @@
 let
   mcServerPort = 25565;
   rconPort = 25575;
+  homelabTailscaleIP = "100.112.52.7";
+  homelabDirectGateway = "10.1.0.2";
 in
 {
   services.resolved = {
@@ -71,28 +73,49 @@ in
     };
   };
 
-  # Split tunnel VPN with homelab
-  networking.wg-quick.interfaces = {
-    wg0 = {
-      address = [ "10.100.0.2/32" ];
-      privateKeyFile = config.sops.secrets.wg_nixos_private_key.path;
+  systemd.services.add-custom-routes = {
+    description = "Add custom routes for homelab direct connection";
+    wantedBy = [ "multi-user.target" ];
+    # Ensure it runs after the network is actually up
+    after = [
+      "network-online.target"
+      "NetworkManager.service"
+    ];
+    wants = [ "network-online.target" ];
 
-      # Split tunnel:
-      # Only route traffic for the VPN subnet (10.100.0.x)
-      # AND the Homelab subnet (10.1.0.x) through the tunnel.
-      peers = [
-        {
-          publicKey = "cvzk8zCBE7o/xkeoyCloC53N116VLBubKQYdAAdYsSo=";
-          endpoint = "10.1.0.2:51820"; # wg server endpoint
-          persistentKeepalive = 25;
+    serviceConfig = {
+      Type = "oneshot";
+      # RemainAfterExit is key: it tells systemd the service is "active"
+      # even after ExecStart finishes, allowing ExecStop to run later.
+      RemainAfterExit = true;
 
-          allowedIPs = [
-            "10.100.0.0/24"
-          ];
-        }
-      ];
+      ExecStart = "${pkgs.iproute2}/bin/ip route add ${homelabTailscaleIP}/32 via ${homelabDirectGateway} dev enp3s0";
+      ExecStop = "${pkgs.iproute2}/bin/ip route del ${homelabTailscaleIP}/32 via ${homelabDirectGateway} dev enp3s0";
     };
   };
+
+  # Split tunnel VPN with homelab
+  # networking.wg-quick.interfaces = {
+  #   wg0 = {
+  #     address = [ "10.100.0.2/32" ];
+  #     privateKeyFile = config.sops.secrets.wg_nixos_private_key.path;
+
+  #     # Split tunnel:
+  #     # Only route traffic for the VPN subnet (10.100.0.x)
+  #     # AND the Homelab subnet (10.1.0.x) through the tunnel.
+  #     peers = [
+  #       {
+  #         publicKey = "cvzk8zCBE7o/xkeoyCloC53N116VLBubKQYdAAdYsSo=";
+  #         endpoint = "10.1.0.2:51820"; # wg server endpoint
+  #         persistentKeepalive = 25;
+
+  #         allowedIPs = [
+  #           "10.100.0.0/24"
+  #         ];
+  #       }
+  #     ];
+  #   };
+  # };
 
   # networkmanager.connectionConfig."static-wifi" = {
   #   type = "wifi";

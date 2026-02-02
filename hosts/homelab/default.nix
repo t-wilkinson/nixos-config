@@ -46,7 +46,7 @@
     "dashboard"
     "sync"
     "zortex"
-    "monitor"
+    "glances"
     "nextcloud"
     "immich"
     # "mc-server"
