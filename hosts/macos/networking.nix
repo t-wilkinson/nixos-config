@@ -2,11 +2,11 @@
 {
   services.tailscale.enable = true;
   # Verify with: scutil --dns
-  # environment.etc."resolver/home.lab".text = ''
-  #   nameserver 100.112.52.7
-  #   search home.lab
-  #   timeout 2
-  # '';
+  environment.etc."resolver/home.lab".text = ''
+    nameserver 100.112.52.7
+    search home.lab
+    timeout 2
+  '';
 
   environment.systemPackages = with pkgs; [
     dnsmasq
