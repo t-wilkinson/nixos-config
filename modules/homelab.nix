@@ -91,7 +91,10 @@ in
                 description = "Additional information to be used by service";
               };
 
-              port = mkOption { type = types.int; };
+              port = mkOption {
+                type = types.nullOr types.int;
+                default = null;
+              };
               extraPorts = mkOption {
                 type = types.listOf types.int;
                 default = [ ];
