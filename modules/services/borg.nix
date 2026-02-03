@@ -80,6 +80,8 @@ in
       };
 
       preHook = ''
+        ${pkgs.curl}/bin/curl -d "Borg backing up homelab" http://${homelab.services.ntfy.localEndpoint}/homelab
+
         # if ! ${pkgs.util-linux}/bin/mountpoint -q /srv/backup; then
         #   echo "Backup drive not mounted. Skipping backup."
         #   exit 0
