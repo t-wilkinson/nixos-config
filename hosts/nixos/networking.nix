@@ -28,6 +28,15 @@ in
       dns = "systemd-resolved";
     };
 
+    # Add route to get to homelab IP through direct ethernet connection
+    interfaces.enp3s0.ipv4.routes = [
+      {
+        address = config.homelab.homelabIP;
+        prefixLength = 32;
+        via = homelabDirectGateway;
+      }
+    ];
+
     interfaces.enp3s0.wakeOnLan.enable = true;
     firewall =
       let
@@ -53,12 +62,10 @@ in
   };
 
   # Use pi DNS for everything
-  # networking.networkmanager.insertNameservers = [ "10.1.0.2" ];
-  # services.wakeonlan.enable = true;
   networking.networkmanager.ensureProfiles.profiles = {
-    "Wired Homelab" = {
+    "wired-homelab" = {
       connection.type = "ethernet";
-      connection.id = "Wired Homelab";
+      connection.id = "wired-homelab";
       connection.interface-name = "enp3s0";
       connection.autoconnect = true;
       "802-3-ethernet".wake-on-lan = "magic"; # sudo ethtool -s enp3s0 wol gp (magic physical)
@@ -94,13 +101,6 @@ in
   #   };
   # };
 
-  networking.interfaces.enp3s0.ipv4.routes = [
-    {
-      address = homelabTailscaleIP; # Note: NixOS expects the IP, not CIDR here
-      prefixLength = 32;
-      via = homelabDirectGateway;
-    }
-  ];
   # Split tunnel VPN with homelab
   # networking.wg-quick.interfaces = {
   #   wg0 = {

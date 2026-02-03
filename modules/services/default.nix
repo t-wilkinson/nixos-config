@@ -1,16 +1,17 @@
-{ ... }:
+{ username, ... }:
 {
   imports = [
     ./mc-server.nix
     ./nextcloud.nix
     ./immich.nix
     ./monitoring.nix
+    ./backups.nix
   ];
 
   homelab = {
+    inherit username;
     domain = "home.lab";
-    vpnIP = "10.100.0.1";
-    vpnNetwork = "10.100.0";
+    homelabIP = "100.112.52.7";
     publicDomain = "treywilkinson.com";
     containerNetwork = "192.168.100";
     containerStateVersion = "24.11";
@@ -38,9 +39,10 @@
         port = 8082;
         subdomain = "dash";
       };
-      sync = {
+      syncthing = {
         port = 8384;
         name = "Syncthing";
+        subdomain = "sync";
       };
       zortex = {
         port = 5000;
@@ -50,6 +52,8 @@
         subdomain = "mc";
         isPublic = true;
         expose = false;
+      };
+      borg = {
       };
 
       # Monitor

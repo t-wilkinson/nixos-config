@@ -16,6 +16,7 @@
     "glances"
     "nextcloud"
     "immich"
+    "borg"
     # "mc-server"
     # "prometheus"
     # "grafana"
@@ -25,10 +26,6 @@
     ./networking.nix
     ./secrets.nix
     ./services.nix
-    ./services/backups.nix
-    # ./services/caddy.nix
-    # ./services/cloud.nix
-    # ./services/monitoring.nix
     ./services/network.nix
     ../../modules/services
   ];

@@ -16,6 +16,9 @@ in
       default = { };
       description = "Library of helper functions for homelab";
     };
+    username = mkOption {
+      type = types.str;
+    };
     groups = mkOption {
       type = types.attrsOf types.int;
       default = { };
@@ -42,14 +45,12 @@ in
       default = config.system.stateVersion;
     };
 
-    vpnNetwork = mkOption {
+    homelabIP = mkOption {
       type = types.str;
-      default = "10.100.0";
     };
-    vpnIP = mkOption {
-      type = types.str;
-      default = "10.100.0.1";
-    };
+    # homelabNetwork = mkOption {
+    #   type = types.str;
+    # };
     domain = mkOption {
       type = types.str;
       default = "home.lab";
