@@ -26,7 +26,7 @@ in
 
       openDefaultPorts = true; # 22000/tcp transfer, 21027/udp discovery
 
-      guiAddress = cfg.endpoint;
+      guiAddress = cfg.localEndpoint;
 
       settings = {
         gui.insecureSkipHostcheck = true;

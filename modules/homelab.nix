@@ -113,7 +113,7 @@ in
                 type = types.str;
                 description = "The calculated internal IP address.";
               };
-              endpoint = mkOption {
+              localEndpoint = mkOption {
                 readOnly = true;
                 default = "${config.localIP}:${toString config.port}";
                 type = types.str;
@@ -121,7 +121,7 @@ in
               };
               # uri = mkOption {
               #   readOnly = true;
-              #   default = "http://${config.endpoint}";
+              #   default = "http://${config.localEndpoint}";
               #   type = types.str;
               # };
 

@@ -5,7 +5,8 @@
     ./nextcloud.nix
     ./immich.nix
     ./monitoring.nix
-    ./backups.nix
+    ./borg.nix
+    ./syncthing.nix
   ];
 
   homelab = {

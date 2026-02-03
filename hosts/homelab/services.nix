@@ -14,7 +14,7 @@ let
     name = service.domain;
     value = {
       extraConfig = ''
-        reverse_proxy ${service.endpoint} {
+        reverse_proxy ${service.localEndpoint} {
           header_up X-Real-IP {http.request.remote.host}
         }
         tls internal
@@ -86,13 +86,13 @@ in
           #   };
           # };
           "${services.immich.publicDomain}" = {
-            service = "http://${services.immich.endpoint}";
+            service = "http://${services.immich.localEndpoint}";
             originRequest = {
               httpHostHeader = services.immich.domain;
             };
           };
           "${services.nextcloud.publicDomain}" = {
-            service = "http://${services.nextcloud.endpoint}";
+            service = "http://${services.nextcloud.localEndpoint}";
             originRequest = {
               httpHostHeader = services.nextcloud.publicDomain;
             };

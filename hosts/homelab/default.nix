@@ -11,7 +11,7 @@
     "ntfy"
     "vault"
     "dashboard"
-    "sync"
+    "syncthing"
     "zortex"
     "glances"
     "nextcloud"
@@ -26,7 +26,6 @@
     ./networking.nix
     ./secrets.nix
     ./services.nix
-    ./services/network.nix
     ../../modules/services
   ];
 
@@ -54,14 +53,14 @@
     options = [ "noatime" ];
   };
 
-  fileSystems."/mnt/backup" = {
-    device = "/dev/disk/by-uuid/D404BD3804BD1E84";
-    fsType = "ntfs";
-    options = [
-      "nofail"
-      "x-systemd.automount"
-    ];
-  };
+  # fileSystems."/mnt/backup" = {
+  #   device = "/dev/disk/by-uuid/D404BD3804BD1E84";
+  #   fsType = "ntfs";
+  #   options = [
+  #     "nofail"
+  #     "x-systemd.automount"
+  #   ];
+  # };
   # fileSystems."/var/lib/nextcloud/data/personal" = {
   #   device = "/srv/sync/personal";
   #   options = [
