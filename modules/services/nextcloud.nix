@@ -89,7 +89,7 @@ in
               overwriteprotocol = "https";
 
               trusted_domains = [
-                cfg.containerIP
+                cfg.localIP
                 cfg.domain
                 cfg.publicDomain
               ];

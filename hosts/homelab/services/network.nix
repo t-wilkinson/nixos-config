@@ -61,13 +61,13 @@ in
             };
           };
           "${services.immich.publicDomain}" = {
-            service = "http://localhost:${toString services.immich.port}";
+            service = "http://${services.immich.endpoint}";
             originRequest = {
               httpHostHeader = services.immich.domain;
             };
           };
           "${services.nextcloud.publicDomain}" = {
-            service = "http://${services.nextcloud.containerIP}:${toString services.nextcloud.port}";
+            service = "http://${services.nextcloud.endpoint}";
             originRequest = {
               httpHostHeader = services.nextcloud.publicDomain;
             };

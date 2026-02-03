@@ -12,7 +12,7 @@ let
     name = service.domain;
     value = {
       extraConfig = ''
-        reverse_proxy ${service.containerIP or "localhost"}:${toString service.port} {
+        reverse_proxy ${service.endpoint} {
           header_up X-Real-IP {http.request.remote.host}
         }
         tls internal
@@ -33,18 +33,6 @@ in
     enable = true;
     virtualHosts = (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose) services)) // {
       "${config.homelab.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
-      # "${services.nextcloud.publicDomain}".extraConfig = ''
-      #   reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
-      #     header_up X-Real-IP {http.request.remote.host}
-      #   }
-      #   tls internal
-      # '';
-      # "${services.nextcloud.domain}".extraConfig = ''
-      #   reverse_proxy 192.168.100.11:${toString services.nextcloud.port} {
-      #     header_up X-Real-IP {http.request.remote.host}
-      #   }
-      #   tls internal
-      # '';
       "${services.dashboard.domain}".extraConfig = ''
         # Serve the Root CRT at /root.crt
         handle /root.crt {
@@ -244,80 +232,5 @@ in
   #       findtime = 14400
   #     '';
   #   };
-  # };
-
-  # MINECRAFT SERVER
-  # services.borgbackup.jobs."minecraft-backup" = {
-  #   paths = [ "/var/lib/minecraft" ];
-  #   encryption.mode = "none"; # Or "repokey" if sending to remote
-  #   repo = "/var/lib/backups/minecraft"; # Or your remote ssh repo
-  #   compression = "auto,zstd";
-  #   startAt = "daily";
-  #
-  #   # Optional: Stop server during backup to ensure data consistency
-  #   # (Minecraft handles live backups okay mostly, but this is safest)
-  #   preHook = ''
-  #     ${pkgs.systemd}/bin/systemctl stop container@mc-server
-  #     sleep 5
-  #   '';
-  #
-  #   postHook = ''
-  #     ${pkgs.systemd}/bin/systemctl start container@mc-server
-  #   '';
-  # };
-
-  # containers.mc-server = {
-  #   autoStart = true;
-  #   privateNetwork = false;
-  #   # forwardPorts = [
-  #   #   {
-  #   #     containerPort = services.mc-server.port;
-  #   #     hostPort = services.mc-server.port;
-  #   #     protocol = "tcp";
-  #   #   }
-  #   # ];
-
-  #   bindMounts = {
-  #     # Bind mount data to host for easy Borg backups
-  #     "/var/lib/minecraft" = {
-  #       hostPath = "/var/lib/minecraft";
-  #       isReadOnly = false;
-  #     };
-  #   };
-
-  #   config =
-  #     { ... }:
-  #     let
-  #       rconPort = 25575;
-  #     in
-  #     {
-  #       networking.firewall.allowedTCPPorts = [
-  #         services.mc-server.port
-  #         rconPort
-  #       ];
-  #       nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [ "minecraft-server" ];
-  #       environment.systemPackages = [ pkgs.mcrcon ];
-  #       users.groups.serverdata.gid = 980;
-  #       services.minecraft-server = {
-  #         enable = true;
-  #         eula = true;
-  #         openFirewall = true;
-  #         declarative = false;
-  #         serverProperties = {
-  #           server-port = services.mc-server.port;
-  #           gamemode = "survival";
-  #           motd = "Welcome to the Wilkinson's Homelab!";
-  #           white-list = false;
-  #           online-mode = false;
-  #           allow-cheats = true;
-
-  #           enable-rcon = true;
-  #           "rcon.password" = "password";
-  #           "rcon.port" = rconPort;
-  #         };
-  #         jvmOpts = "-Xms2048M -Xmx4096M";
-  #       };
-  #       systemd.services.minecraft-server.serviceConfig.Restart = "always";
-  #     };
   # };
 }

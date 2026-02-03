@@ -102,13 +102,24 @@ in
                 default = null;
                 description = "Marks service as a container with private network. The container's ip address becomes containerNetwork.id. It will automatically forward the service's declared port.";
               };
-              containerIP = mkOption {
+              localIP = mkOption {
                 readOnly = true;
                 default =
                   if config.id != null then "${cfg.containerNetwork}.${toString config.id}" else "127.0.0.1";
                 type = types.str;
                 description = "The calculated internal IP address.";
               };
+              endpoint = mkOption {
+                readOnly = true;
+                default = "${config.localIP}:${toString config.port}";
+                type = types.str;
+                description = "The calculated endpoint = ip_address:port";
+              };
+              # uri = mkOption {
+              #   readOnly = true;
+              #   default = "http://${config.endpoint}";
+              #   type = types.str;
+              # };
 
               expose = mkOption {
                 type = types.bool;
@@ -182,7 +193,7 @@ in
 
         privateNetwork = true;
         hostAddress = cfg.hostContainerIP;
-        localAddress = v.containerIP;
+        localAddress = v.localIP;
         forwardPorts = lib.mkDefault (
           map (p: {
             protocol = "tcp";
