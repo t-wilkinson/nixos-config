@@ -11,7 +11,7 @@ in
 
     nat = {
       enable = true;
-      internalInterfaces = [ "ve-+" ];
+      internalInterfaces = [ "ve-+" ]; # for containers
       externalInterface = "wlan0";
     };
 
@@ -19,6 +19,7 @@ in
       "127.0.0.1"
       "1.1.1.1"
     ];
+
     networkmanager = {
       enable = true;
       dns = "none";
@@ -93,29 +94,29 @@ in
     "net.ipv6.conf.all.forwarding" = 1;
   };
 
-  # WireGuard
-  networking.wireguard.interfaces = {
-    wg0 = {
-      ips = [ "${config.homelab.vpnIP}/24" ];
-      listenPort = 51820;
-      privateKeyFile = config.sops.secrets.wg_homelab_private_key.path;
-      peers = [
-        # Main PC
-        {
-          publicKey = "DZqoE/m67JIvOtZR0Q06iV1HvMDpVZskUPj6QxL6chY=";
-          allowedIPs = [ "${config.homelab.vpnNetwork}.2/32" ];
-        }
-        # MacBook
-        {
-          publicKey = "Jid4uv1OrkFs6CutQw/A0APB0NQ9RAO1LnzmuzeDgmc=";
-          allowedIPs = [ "${config.homelab.vpnNetwork}.3/32" ];
-        }
-        # Phone
-        {
-          publicKey = "WGSdzK7EBpPNIYS9CV8j4CdYC82ciPzcnhN6GVz6AEQ=";
-          allowedIPs = [ "${config.homelab.vpnNetwork}.4/32" ];
-        }
-      ];
-    };
-  };
+  # # WireGuard
+  # networking.wireguard.interfaces = {
+  #   wg0 = {
+  #     ips = [ "${config.homelab.vpnIP}/24" ];
+  #     listenPort = 51820;
+  #     privateKeyFile = config.sops.secrets.wg_homelab_private_key.path;
+  #     peers = [
+  #       # Main PC
+  #       {
+  #         publicKey = "DZqoE/m67JIvOtZR0Q06iV1HvMDpVZskUPj6QxL6chY=";
+  #         allowedIPs = [ "${config.homelab.vpnNetwork}.2/32" ];
+  #       }
+  #       # MacBook
+  #       {
+  #         publicKey = "Jid4uv1OrkFs6CutQw/A0APB0NQ9RAO1LnzmuzeDgmc=";
+  #         allowedIPs = [ "${config.homelab.vpnNetwork}.3/32" ];
+  #       }
+  #       # Phone
+  #       {
+  #         publicKey = "WGSdzK7EBpPNIYS9CV8j4CdYC82ciPzcnhN6GVz6AEQ=";
+  #         allowedIPs = [ "${config.homelab.vpnNetwork}.4/32" ];
+  #       }
+  #     ];
+  #   };
+  # };
 }

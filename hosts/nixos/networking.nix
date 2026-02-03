@@ -73,27 +73,34 @@ in
     };
   };
 
-  systemd.services.add-custom-routes = {
-    description = "Add custom routes for homelab direct connection";
-    wantedBy = [ "multi-user.target" ];
-    # Ensure it runs after the network is actually up
-    after = [
-      "network-online.target"
-      "NetworkManager.service"
-    ];
-    wants = [ "network-online.target" ];
+  # systemd.services.add-custom-routes = {
+  #   description = "Add custom routes for homelab direct connection";
+  #   wantedBy = [ "multi-user.target" ];
+  #   # Ensure it runs after the network is actually up
+  #   after = [
+  #     "network-online.target"
+  #     "NetworkManager.service"
+  #   ];
+  #   wants = [ "network-online.target" ];
 
-    serviceConfig = {
-      Type = "oneshot";
-      # RemainAfterExit is key: it tells systemd the service is "active"
-      # even after ExecStart finishes, allowing ExecStop to run later.
-      RemainAfterExit = true;
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     # RemainAfterExit is key: it tells systemd the service is "active"
+  #     # even after ExecStart finishes, allowing ExecStop to run later.
+  #     RemainAfterExit = true;
 
-      ExecStart = "${pkgs.iproute2}/bin/ip route add ${homelabTailscaleIP}/32 via ${homelabDirectGateway} dev enp3s0";
-      ExecStop = "${pkgs.iproute2}/bin/ip route del ${homelabTailscaleIP}/32 via ${homelabDirectGateway} dev enp3s0";
-    };
-  };
+  #     ExecStart = "${pkgs.iproute2}/bin/ip route add ${homelabTailscaleIP}/32 via ${homelabDirectGateway} dev enp3s0";
+  #     ExecStop = "${pkgs.iproute2}/bin/ip route del ${homelabTailscaleIP}/32 via ${homelabDirectGateway} dev enp3s0";
+  #   };
+  # };
 
+  networking.interfaces.enp3s0.ipv4.routes = [
+    {
+      address = homelabTailscaleIP; # Note: NixOS expects the IP, not CIDR here
+      prefixLength = 32;
+      via = homelabDirectGateway;
+    }
+  ];
   # Split tunnel VPN with homelab
   # networking.wg-quick.interfaces = {
   #   wg0 = {

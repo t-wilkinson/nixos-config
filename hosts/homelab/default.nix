@@ -7,19 +7,19 @@
   ...
 }:
 {
-  homelab = {
-    domain = "home.lab";
-    vpnIP = "10.100.0.1";
-    vpnNetwork = "10.100.0";
-    publicDomain = "treywilkinson.com";
-    containerNetwork = "192.168.100";
-    containerStateVersion = "24.11";
-
-    groups = {
-      personaldata = 987; # for exposing to synced directory to services
-      serverdata = 980; # for exposing server files to services
-    };
-  };
+  homelab.enableServices = [
+    "ntfy"
+    "vault"
+    "dashboard"
+    "sync"
+    "zortex"
+    "glances"
+    "nextcloud"
+    "immich"
+    # "mc-server"
+    # "prometheus"
+    # "grafana"
+  ];
 
   imports = [
     ./networking.nix
@@ -39,20 +39,6 @@
       "@wheel"
     ];
   };
-
-  homelab.enableServices = [
-    "ntfy"
-    "vault"
-    "dashboard"
-    "sync"
-    "zortex"
-    "glances"
-    "nextcloud"
-    "immich"
-    # "mc-server"
-    # "prometheus"
-    # "grafana"
-  ];
 
   systemd.tmpfiles.rules =
     let
