@@ -6,11 +6,26 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
+    systemd.tmpfiles.rules =
+      let
+        groups = lib.mapAttrs (k: v: toString v) homelab.groups;
+      in
+      [
+        "d /mnt/media/personal 0770 nextcloud ${groups.personaldata} - -"
+        "Z /mnt/media/personal 0770 nextcloud ${groups.personaldata} - -"
+        "d /mnt/media/drive 0770 nextcloud ${groups.serverdata} - -"
+        "Z /mnt/media/drive 0770 nextcloud ${groups.serverdata} - -"
+      ];
+
     containers.nextcloud = {
       autoStart = true;
       bindMounts = {
-        "/var/lib/nextcloud/data/personal" = {
+        "/mnt/media/personal" = {
           hostPath = homelab.drives.personal;
+          isReadOnly = false;
+        };
+        "/mnt/media/drive" = {
+          hostPath = homelab.drives.googledrive;
           isReadOnly = false;
         };
       }
@@ -32,7 +47,10 @@ in
         }:
         {
           networking.firewall.allowedTCPPorts = [ cfg.port ];
-          users.users.nextcloud.extraGroups = [ "personaldata" ];
+          users.users.nextcloud.extraGroups = [
+            "personaldata"
+            "serverdata"
+          ];
 
           services.postgresql = {
             enable = true;

@@ -23,12 +23,31 @@ in
     config =
       { ... }:
       {
-        users.users.immich.extraGroups = [ "personaldata" ];
+        systemd.tmpfiles.rules =
+          let
+            groups = lib.mapAttrs (k: v: toString v) homelab.groups;
+          in
+          [
+            "d /mnt/media/drive 0770 immich ${groups.personaldata} - -"
+            "Z /mnt/media/drive 0770 immich ${groups.personaldata} - -"
+          ];
+
+        users.users.immich = {
+          uid = 1000;
+          isSystemUser = true;
+          group = "immich";
+          extraGroups = [ "personaldata" ];
+        };
+        users.groups.immich.gid = 1000;
+        users.groups.personaldata = {
+          gid = homelab.groups.personaldata;
+        };
 
         networking.firewall.allowedTCPPorts = [ cfg.port ];
 
         services.immich = {
           enable = true;
+          user = "immich";
           port = cfg.port;
           host = "127.0.0.1";
 

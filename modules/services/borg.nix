@@ -49,9 +49,10 @@ in
 
       # What to backup
       paths = [
-        "/var/lib/nextcloud"
         "/srv/sync"
+        "/var/lib/nextcloud"
         "/var/lib/vaultwarden"
+        "/var/lib/minecraft"
       ];
 
       exclude = [

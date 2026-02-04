@@ -7,9 +7,9 @@
   ...
 }:
 let
+  homelab = config.homelab;
   mcServerPort = 25565;
   rconPort = 25575;
-  homelabTailscaleIP = "100.112.52.7";
   homelabDirectGateway = "10.1.0.2";
 in
 {
@@ -29,13 +29,19 @@ in
     };
 
     # Add route to get to homelab IP through direct ethernet connection
-    interfaces.enp3s0.ipv4.routes = [
-      {
-        address = config.homelab.homelabIP;
-        prefixLength = 32;
-        via = homelabDirectGateway;
-      }
-    ];
+    # interfaces.enp3s0.ipv4.routes = [
+    #   {
+    #     address = config.homelab.homelabIP;
+    #     prefixLength = 32;
+    #     via = homelabDirectGateway;
+    #   }
+
+    #   {
+    #     address = "${config.homelab.containerNetwork}.0";
+    #     prefixLength = 24;
+    #     via = homelabDirectGateway;
+    #   }
+    # ];
 
     interfaces.enp3s0.wakeOnLan.enable = true;
     firewall =
@@ -77,8 +83,23 @@ in
       # ipv4.dns-search = "~home.lab,home.lab";
       ipv4.dns-search = "~home.lab";
       ipv4.never-default = "true";
+      # ipv4.routes = "${homelab.homelabIP}/32 next-hop=${homelabDirectGateway}, ${homelab.containerNetwork}.0/24 ${homelabDirectGateway}";
     };
   };
+
+  networking.networkmanager.dispatcherScripts = [
+    {
+      source = pkgs.writeText "homelab-routes" ''
+        case "$2" in
+          up)
+            ${pkgs.iproute2}/bin/ip route replace ${homelab.homelabIP}/32 via ${homelabDirectGateway} dev enp3s0
+            ${pkgs.iproute2}/bin/ip route replace ${homelab.containerNetwork}.0/24 via ${homelabDirectGateway} dev enp3s0
+            ;;
+        esac
+      '';
+      type = "basic";
+    }
+  ];
 
   # systemd.services.add-custom-routes = {
   #   description = "Add custom routes for homelab direct connection";
@@ -96,8 +117,14 @@ in
   #     # even after ExecStart finishes, allowing ExecStop to run later.
   #     RemainAfterExit = true;
 
-  #     ExecStart = "${pkgs.iproute2}/bin/ip route add ${homelabTailscaleIP}/32 via ${homelabDirectGateway} dev enp3s0";
-  #     ExecStop = "${pkgs.iproute2}/bin/ip route del ${homelabTailscaleIP}/32 via ${homelabDirectGateway} dev enp3s0";
+  #     ExecStart = ''
+  #       ${pkgs.iproute2}/bin/ip route replace ${homelab.homelabIP}/32 via ${homelabDirectGateway} dev enp3s0
+  #       ${pkgs.iproute2}/bin/ip route replace ${homelab.containerNetwork}.0/24 via ${homelabDirectGateway} dev enp3s0
+  #     '';
+  #     # ExecStop = ''
+  #     #   -${pkgs.iproute2}/bin/ip route del ${homelab.homelabIP}/32 via ${homelabDirectGateway} dev enp3s0
+  #     #   -${pkgs.iproute2}/bin/ip route del ${homelab.containerNetwork}.0/24 via ${homelabDirectGateway} dev enp3s0
+  #     # '';
   #   };
   # };
 
