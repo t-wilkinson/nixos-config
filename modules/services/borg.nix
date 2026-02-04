@@ -22,8 +22,10 @@ in
       unitConfig.OnFailure = "borg-job-failure-notify.service";
       serviceConfig = {
         ReadWritePaths = [
+          # Necessary to write the database backups
           "/var/lib/nextcloud"
           "/var/lib/vaultwarden"
+          "/var/lib/immich"
         ];
       };
     };
@@ -88,18 +90,24 @@ in
         #   exit 0
         # fi
 
-        # Dump Nextcloud (Postgres)
+        # NEXTCLOUD
         ${pkgs.nixos-container}/bin/nixos-container run nextcloud -- \
           sudo -u postgres pg_dump nextcloud > /var/lib/nextcloud/nextcloud-sql-dump.sql
         chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/nextcloud/nextcloud-sql-dump.sql
         chmod 660 /var/lib/nextcloud/nextcloud-sql-dump.sql
 
-        # Backup Vaultwarden (SQLite)
+        # VAULTWARDEN
         if [ -f /var/lib/vaultwarden/db.sqlite3 ]; then
           ${pkgs.sqlite}/bin/sqlite3 /var/lib/vaultwarden/db.sqlite3 ".backup '/var/lib/vaultwarden/db-backup.sqlite3'"
           chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/vaultwarden/db-backup.sqlite3
           chmod 660 /var/lib/vaultwarden/db-backup.sqlite3
         fi
+
+        # IMMICH
+        ${pkgs.nixos-container}/bin/nixos-container run immich -- \
+          ${pkgs.postgresql}/bin/pg_dump -U immich immich > /var/lib/immich/immich-sql-dump.sql
+        chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/immich/immich-sql-dump.sql
+        chmod 660 /var/lib/immich/immich-sql-dump.sql
       '';
 
       postHook = ''

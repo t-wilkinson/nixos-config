@@ -84,7 +84,14 @@
   hardware.enableRedistributableFirmware = true;
   hardware.firmware = [ pkgs.raspberrypiWirelessFirmware ];
 
-  programs.fish.enable = true;
+  programs.fish = {
+    enable = true;
+    shellAliases = {
+      ncl = "sudo nixos-container root-login";
+      nc = "sudo nixos-container";
+      netcat = "/run/current-system/sw/bin/nc";
+    };
+  };
   users.mutableUsers = false;
 
   users.users.${username} = {
