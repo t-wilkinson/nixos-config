@@ -132,8 +132,7 @@ in
             "file://${homeDirectory}/Downloads"
             "file://${homeDirectory}/Documents"
             "file://${homeDirectory}/.config"
-            "file://tmp/flatten"
-            # "file://${homeDirectory}/dev/t-wilkinson/personal/resume"
+            "file:///tmp/flatten"
           ];
         };
       };
