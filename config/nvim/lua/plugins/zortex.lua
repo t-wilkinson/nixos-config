@@ -26,7 +26,7 @@ return {
 
         server = {
           enabled = false,
-          api_endpoint = "http://127.0.0.1:5000",
+          api_endpoint = "https://zortex.home.lab",
           user_id = "default",
           -- api_key = "your-secure-api-key-here", -- Same as in Docker .env
         },
@@ -50,8 +50,8 @@ return {
             -- },
             ntfy = {
               enabled = true,
-              topic = "zortex-notify-tcgcp",
-              server_url = "https://ntfy.treywilkinson.com",
+              topic = "zortex-notify",
+              server_url = "https://ntfy.home.lab",
             },
             ses = {
               enabled = true,

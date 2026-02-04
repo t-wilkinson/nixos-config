@@ -17,7 +17,6 @@
     "nextcloud"
     "immich"
     "borg"
-    # "mc-server"
     # "prometheus"
     # "grafana"
   ];
@@ -117,7 +116,7 @@
   environment.systemPackages = with pkgs; [
     wol # Wake on LAN util for turning on the PC through ethernet
     wakeonlan
-    wireguard-tools
+    # wireguard-tools
     syncthing
     tree
     ripgrep
