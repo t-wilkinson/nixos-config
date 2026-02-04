@@ -18,7 +18,7 @@ in
       "Z /srv/backup 0770 ${homelab.username} ${toString homelab.groups.personaldata}"
     ];
 
-    systemd.services."borgbackup-job-homelab-backup" = {
+    systemd.services."borgbackup-job-homelab" = {
       unitConfig.OnFailure = "borg-job-failure-notify.service";
       serviceConfig = {
         ReadWritePaths = [
@@ -41,12 +41,12 @@ in
           -H "Title: Backup Failed on ${config.networking.hostName}" \
           -H "Priority: high" \
           -H "Tags: warning,backup" \
-          -d "The Borg homelab-backup job failed. Check 'journalctl -u borgbackup-job-homelab-backup' for details." \
+          -d "The Borg homelab job failed. Check 'journalctl -u borgbackup-job-homelab' for details." \
           http://${homelab.services.ntfy.localEndpoint}/homelab
       '';
     };
 
-    services.borgbackup.jobs."homelab-backup" = {
+    services.borgbackup.jobs."homelab" = {
       repo = "/srv/backup";
 
       # What to backup
@@ -110,16 +110,17 @@ in
         chmod 660 /var/lib/immich/immich-sql-dump.sql
       '';
 
-      postHook = ''
+      postHook = lib.mkIf homelab.services.ntfy.enable ''
         # BORG_EXIT_CODE: 0 = success, 1 = warning, 2 = error
-        if [ "$BORG_EXIT_CODE" -eq 0 ]; then
+        EXIT_CODE="''${BORG_EXIT_CODE:-2}"
+        if [ "$EXIT_CODE" -eq 0 ]; then
           ${pkgs.curl}/bin/curl \
             -H "Title: Backup Successful" \
             -H "Priority: low" \
             -H "Tags: white_check_mark,backup" \
             -d "Borg finished backing up to /srv/backup successfully." \
             http://${homelab.services.ntfy.localEndpoint}/homelab
-        elif [ "$BORG_EXIT_CODE" -eq 1 ]; then
+        elif [ "$EXIT_CODE" -eq 1 ]; then
           ${pkgs.curl}/bin/curl \
             -H "Title: Backup Finished with Warnings" \
             -H "Priority: default" \
