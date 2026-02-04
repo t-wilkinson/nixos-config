@@ -49,6 +49,7 @@ in
       home = {
         inherit username homeDirectory;
         sessionPath = [
+          "$HOME/dev/t-wilkinson/personal/scripts"
           "$HOME/dev/t-wilkinson/projects/scripts"
           "$HOME/.local/bin"
           "$HOME/.npm-packages/bin"
@@ -126,9 +127,12 @@ in
             "file://${homeDirectory}/dev"
             "file://${homeDirectory}/dev/t-wilkinson"
             "file://${homeDirectory}/dev/t-wilkinson/zortex.nvim"
+            "file://${homeDirectory}/dev/t-wilkinson/nixos-config"
+            "file://${homeDirectory}/dev/t-wilkinson/personal"
             "file://${homeDirectory}/Downloads"
             "file://${homeDirectory}/Documents"
             "file://${homeDirectory}/.config"
+            "file://tmp/flatten"
             # "file://${homeDirectory}/dev/t-wilkinson/personal/resume"
           ];
         };
