@@ -25,7 +25,7 @@ return {
         },
 
         server = {
-          enabled = false,
+          enabled = true,
           api_endpoint = "https://zortex.home.lab",
           user_id = "default",
           -- api_key = "your-secure-api-key-here", -- Same as in Docker .env
@@ -54,7 +54,7 @@ return {
               server_url = "https://ntfy.home.lab",
             },
             ses = {
-              enabled = true,
+              enabled = false,
               region = "us-east-1", -- Your AWS region
               from_email = "noreply@treywilkinson.com",
               default_to_email = "winston.trey.wilkinson@gmail.com",
@@ -76,7 +76,7 @@ return {
 
             -- Daily digest settings
             digest = {
-              enabled = true,
+              enabled = false,
               auto_send = false,
               days_ahead = 7,
               send_hour = 7, -- 7 AM

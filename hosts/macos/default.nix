@@ -11,6 +11,10 @@
     ./networking.nix
   ];
 
+  security.pki.certificateFiles = [
+    ../homelab/homelab-root.crt
+  ];
+
   services.openssh.enable = false;
   sops = {
     age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
