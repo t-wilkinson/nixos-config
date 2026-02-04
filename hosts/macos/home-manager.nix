@@ -31,6 +31,7 @@
       # "jorgelbg/tap"
     ];
     brews = [
+      "ntfy"
       "terminal-notifier"
       "bitwarden-cli"
       "pinentry"
