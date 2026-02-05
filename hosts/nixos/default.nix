@@ -13,6 +13,7 @@
     ../../modules/shared.nix
     ../../modules/homelab.nix
     ../../modules/services
+    ../../modules/components/virtualisation.nix
   ];
 
   homelab = {

@@ -36,16 +36,16 @@
   environment.systemPackages = with pkgs; [
     # colima # lima with contains (docker, containerd, kubernetes, incus)
     # lima # linux (virtual)machines
-    kubernetes
-    minikube
+    # kubernetes
+    # minikube
     docker
     docker-compose
-    kubectl
+    # kubectl
   ];
 
   # boot.kernelModules = [ "kvm-intel" ];
   virtualisation = {
-    # docker.enable = true;
+    docker.enable = true;
     # spiceUSBRedirection.enable = true;
     # lxd.enable = false;
     # incus.enable = false; # make sure to run `incus admin init`

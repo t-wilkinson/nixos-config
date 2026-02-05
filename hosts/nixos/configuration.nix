@@ -56,6 +56,7 @@
         "uinput"
         # "render"
         "libvirtd"
+        (lib.mkIf config.virtualisation.docker.enable "docker")
         (lib.mkIf config.networking.networkmanager.enable "networkmanager")
       ];
       openssh.authorizedKeys.keyFiles = [

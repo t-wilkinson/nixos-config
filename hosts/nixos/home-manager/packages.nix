@@ -14,6 +14,7 @@
       # VIRTUALIZATION
       k3s
       incus
+      docker
 
       # GUI
       kdePackages.okular # pdf viewer

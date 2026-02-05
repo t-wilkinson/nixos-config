@@ -16,6 +16,8 @@ let
       extraConfig = ''
         reverse_proxy ${service.localEndpoint} {
           header_up X-Real-IP {http.request.remote.host}
+          header_up X-Forwarded-Port {http.request.port}
+          header_up X-Forwarded-Proto {http.request.scheme}
         }
         tls internal
       '';
