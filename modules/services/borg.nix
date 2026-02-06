@@ -92,7 +92,7 @@ in
 
         # NEXTCLOUD
         ${pkgs.nixos-container}/bin/nixos-container run nextcloud -- \
-          sudo -u postgres pg_dump nextcloud > /var/lib/nextcloud/nextcloud-sql-dump.sql
+          sudo -u postgres ${pkgs.postgresql}/bin/pg_dump nextcloud > /var/lib/nextcloud/nextcloud-sql-dump.sql
         chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/nextcloud/nextcloud-sql-dump.sql
         chmod 660 /var/lib/nextcloud/nextcloud-sql-dump.sql
 
@@ -105,7 +105,7 @@ in
 
         # IMMICH
         ${pkgs.nixos-container}/bin/nixos-container run immich -- \
-          ${pkgs.postgresql}/bin/pg_dump -U immich immich > /var/lib/immich/immich-sql-dump.sql
+          sudo -u immich ${pkgs.postgresql}/bin/pg_dump immich > /var/lib/immich/immich-sql-dump.sql
         chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/immich/immich-sql-dump.sql
         chmod 660 /var/lib/immich/immich-sql-dump.sql
       '';
