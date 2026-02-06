@@ -13,8 +13,8 @@ in
       [
         "d /mnt/media/personal 0770 nextcloud ${groups.personaldata} - -"
         "Z /mnt/media/personal 0770 nextcloud ${groups.personaldata} - -"
-        "d /mnt/media/drive 0770 nextcloud ${groups.serverdata} - -"
-        "Z /mnt/media/drive 0770 nextcloud ${groups.serverdata} - -"
+        "d /mnt/media/pubdrive 0770 nextcloud ${groups.serverdata} - -"
+        "Z /mnt/media/pubdrive 0770 nextcloud ${groups.serverdata} - -"
       ];
 
     containers.nextcloud = {
@@ -24,8 +24,8 @@ in
           hostPath = homelab.drives.personal;
           isReadOnly = false;
         };
-        "/mnt/media/drive" = {
-          hostPath = homelab.drives.googledrive;
+        "/mnt/media/pubdrive" = {
+          hostPath = homelab.drives.pubdrive;
           isReadOnly = false;
         };
       }

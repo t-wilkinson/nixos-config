@@ -18,7 +18,7 @@
     containerStateVersion = "24.11";
     drives = {
       minecraft = "/var/lib/minecraft";
-      googledrive = "/srv/sync/personal/drive";
+      pubdrive = "/srv/pubdrive";
       personal = "/srv/sync/personal";
     };
 

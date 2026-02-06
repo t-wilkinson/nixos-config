@@ -132,7 +132,7 @@ in
             "file://${homeDirectory}/Downloads"
             "file://${homeDirectory}/Documents"
             "file://${homeDirectory}/.config"
-            "file:///tmp/flatten"
+            "file:///${homeDirectory}/.cache/flatten"
           ];
         };
       };

@@ -15,8 +15,8 @@ in
     autoStart = true;
     # Bind mount the persistent data from the host into the container
     bindMounts = {
-      "/mnt/media/drive" = {
-        hostPath = homelab.drives.googledrive;
+      "/mnt/media/pubdrive" = {
+        hostPath = homelab.drives.pubdrive;
         isReadOnly = false;
       };
     };
@@ -28,15 +28,17 @@ in
             groups = lib.mapAttrs (k: v: toString v) homelab.groups;
           in
           [
-            "d /mnt/media/drive 0770 immich ${groups.personaldata} - -"
-            "Z /mnt/media/drive 0770 immich ${groups.personaldata} - -"
+            "d /mnt/media/pubdrive 0770 immich ${groups.serverdata} - -"
+            "Z /mnt/media/pubdrive 0770 immich ${groups.serverdata} - -"
           ];
 
         users.users.immich = {
           uid = 1000;
           isSystemUser = true;
           group = "immich";
-          extraGroups = [ "personaldata" ];
+          extraGroups = [
+            "serverdata"
+          ];
         };
         users.groups.immich.gid = 1000;
         users.groups.personaldata = {

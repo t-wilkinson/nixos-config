@@ -191,6 +191,7 @@ in
     mountdPort = 4002;
     statdPort = 4000;
     exports = ''
+      /srv/pubdrive 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
       /srv/sync/personal 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
       /var/lib/minecraft 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
     '';

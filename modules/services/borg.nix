@@ -49,9 +49,9 @@ in
     services.borgbackup.jobs."homelab" = {
       repo = "/srv/backup";
 
-      # What to backup
       paths = [
         "/srv/sync"
+        "/srv/pubdrive"
         "/var/lib/nextcloud"
         "/var/lib/vaultwarden"
         "/var/lib/minecraft"

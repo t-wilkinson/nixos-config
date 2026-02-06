@@ -80,11 +80,21 @@ function prjcd
     cd $(prj cd "$argv")
 end
 
+function gp
+    set -l msg (date "+%Y-%m-%d %H:%M")
+    if test (count $argv) -gt 0
+        set msg "$argv"
+    end
+
+    git add -A
+    git commit -m "$msg"
+    git push
+end
+
 alias pamcan=pacman
 alias v=nvim
 alias vim=nvim
 alias fv="nvim \$(fzf)"
-alias gp="git add -A && git commit -m 'made changes' && git push"
 
 alias ls="eza --icons=always --grid"
 # alias ls='eza'

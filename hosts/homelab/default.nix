@@ -38,12 +38,15 @@
   systemd.tmpfiles.rules =
     let
       groups = lib.mapAttrs (n: v: toString v) config.homelab.groups;
+      drives = config.homelab.drives;
     in
     [
-      "d /srv/sync/personal/drive 0770 ${username} ${groups.personaldata} - -"
-      "Z /srv/sync/personal/drive 0770 ${username} ${groups.personaldata} - -"
-      "d /var/lib/minecraft 0775 ${username} ${groups.serverdata} - -"
-      "Z /var/lib/minecraft 0775 ${username} ${groups.serverdata} - -"
+      "d ${drives.pubdrive} 0770 ${username} ${groups.serverdata} - -"
+      "Z ${drives.pubdrive} 0770 ${username} ${groups.serverdata} - -"
+      "d ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
+      "Z ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
+      "d ${drives.minecraft} 0775 ${username} ${groups.serverdata} - -"
+      "Z ${drives.minecraft} 0775 ${username} ${groups.serverdata} - -"
     ];
 
   fileSystems."/" = {

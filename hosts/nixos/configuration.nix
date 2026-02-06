@@ -302,6 +302,15 @@
     loader.efi.canTouchEfiVariables = true;
   };
 
+  fileSystems."/mnt/homelab/pubdrive" = {
+    device = "10.1.0.2:/srv/pubdrive";
+    fsType = "nfs";
+    options = [
+      "x-systemd.automount"
+      "noauto"
+      "bg"
+    ]; # Only mount when accessed
+  };
   fileSystems."/mnt/homelab/personal" = {
     device = "10.1.0.2:/srv/sync/personal";
     fsType = "nfs";
