@@ -7,6 +7,8 @@
 let
   homelab = config.homelab;
   cfg = config.homelab.services.borg;
+  pc_ip_address = "10.1.0.1";
+  mcrconCmd = "${pkgs.mcrcon}/bin/mcrcon -H ${pc_ip_address} -p ${toString homelab.services.mc-server.data.rconPort} -p password";
 in
 {
   config = lib.mkIf cfg.enable {
@@ -85,14 +87,14 @@ in
       preHook = ''
         ${pkgs.curl}/bin/curl -d "Borg backing up homelab" http://${homelab.services.ntfy.localEndpoint}/homelab
 
-        # if ! ${pkgs.util-linux}/bin/mountpoint -q /srv/backup; then
-        #   echo "Backup drive not mounted. Skipping backup."
-        #   exit 0
-        # fi
+        if ! ${pkgs.util-linux}/bin/mountpoint -q /srv/backup; then
+          echo "Backup drive not mounted. Skipping backup."
+          exit 0
+        fi
 
         # NEXTCLOUD
         ${pkgs.nixos-container}/bin/nixos-container run nextcloud -- \
-          sudo -u postgres ${pkgs.postgresql}/bin/pg_dump nextcloud > /var/lib/nextcloud/nextcloud-sql-dump.sql
+          sudo -u postgres ${pkgs.postgresql}/bin/pg_dump -h /run/postgresql nextcloud > /var/lib/nextcloud/nextcloud-sql-dump.sql
         chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/nextcloud/nextcloud-sql-dump.sql
         chmod 660 /var/lib/nextcloud/nextcloud-sql-dump.sql
 
@@ -108,9 +110,15 @@ in
           sudo -u immich ${pkgs.postgresql}/bin/pg_dump immich > /var/lib/immich/immich-sql-dump.sql
         chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/immich/immich-sql-dump.sql
         chmod 660 /var/lib/immich/immich-sql-dump.sql
+
+        # MINECRAFT
+        ${mcrconCmd} "save-all"
+        ${mcrconCmd} "save-off"
       '';
 
       postHook = lib.mkIf homelab.services.ntfy.enable ''
+        ${mcrconCmd} "save-on"
+
         # BORG_EXIT_CODE: 0 = success, 1 = warning, 2 = error
         EXIT_CODE="''${BORG_EXIT_CODE:-2}"
         if [ "$EXIT_CODE" -eq 0 ]; then

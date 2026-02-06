@@ -117,6 +117,7 @@
   };
 
   environment.systemPackages = with pkgs; [
+    mcrcon # necessary for accessing mc-server on other pc
     wol # Wake on LAN util for turning on the PC through ethernet
     wakeonlan
     # wireguard-tools

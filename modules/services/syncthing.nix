@@ -51,6 +51,7 @@ in
             id = "personal";
             path = "/srv/sync/personal";
             devices = [ "nixos" ];
+            ignorePerms = true;
             versioning = {
               type = "simple";
               params = {
