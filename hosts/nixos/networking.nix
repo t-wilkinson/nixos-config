@@ -28,6 +28,12 @@ in
       dns = "systemd-resolved";
     };
 
+    extraHosts = ''
+      127.0.0.1 ic.com
+      127.0.0.1 api.ic.com
+      127.0.0.1 backend
+    '';
+
     # Add route to get to homelab IP through direct ethernet connection
     # interfaces.enp3s0.ipv4.routes = [
     #   {
