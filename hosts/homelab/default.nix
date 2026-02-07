@@ -28,6 +28,8 @@
     ../../modules/services
   ];
 
+  services.automatic-timezoned.enable = true;
+
   nix.settings = {
     trusted-users = [
       "root"
