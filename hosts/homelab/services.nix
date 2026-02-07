@@ -167,6 +167,7 @@ in
         #     };
         #   }
         # ];
+
         "My Services" = [
           {
             "Root Certificate" = {
@@ -174,7 +175,32 @@ in
               href = "https://${services.dashboard.domain}/root.crt";
               description = "Download to trust HTTPS";
             };
+
           }
+          {
+            "Zortex service" = {
+              icon = "mdi-bell-ring";
+              href = "https://${services.zortex.domain}";
+              description = "Notification Hub";
+              widget = {
+                type = "customapi";
+                url = "https://${services.zortex.domain}/api/summary";
+                refresh = 60000; # Refresh every minute
+                mappings = [
+                  {
+                    field = "pending_count";
+                    label = "Pending";
+                    format = "number";
+                  }
+                  {
+                    field = "next_event";
+                    label = "Next";
+                  }
+                ];
+              };
+            };
+          }
+
         ]
         ++ (lib.mapAttrsToList mkHomepageEntry (
           lib.filterAttrs (n: v: n != "dashboard" && v.expose) services

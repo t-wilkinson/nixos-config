@@ -91,10 +91,29 @@ function gp
     git push
 end
 
+function ns --description "nix shell wrapper with automatic nixpkgs# prefix"
+    set -l inputs
+
+    for arg in $argv
+        if string match -q '*#*' -- $arg
+            set inputs $inputs $arg
+        else if string match -q -- '--*' $arg
+            set inputs $inputs $arg
+        else
+            set inputs $inputs nixpkgs#$arg
+        end
+    end
+
+    command nix shell $inputs
+end
+
 alias pamcan=pacman
 alias v=nvim
 alias vim=nvim
 alias fv="nvim \$(fzf)"
+alias ncl="sudo nixos-container root-login"
+alias nc="sudo nixos-container"
+alias netcat="/run/current-system/sw/bin/nc"
 
 alias ls="eza --icons=always --grid"
 # alias ls='eza'
