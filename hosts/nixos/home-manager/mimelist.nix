@@ -5,7 +5,9 @@ let
   image-viewer = "org.gnome.Loupe.desktop";
   image-editor = "org.kde.kolourpaint";
   torrent = "transmission-gtk.desktop";
-in {
+  pdf = "org.kde.okular.desktop";
+in
+{
   xdg.mimeApps = rec {
     enable = true;
     associations.added = defaultApplications;
@@ -18,7 +20,7 @@ in {
       "text/html" = browser;
 
       "x-scheme-handler/magnet" = torrent;
-      "application/pdf" = browser;
+      "application/pdf" = pdf;
       "application/x-shellscript" = editor;
 
       "image/jpeg" = image-editor;
