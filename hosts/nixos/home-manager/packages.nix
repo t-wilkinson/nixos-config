@@ -2,99 +2,101 @@
 {
 
   home = {
-    packages = with pkgs; [
-      i3
-      sway
-      pinentry
-      foot
-      bitwarden-desktop
-      bitwarden-cli
-      gimp
+    packages =
+      with pkgs;
+      [
+        i3
+        sway
+        pinentry
+        foot
+        bitwarden-desktop
+        bitwarden-cli
+        gimp
 
-      # VIRTUALIZATION
-      k3s
-      incus
-      docker
+        # VIRTUALIZATION
+        k3s
+        incus
+        docker
 
-      # GUI
-      kdePackages.okular # pdf viewer
-      # zathura # pdf viewer
-      blueberry
-      (mpv.override { scripts = [ mpvScripts.mpris ]; })
-      d-spy
-      kdePackages.dolphin
-      nautilus # gnome
-      icon-library
-      dconf-editor # gnome
-      libsForQt5.qt5.qtimageformats
-      yad
-      # tor-browser-bundle-bin
-      (google-chrome.override {
-        commandLineArgs = [
-          "--enable-features=UseOzonePlatform"
-          "--ozone-platform=wayland"
-        ];
-      })
-      # chromedriver
-      easyeffects
+        # GUI
+        kdePackages.okular # pdf viewer
+        # zathura # pdf viewer
+        blueberry
+        (mpv.override { scripts = [ mpvScripts.mpris ]; })
+        d-spy
+        kdePackages.dolphin
+        nautilus # gnome
+        icon-library
+        dconf-editor # gnome
+        libsForQt5.qt5.qtimageformats
+        yad
+        # tor-browser-bundle-bin
+        (google-chrome.override {
+          commandLineArgs = [
+            "--enable-features=UseOzonePlatform"
+            "--ozone-platform=wayland"
+          ];
+        })
+        # chromedriver
+        easyeffects
 
-      # tools
-      libnotify
-      showmethekey
-      # vscode
-      ydotool # simulate mouse and keyboard
+        # tools
+        libnotify
+        showmethekey
+        # vscode
+        ydotool # simulate mouse and keyboard
 
-      # theming tools
-      gradience
-      gnome-tweaks
+        # theming tools
+        gradience
+        gnome-tweaks
 
-      # hyprland
-      hyprland
-      brightnessctl
-      cliphist
-      fuzzel
-      grim
-      hyprpicker
-      tesseract
-      pavucontrol
-      playerctl
-      rofi-wayland
-      swappy
-      swaylock-effects
-      swayidle
-      slurp
-      swww
-      wayshot
-      wlsunset
-      wl-clipboard
-      wf-recorder
-      wayvnc
-      jq
+        # hyprland
+        hyprland
+        brightnessctl
+        cliphist
+        fuzzel
+        grim
+        hyprpicker
+        tesseract
+        pavucontrol
+        playerctl
+        rofi-wayland
+        swappy
+        swaylock-effects
+        swayidle
+        slurp
+        swww
+        wayshot
+        wlsunset
+        wl-clipboard
+        wf-recorder
+        wayvnc
+        jq
 
-      # FILES
-      cifs-utils # smb
-      nfs-utils # nfs
+        # FILES
+        cifs-utils # smb
+        nfs-utils # nfs
 
-      # NETWORKING
-      ethtool
+        # NETWORKING
+        ethtool
 
-      # GAMES
-      prismlauncher
-      unstable.lunar-client
+        # GAMES
+        prismlauncher
 
-      # MISC
-      # android-file-transfer
-      # appimage-run
-      # texliveFull
+        # MISC
+        # android-file-transfer
+        # appimage-run
+        # texliveFull
 
-      # Office-tools
-      libreoffice
+        # Office-tools
+        libreoffice
 
-      php
+        php
 
-      # (writeShellScriptBin "hello-bro" ''
-      #   echo "Hello, ${config.home.username}!"
-      # '')
-    ];
+        # (writeShellScriptBin "hello-bro" ''
+        #   echo "Hello, ${config.home.username}!"
+        # '')
+      ]
+      ++ (if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then [ unstable.lunar-client ] else [ ]);
   };
 }
