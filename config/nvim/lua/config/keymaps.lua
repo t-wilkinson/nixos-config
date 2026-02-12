@@ -26,3 +26,15 @@ vim.api.nvim_set_keymap("x", "S", [[:<C-u>lua MiniSurround.add('visual')<CR>]], 
 
 -- Make special mapping for "add surrounding for line"
 vim.api.nvim_set_keymap("n", "yss", "ys_", { noremap = false })
+
+for i = 1, 9 do
+  vim.keymap.set("n", "z" .. i, function()
+    vim.opt.foldlevel = i - 1
+    vim.opt.foldenable = true
+  end, { desc = "Set foldlevel to " .. (i - 1) })
+end
+
+-- vim.keymap.set("n", "z0", function()
+--   vim.opt.foldlevel = 0
+--   vim.opt.foldenable = true
+-- end, { desc = "Close all folds" })
