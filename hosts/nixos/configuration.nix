@@ -302,6 +302,15 @@
     loader.efi.canTouchEfiVariables = true;
   };
 
+  fileSystems."/mnt/homelab/misc" = {
+    device = "10.1.0.2:/srv/misc";
+    fsType = "nfs";
+    options = [
+      "x-systemd.automount"
+      "noauto"
+      "bg"
+    ];
+  };
   fileSystems."/mnt/homelab/pubdrive" = {
     device = "10.1.0.2:/srv/pubdrive";
     fsType = "nfs";
@@ -309,7 +318,7 @@
       "x-systemd.automount"
       "noauto"
       "bg"
-    ]; # Only mount when accessed
+    ];
   };
   fileSystems."/mnt/homelab/personal" = {
     device = "10.1.0.2:/srv/sync/personal";
@@ -318,7 +327,7 @@
       "x-systemd.automount"
       "noauto"
       "bg"
-    ]; # Only mount when accessed
+    ];
   };
   fileSystems."/var/lib/minecraft" = {
     device = "10.1.0.2:/var/lib/minecraft";

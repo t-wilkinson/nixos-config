@@ -96,6 +96,14 @@
         # (writeShellScriptBin "hello-bro" ''
         #   echo "Hello, ${config.home.username}!"
         # '')
+
+        # 3D PRINTING
+        freecad
+        openscad
+        solvespace
+        blender
+        prusa-slicer
+        orca-slicer
       ]
       ++ (if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then [ unstable.lunar-client ] else [ ]);
   };

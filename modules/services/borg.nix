@@ -62,8 +62,15 @@ in
       exclude = [
         "*.pyc"
         "/home/*/.cache"
+
+        # Nextcloud
         "*/nextcloud.db-wal"
         "*/nextcloud.db-shm"
+
+        # Minecraft
+        "*/logs/latest.log"
+        "*.jfr"
+        "*.jfr.tmp"
       ];
 
       # Encryption: 'none' is easiest for a physical drive at home,
@@ -93,12 +100,14 @@ in
         fi
 
         # NEXTCLOUD
+        echo "Backing up nextcloud..."
         ${pkgs.nixos-container}/bin/nixos-container run nextcloud -- \
           sudo -u postgres ${pkgs.postgresql}/bin/pg_dump -h /run/postgresql nextcloud > /var/lib/nextcloud/nextcloud-sql-dump.sql
         chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/nextcloud/nextcloud-sql-dump.sql
         chmod 660 /var/lib/nextcloud/nextcloud-sql-dump.sql
 
         # VAULTWARDEN
+        echo "Backing up vaultwarden..."
         if [ -f /var/lib/vaultwarden/db.sqlite3 ]; then
           ${pkgs.sqlite}/bin/sqlite3 /var/lib/vaultwarden/db.sqlite3 ".backup '/var/lib/vaultwarden/db-backup.sqlite3'"
           chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/vaultwarden/db-backup.sqlite3
@@ -106,21 +115,30 @@ in
         fi
 
         # IMMICH
+        echo "Backing up immich..."
         ${pkgs.nixos-container}/bin/nixos-container run immich -- \
           sudo -u immich ${pkgs.postgresql}/bin/pg_dump immich > /var/lib/immich/immich-sql-dump.sql
         chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/immich/immich-sql-dump.sql
         chmod 660 /var/lib/immich/immich-sql-dump.sql
 
         # MINECRAFT
-        ${mcrconCmd} "save-all"
-        ${mcrconCmd} "save-off"
+        echo "Backing up Minecraft..."
+        if ${pkgs.iputils}/bin/ping -c 1 -W 2 ${pc_ip_address} > /dev/null; then
+          ${mcrconCmd} "save-all"
+          ${mcrconCmd} "save-off"
+        else
+          echo "Minecraft server at ${pc_ip_address} is unreachable. Skipping Minecraft backup."
+        fi
       '';
 
       postHook = lib.mkIf homelab.services.ntfy.enable ''
-        ${mcrconCmd} "save-on"
+        if ${pkgs.iputils}/bin/ping -c 1 -W 2 ${pc_ip_address} > /dev/null; then
+          ${mcrconCmd} "save-on"
+        fi
 
         # BORG_EXIT_CODE: 0 = success, 1 = warning, 2 = error
         EXIT_CODE="''${BORG_EXIT_CODE:-2}"
+        echo $BORG_EXIT_CODE
         if [ "$EXIT_CODE" -eq 0 ]; then
           ${pkgs.curl}/bin/curl \
             -H "Title: Backup Successful" \
