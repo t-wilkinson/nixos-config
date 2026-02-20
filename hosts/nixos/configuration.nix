@@ -9,6 +9,29 @@
   ...
 }:
 {
+  # for droidcam
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelModules = [
+    "v4l2loopback"
+    "snd-aloop"
+  ];
+  boot.extraModulePackages = [
+    config.boot.kernelPackages.v4l2loopback
+  ];
+  # Set initial kernel module settings
+  boot.extraModprobeConfig = ''
+    options v4l2loopback exclusive_caps=1 card_label="Virtual Camera"
+  '';
+
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-hyprland
+      pkgs.xdg-desktop-portal-gtk # Common fallback for file pickers/dialogs
+    ];
+    config.common.default = "*"; # Ensures portals are used correctly
+  };
+
   # nix
   documentation.nixos.enable = false;
   nixpkgs = {
@@ -35,13 +58,14 @@
 
   environment = {
     localBinInPath = true;
-    # sessionVariables = {
-    #   # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
-    #   NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
-    #   # NIXPKGS_ALLOW_UNFREE = "1";
-    #   # NIXPKGS_ALLOW_INSECURE = "1";
-    #   # LIBVA_DRIVER_NAME = "iHD";
-    # };
+    sessionVariables = {
+      MOZ_ENABLE_WAYLAND = "1";
+      #   # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
+      #   NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
+      #   # NIXPKGS_ALLOW_UNFREE = "1";
+      #   # NIXPKGS_ALLOW_INSECURE = "1";
+      #   # LIBVA_DRIVER_NAME = "iHD";
+    };
   };
 
   users = {
@@ -73,6 +97,8 @@
   };
 
   environment.systemPackages = with pkgs; [
+    droidcam
+
     adwaita-qt
     qt6.qtwayland
     qt5.qtwayland

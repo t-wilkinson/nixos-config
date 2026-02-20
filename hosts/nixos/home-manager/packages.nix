@@ -1,6 +1,9 @@
-{ pkgs, unstable, ... }:
 {
-
+  pkgs,
+  unstable,
+  ...
+}:
+{
   home = {
     packages =
       with pkgs;
@@ -30,7 +33,7 @@
         dconf-editor # gnome
         libsForQt5.qt5.qtimageformats
         yad
-        # tor-browser-bundle-bin
+        tor-browser-bundle-bin
         (google-chrome.override {
           commandLineArgs = [
             "--enable-features=UseOzonePlatform"

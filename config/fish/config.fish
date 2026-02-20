@@ -80,6 +80,16 @@ function prjcd
     cd $(prj cd "$argv")
 end
 
+function gc
+    set -l msg (date "+%Y-%m-%d %H:%M")
+    if test (count $argv) -gt 0
+        set msg "$argv"
+    end
+
+    git add -A
+    git commit -m "$msg"
+end
+
 function gp
     set -l msg (date "+%Y-%m-%d %H:%M")
     if test (count $argv) -gt 0
