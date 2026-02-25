@@ -50,7 +50,10 @@ in
           "personal" = {
             id = "personal";
             path = "/srv/sync/personal";
-            devices = [ "nixos" ];
+            devices = [
+              "nixos"
+              "macos"
+            ];
             ignorePerms = true;
             versioning = {
               type = "simple";
