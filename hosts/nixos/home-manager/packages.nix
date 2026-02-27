@@ -16,6 +16,8 @@
         bitwarden-cli
         gimp
 
+        discord
+
         # VIRTUALIZATION
         k3s
         incus
