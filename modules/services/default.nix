@@ -20,6 +20,7 @@
       minecraft = "/var/lib/minecraft";
       pubdrive = "/srv/pubdrive";
       personal = "/srv/sync/personal";
+      misc = "/srv/misc";
     };
 
     groups = {
