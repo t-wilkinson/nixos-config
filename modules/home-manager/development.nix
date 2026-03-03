@@ -6,6 +6,8 @@
 }:
 with pkgs;
 [
+  unstable.jetbrains.idea
+
   # LANGUAGES
   # jdk # has compatibility issues
   # R
