@@ -269,6 +269,7 @@ in
   services.zortex = {
     enable = true;
     port = services.zortex.port;
+    timezone = "America/New_York";
     ntfy.url = "https://${services.ntfy.domain}";
     ntfy.topic = "zortex-notify";
     # dataDir = "/var/lib/zortex";

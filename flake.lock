@@ -1553,11 +1553,11 @@
         "nixpkgs": "nixpkgs_6"
       },
       "locked": {
-        "lastModified": 1770494080,
-        "narHash": "sha256-e0SgwMPtcmHgmNGoz7kge20jWELV4/WbPZzpa8tL5Z4=",
+        "lastModified": 1772725023,
+        "narHash": "sha256-YiKtNF78Vjf4liV0eyoxDo4wiufWVj00uEajhiPp8w0=",
         "owner": "t-wilkinson",
         "repo": "zortex.nvim",
-        "rev": "701b8c3b5263f7c470dfc026b12b13e320e31bc2",
+        "rev": "d60249d436ebf984be64a58968da71bad06ba2fb",
         "type": "github"
       },
       "original": {

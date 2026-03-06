@@ -32,6 +32,8 @@
     config.common.default = "*"; # Ensures portals are used correctly
   };
 
+  boot.kernelParams = [ "btusb.enable_autosuspend=n" ];
+
   # nix
   documentation.nixos.enable = false;
   nixpkgs = {
