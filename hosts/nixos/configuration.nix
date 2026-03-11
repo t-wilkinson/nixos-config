@@ -82,6 +82,7 @@
         "uinput"
         # "render"
         "libvirtd"
+        "dialout"
         (lib.mkIf config.virtualisation.docker.enable "docker")
         (lib.mkIf config.networking.networkmanager.enable "networkmanager")
       ];
