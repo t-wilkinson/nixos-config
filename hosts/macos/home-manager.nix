@@ -34,7 +34,7 @@
       "ntfy"
       "terminal-notifier"
       "bitwarden-cli"
-      "pinentry"
+      # "pinentry"
       "pinentry-mac"
       # "pinentry-touchid"
       "whalebrew"
