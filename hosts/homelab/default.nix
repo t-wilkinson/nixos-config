@@ -17,6 +17,7 @@
     "nextcloud"
     "immich"
     "borg"
+    "mealie"
     # "prometheus"
     # "grafana"
   ];

@@ -7,6 +7,7 @@
     ./monitoring.nix
     ./borg.nix
     ./syncthing.nix
+    ./mealie.nix
   ];
 
   homelab = {
@@ -56,6 +57,11 @@
         expose = false;
       };
       borg = {
+      };
+      mealie = {
+        port = 9925;
+        subdomain = "mealie";
+        isPublic = true;
       };
 
       # Monitor
