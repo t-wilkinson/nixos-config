@@ -87,6 +87,18 @@ in
           #     httpHostHeader = services.mc-server.domain;
           #   };
           # };
+          "${services.actual-budget.publicDomain}" = {
+            service = "http://${services.actual-budget.localEndpoint}";
+            originRequest = {
+              httpHostHeader = services.actual-budget.domain;
+            };
+          };
+          "${services.mealie.publicDomain}" = {
+            service = "http://${services.mealie.localEndpoint}";
+            originRequest = {
+              httpHostHeader = services.mealie.domain;
+            };
+          };
           "${services.immich.publicDomain}" = {
             service = "http://${services.immich.localEndpoint}";
             originRequest = {

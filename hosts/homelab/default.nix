@@ -18,6 +18,7 @@
     "immich"
     "borg"
     "mealie"
+    "actual-budget"
     # "prometheus"
     # "grafana"
   ];
@@ -50,6 +51,8 @@
       "Z ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
       "d ${drives.minecraft} 0775 ${username} ${groups.serverdata} - -"
       "Z ${drives.minecraft} 0775 ${username} ${groups.serverdata} - -"
+      "d ${drives.actual-budget} 0775 ${username} ${groups.serverdata} - -"
+      "Z ${drives.actual-budget} 0775 ${username} ${groups.serverdata} - -"
     ];
 
   fileSystems."/" = {

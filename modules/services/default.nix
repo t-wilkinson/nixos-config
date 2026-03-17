@@ -8,6 +8,7 @@
     ./borg.nix
     ./syncthing.nix
     ./mealie.nix
+    ./actual-budget.nix
   ];
 
   homelab = {
@@ -22,6 +23,7 @@
       pubdrive = "/srv/pubdrive";
       personal = "/srv/sync/personal";
       misc = "/srv/misc";
+      actual-budget = "/var/lib/actual-budget";
     };
 
     groups = {
@@ -59,9 +61,16 @@
       borg = {
       };
       mealie = {
+        id = 20;
         port = 9925;
-        subdomain = "mealie";
         isPublic = true;
+      };
+      actual-budget = {
+        id = 21;
+        port = 5006;
+        subdomain = "budget";
+        isPublic = true;
+        description = "Personal finance manager";
       };
 
       # Monitor
