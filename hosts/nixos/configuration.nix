@@ -249,25 +249,15 @@
         };
       };
     };
+    udev = {
+      # Prevents the computer from waking up from super sensitive mouse
+      extraRules = ''
+        ACTION=="add", SUBSYSTEM=="pci", DRIVER=="xhci_hcd", ATTR{power/wakeup}="disabled"
+      '';
+    };
   };
 
   systemd = {
-    user.services.disable-xhci-wakeup = {
-      description = "Disable XHCI ACPI wakeup";
-      wantedBy = [ "multi-user.target" ];
-      after = [ "sysinit.target" ];
-
-      serviceConfig = {
-        Type = "oneshot";
-        ExecStart = ''
-          ${pkgs.coreutils}/bin/sh -euc '
-            if ${pkgs.gnugrep}/bin/grep -q "^XHCI.*enabled" /proc/acpi/wakeup; then
-              echo XHCI > /proc/acpi/wakeup
-            fi
-          '
-        '';
-      };
-    };
     user.services.polkit-gnome-authentication-agent-1 = {
       description = "polkit-gnome-authentication-agent-1";
       wantedBy = [ "graphical-session.target" ];
