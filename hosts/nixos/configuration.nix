@@ -70,6 +70,7 @@
     };
   };
 
+  # virtualisation.vmware.guest.enable = true;
   users = {
     defaultUserShell = pkgs.fish;
     users.${username} = {

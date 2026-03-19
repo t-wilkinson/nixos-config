@@ -84,7 +84,7 @@ with pkgs;
   # git-filter-repo
 
   # PACKAGE MANAGEMENT/NIX
-  # nh
+  nh
   # nix-output-monitor
   # nvd
 
