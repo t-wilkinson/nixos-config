@@ -80,7 +80,7 @@ in
       connection.id = "wired-homelab";
       connection.interface-name = "enp3s0";
       connection.autoconnect = true;
-      "802-3-ethernet".wake-on-lan = "magic"; # sudo ethtool -s enp3s0 wol gp (magic physical)
+      # "802-3-ethernet".wake-on-lan = "magic"; # sudo ethtool -s enp3s0 wol gp (magic physical)
 
       ipv4.method = "manual";
       ipv4.addresses = "10.1.0.1/30";
@@ -95,7 +95,7 @@ in
 
   networking.networkmanager.dispatcherScripts = [
     {
-      source = pkgs.writeText "homelab-routes" ''
+      source = pkgs.writeShellScript "homelab-routes" ''
         case "$2" in
           up)
             ${pkgs.iproute2}/bin/ip route replace ${homelab.homelabIP}/32 via ${homelabDirectGateway} dev enp3s0

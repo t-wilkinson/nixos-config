@@ -322,43 +322,84 @@
     loader.efi.canTouchEfiVariables = true;
   };
 
-  fileSystems."/mnt/homelab/misc" = {
-    device = "10.1.0.2:/srv/misc";
-    fsType = "nfs";
-    options = [
-      "x-systemd.automount"
-      "noauto"
-      "bg"
+  fileSystems =
+    let
+      homelabOptions = [
+        "x-systemd.automount"
+        "x-systemd.idle-timeout=10"
+        "x-systemd.mount-timeout=10s"
+        "x-systemd.after=network-online.target"
+        "noauto"
+        "_netdev"
+      ];
+    in
+    {
+      "/mnt/homelab/misc" = {
+        device = "10.1.0.2:/srv/misc";
+        fsType = "nfs";
+        options = homelabOptions;
+      };
+      "/mnt/homelab/pubdrive" = {
+        device = "10.1.0.2:/srv/pubdrive";
+        fsType = "nfs";
+        options = homelabOptions;
+      };
+      "/mnt/homelab/personal" = {
+        device = "10.1.0.2:/srv/sync/personal";
+        fsType = "nfs";
+        options = homelabOptions;
+      };
+      "/var/lib/minecraft" = {
+        device = "10.1.0.2:/var/lib/minecraft";
+        fsType = "nfs";
+        options = homelabOptions ++ [
+          "rw"
+          "soft"
+        ]; # Only mount when accessed
+      };
+    };
+
+  specialisation.vmware.configuration = {
+    virtualisation.vmware.guest.enable = lib.mkForce true;
+    services.xserver.videoDrivers = lib.mkForce [ "vmware" ];
+
+    # Fix for the black screen/cursor issues in virtualized Wayland
+    environment.sessionVariables = {
+      WLR_NO_HARDWARE_CURSORS = "1";
+      # Ensure standard mouse behavior in the VM
+      WLR_RENDERER_ALLOW_SOFTWARE = "1";
+      LIBGL_ALWAYS_SOFTWARE = "1";
+    };
+
+    hardware.graphics.extraPackages = lib.mkForce [
+      pkgs.mesa
+      pkgs.libdrm
     ];
-  };
-  fileSystems."/mnt/homelab/pubdrive" = {
-    device = "10.1.0.2:/srv/pubdrive";
-    fsType = "nfs";
-    options = [
-      "x-systemd.automount"
-      "noauto"
-      "bg"
-    ];
-  };
-  fileSystems."/mnt/homelab/personal" = {
-    device = "10.1.0.2:/srv/sync/personal";
-    fsType = "nfs";
-    options = [
-      "x-systemd.automount"
-      "noauto"
-      "bg"
-    ];
-  };
-  fileSystems."/var/lib/minecraft" = {
-    device = "10.1.0.2:/var/lib/minecraft";
-    fsType = "nfs";
-    options = [
-      "rw"
-      "soft"
-      "bg"
-      "x-systemd.automount"
-      "noauto"
-    ]; # Only mount when accessed
+
+    # boot.initrd.availableKernelModules = lib.mkForce [
+    #   "xhci_pci"
+    #   "ahci"
+    #   "nvme"
+    #   "usbhid"
+    #   "usb_storage"
+    #   "sd_mod" # From hardware-config
+    #   "vmw_pvscsi"
+    #   "vmw_balloon"
+    #   "vmw_vmci" # VMware specific
+    # ];
+
+    # Disable hardware-specific modules that might hang the VM boot
+    # boot.initrd.availableKernelModules = lib.mkForce [
+    #   "uhci_hcd"
+    #   "ehci_pci"
+    #   "ahci"
+    #   "virtio_pci"
+    #   "virtio_scsi"
+    #   "sd_mod"
+    #   "sr_mod"
+    #   "vmw_pvscsi"
+    # ];
+    system.nixos.tags = [ "windows-vmware" ];
   };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
