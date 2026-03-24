@@ -9,8 +9,13 @@
   ...
 }:
 {
+  networking.hostId = "73e662d7";
+  services.zfs.autoScrub.enable = true;
+  services.zfs.autoSnapshot = { enable = true; flags = "-k"; };
+  boot.supportedFilesystems = [ "zfs" ];
+
   # for droidcam
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelModules = [
     "v4l2loopback"
     "snd-aloop"
@@ -302,8 +307,8 @@
 
   swapDevices = [
     {
-      device = "/var/lib/swapfile";
-      size = 16 * 1024;
+      device = "/dev/disk/by-id/nvme-CT1000P5PSSD8_2316402A1248-part2";
+      # size = 16 * 1024;
     }
   ];
 

@@ -13,16 +13,31 @@
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/ce486d8c-d24e-4387-8592-27355e8490c9";
-      fsType = "ext4";
-    };
+fileSystems."/" = {
+  device = "rpool/root";
+  fsType = "zfs";
+};
 
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/09BA-392B";
-      fsType = "vfat";
-      options = [ "fmask=0022" "dmask=0022" ];
-    };
+fileSystems."/nix" = {
+  device = "rpool/nix";
+  fsType = "zfs";
+};
+
+fileSystems."/home" = {
+  device = "rpool/home";
+  fsType = "zfs";
+};
+
+  # fileSystems."/" =
+  #   { device = "/dev/disk/by-uuid/ce486d8c-d24e-4387-8592-27355e8490c9";
+  #     fsType = "ext4";
+  #   };
+
+  # fileSystems."/boot" =
+  #   { device = "/dev/disk/by-uuid/09BA-392B";
+  #     fsType = "vfat";
+  #     options = [ "fmask=0022" "dmask=0022" ];
+  #   };
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
   # (the default) this is the recommended approach. When using systemd-networkd it's
