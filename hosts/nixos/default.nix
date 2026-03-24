@@ -18,7 +18,7 @@
 
   homelab = {
     enableServices = [
-      "mc-server"
+      # "mc-server"
     ];
   };
 

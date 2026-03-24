@@ -70,7 +70,6 @@
     };
   };
 
-  # virtualisation.vmware.guest.enable = true;
   users = {
     defaultUserShell = pkgs.fish;
     users.${username} = {
@@ -361,14 +360,27 @@
 
   specialisation.vmware.configuration = {
     virtualisation.vmware.guest.enable = lib.mkForce true;
-    services.xserver.videoDrivers = lib.mkForce [ "vmware" ];
+    services.xserver.videoDrivers = lib.mkForce [
+      "vmware"
+      "modesetting"
+    ];
+    services.xserver.desktopManager.gnome.enable = lib.mkForce false;
 
     # Fix for the black screen/cursor issues in virtualized Wayland
     environment.sessionVariables = {
+      MOZ_ENABLE_WAYLAND = "1";
       WLR_NO_HARDWARE_CURSORS = "1";
+      WLR_BACKEND = "drm";
       # Ensure standard mouse behavior in the VM
       WLR_RENDERER_ALLOW_SOFTWARE = "1";
       LIBGL_ALWAYS_SOFTWARE = "1";
+    };
+
+    xdg.portal = {
+      extraPortals = lib.mkForce [
+        pkgs.xdg-desktop-portal-hyprland
+        pkgs.xdg-desktop-portal-gtk
+      ];
     };
 
     hardware.graphics.extraPackages = lib.mkForce [
@@ -399,7 +411,7 @@
     #   "sr_mod"
     #   "vmw_pvscsi"
     # ];
-    system.nixos.tags = [ "windows-vmware" ];
+    system.nixos.tags = [ "vmware" ];
   };
 
   system.stateVersion = "24.05"; # If you touch this, Covid 2.0 will be released
