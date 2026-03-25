@@ -30,7 +30,7 @@ return {
       --   },
       -- },
       ensure_installed = {
-        "angular-language-server",
+        -- "angular-language-server",
         "bash-language-server",
         "clangd",
         "cmakelang",
@@ -61,7 +61,7 @@ return {
         "terraform-ls",
         "tflint",
         "vtsls",
-        "vue-language-server",
+        -- "vue-language-server",
         "yaml-language-server",
         -- "pyright",
         -- "clangd",

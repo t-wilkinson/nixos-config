@@ -32,6 +32,7 @@
       nixpkgs-unstable,
       sops-nix,
       thorium,
+      wrapper-modules,
       zortex,
     }@inputs:
     let
@@ -202,6 +203,26 @@
       };
 
       checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
+
+      packages = nixpkgs-nixos.lib.genAttrs linuxSystems (
+        system:
+        let
+          imports = {
+            inherit self inputs;
+            inherit (nixpkgs-unstable) lib;
+            pkgs = import nixpkgs-unstable {
+              inherit system;
+              overlays = [
+                # (final: prev: { lndir = prev.xorg.lndir; })
+              ];
+            };
+          };
+        in
+        {
+          myNiri = import ./modules/niri.nix imports;
+          myNoctalia = import ./modules/noctalia.nix imports;
+        }
+      );
     };
 
   inputs = {
@@ -237,6 +258,7 @@
     #   url = "github:nix-community/haumea";
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
+    wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
 
     # macOS
     nix-darwin = {
