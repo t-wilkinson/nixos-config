@@ -105,7 +105,7 @@
         # 3D PRINTING
         freecad
         openscad
-        solvespace
+        # solvespace
         blender
         prusa-slicer
         orca-slicer

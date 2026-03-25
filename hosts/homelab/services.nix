@@ -2,6 +2,7 @@
 {
   config,
   pkgs,
+  unstable,
   lib,
   ...
 }:
@@ -259,6 +260,7 @@ in
   # PASSWORD MANAGER
   services.vaultwarden = {
     enable = true;
+    package = unstable.vaultwarden;
     config = {
       ROCKET_PORT = services.vault.port;
       SIGNUPS_ALLOWED = true;

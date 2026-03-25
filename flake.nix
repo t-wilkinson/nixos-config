@@ -137,38 +137,47 @@
           ++ extraModules;
         };
 
-      homelab = nixpkgs-nixos.lib.nixosSystem {
-        system = "aarch64-linux";
-        specialArgs = {
-          inherit inputs username;
-          hostname = "pi";
-        };
-        modules = [
-          "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
-          nixos-hardware.nixosModules.raspberry-pi-4
-          zortex.nixosModules.default
-          ./modules/homelab.nix
-          (
-            { pkgs, lib, ... }:
-            {
-              # The generic image asks for 'sun4i-drm', but the RPi4 kernel doesn't have it.
-              # This overlay tells the build to skip missing modules instead of failing.
-              nixpkgs.overlays = [
-                (final: prev: {
-                  makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
-                })
-              ];
-            }
-          )
+      homelab =
+        let
+          system = "aarch64-linux";
+        in
+        nixpkgs-nixos.lib.nixosSystem {
+          specialArgs = {
+            inherit system inputs username;
+            hostname = "pi";
+            unstable = import nixpkgs-nixos {
+              inherit system;
+              config.allowUnfree = true;
+              config.allowBroken = true;
+            };
 
-          ({
-            sdImage.compressImage = false;
-            sdImage.imageName = "homelab-rpi4.img";
-          })
-          sops-nix.nixosModules.sops
-          ./hosts/homelab
-        ];
-      };
+          };
+          modules = [
+            "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
+            nixos-hardware.nixosModules.raspberry-pi-4
+            zortex.nixosModules.default
+            ./modules/homelab.nix
+            (
+              { pkgs, lib, ... }:
+              {
+                # The generic image asks for 'sun4i-drm', but the RPi4 kernel doesn't have it.
+                # This overlay tells the build to skip missing modules instead of failing.
+                nixpkgs.overlays = [
+                  (final: prev: {
+                    makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
+                  })
+                ];
+              }
+            )
+
+            ({
+              sdImage.compressImage = false;
+              sdImage.imageName = "homelab-rpi4.img";
+            })
+            sops-nix.nixosModules.sops
+            ./hosts/homelab
+          ];
+        };
 
     in
     {
