@@ -8,27 +8,19 @@
 }:
 {
   imports = [
-    ./home-manager
-    ./vmware.nix
-    ./configuration.nix
-    ./hardware.nix
-    ./networking.nix
     ./audio.nix
-    ./locale.nix
+    ./filesystem.nix
     ./gnome.nix
+    ./hardware.nix
+    ./home-manager
+    ./homelab.nix
+    ./locale.nix
+    ./networking.nix
     ./services.nix
+    ./vmware.nix
     ../../modules/shared.nix
     ../../modules/virtualisation.nix
   ];
-
-  xdg.portal = {
-    enable = true;
-    extraPortals = [
-      pkgs.xdg-desktop-portal-hyprland
-      pkgs.xdg-desktop-portal-gtk # Common fallback for file pickers/dialogs
-    ];
-    config.common.default = "*"; # Ensures portals are used correctly
-  };
 
   # NIX
   documentation.nixos.enable = false;
@@ -56,6 +48,9 @@
 
   environment = {
     localBinInPath = true;
+    variables = {
+      QT_QPA_PLATFORM = "wayland";
+    };
     sessionVariables = {
       MOZ_ENABLE_WAYLAND = "1";
       #   # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
@@ -95,6 +90,15 @@
     style = "adwaita";
   };
 
+  xdg.portal = {
+    enable = true;
+    extraPortals = [
+      pkgs.xdg-desktop-portal-hyprland
+      pkgs.xdg-desktop-portal-gtk # Common fallback for file pickers/dialogs
+    ];
+    config.common.default = "*"; # Ensures portals are used correctly
+  };
+
   environment.systemPackages = with pkgs; [
     droidcam
 
@@ -122,10 +126,6 @@
     gnutls
     libglvnd
   ];
-
-  environment.variables = {
-    QT_QPA_PLATFORM = "wayland";
-  };
 
   programs = {
     ssh.startAgent = true;
@@ -178,11 +178,6 @@
     };
   };
 
-  # Prevent the computer from waking up from super sensitive mouse
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="pci", DRIVER=="xhci_hcd", ATTR{power/wakeup}="disabled"
-  '';
-
   systemd = {
     user.services.polkit-gnome-authentication-agent-1 = {
       description = "polkit-gnome-authentication-agent-1";
@@ -199,6 +194,13 @@
     };
   };
 
+  security = {
+    rtkit.enable = true;
+    polkit.enable = true;
+    pam.services.swaylock = { };
+    # pam.services.swaylock-effects = {};
+  };
+
   # Suspend on power button press
   services.logind.extraConfig = ''
     HandlePowerKey=suspend
@@ -206,12 +208,10 @@
     HandleLidSwitchExternalPower=ignore
   '';
 
-  security = {
-    rtkit.enable = true;
-    polkit.enable = true;
-    pam.services.swaylock = { };
-    # pam.services.swaylock-effects = {};
-  };
+  # Prevent the computer from waking up from super sensitive mouse
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="pci", DRIVER=="xhci_hcd", ATTR{power/wakeup}="disabled"
+  '';
 
   sops = {
     defaultSopsFile = ./secrets.yaml;

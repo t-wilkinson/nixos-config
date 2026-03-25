@@ -22,8 +22,9 @@
       twitter-color-emoji
     ];
 
-    gnome.excludePackages =
-      (with pkgs; [
+    gnome.excludePackages = (
+      with pkgs;
+      [
         gedit # text editor
         gnome-photos
         gnome-tour
@@ -46,9 +47,7 @@
         gnome-shell-extensions
         gnome-maps
         # gnome-font-viewer
-      ])
-      ++ (with pkgs.gnome; [
-      ]);
+      ]
+    );
   };
 }
-

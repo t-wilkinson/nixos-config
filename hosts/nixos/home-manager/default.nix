@@ -56,7 +56,7 @@ in
         ];
         packages = [ git-credential-pass ];
         file =
-          myLib.makeConfigLinks impurity [
+          myLib.mkConfigLinks impurity [
             "Kvantum"
             "ags"
             "chrome-flags.conf"

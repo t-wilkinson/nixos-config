@@ -84,9 +84,6 @@
   boot.loader.grub.enable = false;
   boot.loader.generic-extlinux-compatible.enable = true;
 
-  # Enable binfmt emulation so you can build this locally on x86
-  nixpkgs.hostPlatform = "aarch64-linux";
-
   zramSwap.enable = true;
 
   hardware.enableRedistributableFirmware = true;
@@ -133,6 +130,11 @@
     fd
     lsof
   ];
+
+  nix.settings = {
+    substituters = [ "https://nix-community.cachix.org" ];
+    trusted-public-keys = [ "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
+  };
 
   nix.settings.experimental-features = [
     "nix-command"

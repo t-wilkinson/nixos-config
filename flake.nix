@@ -156,16 +156,23 @@
             "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             nixos-hardware.nixosModules.raspberry-pi-4
             zortex.nixosModules.default
+            # (
+            #   { pkgs, lib, ... }:
+            #   {
+            #     # The generic image asks for 'sun4i-drm', but the RPi4 kernel doesn't have it.
+            #     # This overlay tells the build to skip missing modules instead of failing.
+            #     nixpkgs.overlays = [
+            #       (final: prev: {
+            #         makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
+            #       })
+            #     ];
+            #   }
+            # )
             (
-              { pkgs, lib, ... }:
+              { lib, ... }:
               {
-                # The generic image asks for 'sun4i-drm', but the RPi4 kernel doesn't have it.
-                # This overlay tells the build to skip missing modules instead of failing.
-                nixpkgs.overlays = [
-                  (final: prev: {
-                    makeModulesClosure = x: prev.makeModulesClosure (x // { allowMissing = true; });
-                  })
-                ];
+                nixpkgs.buildPlatform = "x86_64-linux";
+                nixpkgs.hostPlatform = "aarch64-linux";
               }
             )
 

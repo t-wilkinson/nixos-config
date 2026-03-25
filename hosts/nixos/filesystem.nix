@@ -34,17 +34,17 @@
       ];
     in
     {
-      fileSystems."/" = {
+      "/" = {
         device = "rpool/root";
         fsType = "zfs";
       };
 
-      fileSystems."/nix" = {
+      "/nix" = {
         device = "rpool/nix";
         fsType = "zfs";
       };
 
-      fileSystems."/home" = {
+      "/home" = {
         device = "rpool/home";
         fsType = "zfs";
       };
