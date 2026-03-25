@@ -22,6 +22,8 @@
     ../../modules/virtualisation.nix
   ];
 
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+
   # NIX
   documentation.nixos.enable = false;
   nixpkgs = {
