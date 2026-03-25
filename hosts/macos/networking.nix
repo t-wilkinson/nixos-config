@@ -1,5 +1,8 @@
-{ pkgs, config, ... }:
+{ pkgs, hostname, ... }:
 {
+
+  networking.hostName = hostname;
+
   services.tailscale.enable = true;
   # Verify with: scutil --dns
   environment.etc."resolver/home.lab".text = ''
@@ -11,6 +14,7 @@
   environment.systemPackages = with pkgs; [
     dnsmasq
   ];
+
   # services.dnsmasq = {
   #   enable = true;
   #   addresses = {

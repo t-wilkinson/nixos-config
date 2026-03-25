@@ -1,7 +1,6 @@
 {
   pkgs,
   username,
-  hostname,
   ...
 }:
 {
@@ -9,6 +8,8 @@
     ./home-manager.nix
     ../../modules/shared.nix
     ./networking.nix
+    # ./dock.nix
+    # ./podman.nix
   ];
 
   security.pki.certificateFiles = [
@@ -16,6 +17,7 @@
   ];
 
   services.openssh.enable = false;
+
   sops = {
     age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
     defaultSopsFile = ./secrets.yaml;
@@ -33,11 +35,16 @@
     optimise.automatic = true;
 
     settings = {
+      # experimental-features = "nix-command flakes";
       trusted-users = [
         "@admin"
         username
       ];
     };
+
+    # extraOptions = ''
+    #   experimental-features = nix-command flakes
+    # '';
 
     gc = {
       automatic = true;
@@ -48,10 +55,6 @@
       };
       options = "--delete-older-than 30d";
     };
-
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
   };
 
   programs = {
@@ -74,11 +77,9 @@
   #   };
   # };
 
-  networking.hostName = hostname;
-
   system = {
     stateVersion = 5;
-    primaryUser = "trey";
+    primaryUser = username;
 
     # Turn off NIX_PATH warnings because we're using flakes
     checks.verifyNixPath = false;

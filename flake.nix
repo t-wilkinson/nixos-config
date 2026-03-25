@@ -56,8 +56,8 @@
               value = mkConfiguration system [
                 {
                   # Is this necessary?
-                  imports = [ impurity-nix.nixosModules.impurity ];
-                  impurity.configRoot = self;
+                  # imports = [ impurity-nix.nixosModules.impurity ];
+                  # impurity.configRoot = self;
                 }
               ];
             }
@@ -96,7 +96,6 @@
             darwin-docker.darwinModules.docker
             sops-nix.darwinModules.sops
 
-            # ./modules/distributed-build.nix
             {
               nix-homebrew = {
                 user = username;
@@ -157,7 +156,6 @@
             "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             nixos-hardware.nixosModules.raspberry-pi-4
             zortex.nixosModules.default
-            ./modules/homelab.nix
             (
               { pkgs, lib, ... }:
               {
@@ -219,8 +217,8 @@
           };
         in
         {
-          myNiri = import ./modules/niri.nix imports;
-          myNoctalia = import ./modules/noctalia.nix imports;
+          myNiri = import ./modules/packages/niri.nix imports;
+          myNoctalia = import ./modules/packages/noctalia.nix imports;
         }
       );
     };

@@ -1,6 +1,7 @@
 { username, ... }:
 {
   imports = [
+    ./module.nix
     ./mc-server.nix
     ./nextcloud.nix
     ./immich.nix

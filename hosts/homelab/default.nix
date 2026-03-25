@@ -7,6 +7,13 @@
   ...
 }:
 {
+  imports = [
+    ./networking.nix
+    ./secrets.nix
+    ./services.nix
+    ../../modules/homelab
+  ];
+
   homelab.enableServices = [
     "ntfy"
     "vault"
@@ -21,13 +28,6 @@
     "actual-budget"
     # "prometheus"
     # "grafana"
-  ];
-
-  imports = [
-    ./networking.nix
-    ./secrets.nix
-    ./services.nix
-    ../../modules/services
   ];
 
   services.automatic-timezoned.enable = true;

@@ -1,15 +1,11 @@
 {
   self,
-  config,
   inputs,
   impurity,
   pkgs,
   unstable,
-  lib,
-  home-manager,
   homedir,
   username,
-  hostname,
   ...
 }:
 {
