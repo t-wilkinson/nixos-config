@@ -169,9 +169,10 @@
             #   }
             # )
             (
-              { lib, ... }:
+              { lib, pkgs, ... }:
               {
                 nixpkgs.hostPlatform = "aarch64-linux";
+                boot.kernelPackages = pkgs.linuxPackages;
               }
             )
 
