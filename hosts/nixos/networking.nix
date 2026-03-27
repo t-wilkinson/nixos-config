@@ -67,6 +67,7 @@ in
           mcServerPort
           rconPort
           22
+          8888 # jupyter notebook
           # 6229 # ssh
           # 5900 # vnc
         ];

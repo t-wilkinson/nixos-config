@@ -49,6 +49,16 @@
         fsType = "zfs";
       };
 
+      "/boot" = {
+        device = "/dev/disk/by-id/nvme-CT1000P5PSSD8_2316402A1248-part1";
+        fsType = "vfat";
+        options = [
+          "nofail"
+          "fmask=0022"
+          "dmask=0022"
+        ];
+      };
+
       # "/" =
       #   { device = "/dev/disk/by-uuid/ce486d8c-d24e-4387-8592-27355e8490c9";
       #     fsType = "ext4";

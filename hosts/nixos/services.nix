@@ -1,6 +1,7 @@
 { pkgs, ... }:
 {
   services = {
+    hardware.openrgb.enable = true;
     # blueman.enable = true;
     # printing.enable = true;
     envfs.enable = true;
