@@ -8,6 +8,8 @@
     packages =
       with pkgs;
       [
+        unstable.jetbrains.idea
+
         i3
         sway
         pinentry

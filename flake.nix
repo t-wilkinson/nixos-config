@@ -39,11 +39,11 @@
       username = "trey";
       linuxSystems = [
         "x86_64-linux"
-        "aarch64-linux"
+        # "aarch64-linux"
       ];
       darwinSystems = [
         "aarch64-darwin"
-        "x86_64-darwin"
+        # "x86_64-darwin"
       ];
       mkApps = import ./lib/mk-apps.nix { inherit self inputs; };
 
@@ -126,6 +126,7 @@
               inherit system;
               config.allowUnfree = true;
               config.allowBroken = true;
+              # config.allowUnsupportedSystem = true;
             };
             myLib = import ./lib { inherit self; };
           };
