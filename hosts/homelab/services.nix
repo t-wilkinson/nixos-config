@@ -7,7 +7,7 @@
   ...
 }:
 let
-  tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # cloudflared tunnel
+  tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # .cfargotunnel.com - CNAME cloudflared tunnel
   homelab = config.homelab;
   services = config.homelab.services;
 
@@ -88,6 +88,12 @@ in
           #     httpHostHeader = services.mc-server.domain;
           #   };
           # };
+          "jupyter.${config.homelab.domain}" = {
+            service = "http://10.1.0.1:8888";
+            originRequest = {
+              httpHostHeader = "jupyter.${config.homelab.domain}";
+            };
+          };
           "${services.actual-budget.publicDomain}" = {
             service = "http://${services.actual-budget.localEndpoint}";
             originRequest = {
@@ -211,6 +217,13 @@ in
                   }
                 ];
               };
+            };
+          }
+          {
+            "Jupyter Lab" = {
+              icon = "mdi-notebook-outline";
+              href = "https://jupyter.${config.homelab.domain}";
+              description = "Remote Data Science Environment";
             };
           }
 
