@@ -6,5 +6,5 @@ export NIX_SSHOPTS="-t"
 nixos-rebuild switch \
   --flake .#homelab \
   --target-host trey@home.lab \
-  --build-host ssh://linux-builder \
   --use-remote-sudo
+# --build-host ssh://linux-builder \

@@ -88,10 +88,10 @@ in
           #     httpHostHeader = services.mc-server.domain;
           #   };
           # };
-          "jupyter.${config.homelab.domain}" = {
+          "jupyter.${config.homelab.publicDomain}" = {
             service = "http://10.1.0.1:8888";
             originRequest = {
-              httpHostHeader = "jupyter.${config.homelab.domain}";
+              httpHostHeader = "jupyter.${config.homelab.publicDomain}";
             };
           };
           "${services.actual-budget.publicDomain}" = {
@@ -222,7 +222,7 @@ in
           {
             "Jupyter Lab" = {
               icon = "mdi-notebook-outline";
-              href = "https://jupyter.${config.homelab.domain}";
+              href = "https://jupyter.${config.homelab.publicDomain}";
               description = "Remote Data Science Environment";
             };
           }
