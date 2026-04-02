@@ -87,6 +87,8 @@ let
       "apply" = app "apply";
       "b" = app "build-impure";
       "bs" = app "build-switch-impure";
+      # "wgu-pure" = app "build-switch-wgu-pure";
+      "wgu" = app "build-switch-wgu";
       "build" = app "build";
       "build-impure" = app "build-impure";
       "build-switch" = app "build-switch";

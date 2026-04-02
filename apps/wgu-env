@@ -1,0 +1,49 @@
+#!/bin/sh -e
+
+NIX_DAEMON_PLIST="/Library/LaunchDaemons/org.nixos.nix-daemon.plist"
+REMOTE_PLIST="/System/Library/LaunchDaemons/com.apple.remotemanagement.remotectl.plist"
+if [ "$1" = "restore" ]; then
+  sudo launchctl load $NIX_DAEMON_PLIST
+  sudo launchctl load $REMOTE_PLIST
+  echo "Run \`:lsp start\` or \`:LspStart\` in Vim"
+  exit 0
+fi
+
+if [ "$1" = "clear" ]; then
+  # echo "Stopping high-risk ProctorU triggers..."
+  #
+  # # Stop System-level daemons managed by nix-darwin
+  # sudo launchctl stop org.nixos.tailscaled 2>/dev/null
+  # sudo launchctl stop org.nixos.linux-builder 2>/dev/null
+  #
+  # # Kill Virtualization (QEMU)
+  # # The linux-builder runs qemu-system-aarch64
+  # pkill -9 -f "qemu-system-aarch64"
+  #
+  # # Kill active Debuggers and Development tools
+  # # Targets the debugpy and pydevd processes found in your log
+  # pkill -9 -f "debugpy"
+  # pkill -9 -f "pydevd"
+  # pkill -9 -f "jupyter-lab" #
+  #
+  # # Kill Syncing Services
+  # pkill -9 -f "syncthing" #
+  #
+  # # Close specific Dev Apps
+  # pkill -9 "Bitwarden"
+  # pkill -9 "kitty" #
+  # pkill -9 "nvim"  #
+
+  pkill -9 ssh-agent 2>/dev/null
+  pkill -9 language-server 2>/dev/null
+
+  sudo pkill -9 docker 2>/dev/null
+  sudo launchctl load $NIX_DAEMON_PLIST
+  sudo launchctl load $REMOTE_PLIST
+
+  echo "Run \`:lsp stop\` or \`:LspStop\` in Vim"
+
+  echo "System cleaned. Run 'ps aux | grep -E \"tailscale|qemu|python\"' to verify."
+
+  exit 0
+fi

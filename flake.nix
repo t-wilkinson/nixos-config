@@ -47,6 +47,12 @@
       ];
       mkApps = import ./lib/mk-apps.nix { inherit self inputs; };
 
+      impurity-module = {
+        impurity.enable = true;
+        imports = [ impurity-nix.nixosModules.impurity ];
+        impurity.configRoot = self;
+      };
+
       mkImpureConfigurations =
         mkConfiguration: systems:
         builtins.listToAttrs (
@@ -64,11 +70,7 @@
             {
               name = "${system}-impure";
               value = mkConfiguration system [
-                {
-                  impurity.enable = true;
-                  imports = [ impurity-nix.nixosModules.impurity ];
-                  impurity.configRoot = self;
-                }
+                impurity-module
               ];
             }
           ]) systems
@@ -192,7 +194,12 @@
         nixpkgs-nixos.lib.genAttrs linuxSystems mkApps.linux
         // nixpkgs-darwin.lib.genAttrs darwinSystems mkApps.darwin;
 
-      darwinConfigurations = mkImpureConfigurations mkDarwinConfiguration darwinSystems;
+      darwinConfigurations = mkImpureConfigurations mkDarwinConfiguration darwinSystems // {
+        "aarch64-darwin-wgu" = mkDarwinConfiguration "aarch64-darwin" [
+          impurity-module
+          { imports = [ ./hosts/macos/wgu.nix ]; }
+        ];
+      };
 
       nixosConfigurations = mkImpureConfigurations mkNixosConfiguration linuxSystems // {
         homelab = homelab;
