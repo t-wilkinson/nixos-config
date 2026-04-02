@@ -3,7 +3,6 @@
 SCRIPT_DIR=$(git rev-parse --show-toplevel)
 SYSTEM_TYPE="aarch64-darwin-wgu"
 FLAKE_SYSTEM="darwinConfigurations.${SYSTEM_TYPE}.system"
-echo $SCRIPT_DIR
 
 export NIXPKGS_ALLOW_UNFREE=1
 export IMPURITY_PATH="$SCRIPT_DIR"

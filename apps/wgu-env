@@ -1,10 +1,11 @@
-#!/bin/sh -e
+#!/bin/sh
 
 NIX_DAEMON_PLIST="/Library/LaunchDaemons/org.nixos.nix-daemon.plist"
 REMOTE_PLIST="/System/Library/LaunchDaemons/com.apple.remotemanagement.remotectl.plist"
+
 if [ "$1" = "restore" ]; then
-  sudo launchctl load $NIX_DAEMON_PLIST
-  sudo launchctl load $REMOTE_PLIST
+  sudo launchctl load $NIX_DAEMON_PLIST 2>/dev/null
+  sudo launchctl load $REMOTE_PLIST 2>/dev/null
   echo "Run \`:lsp start\` or \`:LspStart\` in Vim"
   exit 0
 fi
@@ -38,12 +39,12 @@ if [ "$1" = "clear" ]; then
   pkill -9 language-server 2>/dev/null
 
   sudo pkill -9 docker 2>/dev/null
-  sudo launchctl load $NIX_DAEMON_PLIST
-  sudo launchctl load $REMOTE_PLIST
+  sudo launchctl unload $NIX_DAEMON_PLIST 2>/dev/null
+  sudo launchctl unload $REMOTE_PLIST 2>/dev/null
 
   echo "Run \`:lsp stop\` or \`:LspStop\` in Vim"
-
-  echo "System cleaned. Run 'ps aux | grep -E \"tailscale|qemu|python\"' to verify."
+  echo "Run \`$0 restore\` to restore services"
+  # echo "System cleaned. Run 'ps aux | grep -E \"tailscale|qemu|python\"' to verify."
 
   exit 0
 fi
