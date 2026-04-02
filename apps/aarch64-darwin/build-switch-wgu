@@ -1,11 +1,12 @@
 #!/bin/sh -e
 
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(git rev-parse --show-toplevel)
 SYSTEM_TYPE="aarch64-darwin-wgu"
 FLAKE_SYSTEM="darwinConfigurations.${SYSTEM_TYPE}.system"
+echo $SCRIPT_DIR
 
 export NIXPKGS_ALLOW_UNFREE=1
-export IMPURITY_PATH="$(git rev-parse --show-toplevel)"
+export IMPURITY_PATH="$SCRIPT_DIR"
 
 # Build and Switch
 nix --extra-experimental-features 'nix-command flakes' build --impure .#$FLAKE_SYSTEM --show-trace

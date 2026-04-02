@@ -26,6 +26,7 @@
         owner = "root";
       };
     };
+    age.sshKeyPaths = [ ];
     gnupg.sshKeyPaths = [ ];
   };
 
