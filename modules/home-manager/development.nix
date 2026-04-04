@@ -19,6 +19,8 @@ with pkgs;
   php
   php84Packages.composer
   # php84Packages.php-cs-fixer
+  # sbcl # lisp
+  # clisp
 
   rustup # rust version manager
   # nuget # C#
