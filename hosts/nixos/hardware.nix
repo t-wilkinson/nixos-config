@@ -11,6 +11,36 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
+  services.xserver.videoDrivers = [ "nvidia" ];
+
+  environment.systemPackages = with pkgs; [
+    cudaPackages.cudatoolkit
+    nvidia-vaapi-driver
+    nvtopPackages.nvidia
+  ];
+
+  hardware.nvidia = {
+    modesetting.enable = true;
+
+    # Power management is important for offload mode
+    powerManagement.enable = true;
+    powerManagement.finegrained = true; # Power down GPU when not in use
+    open = false;
+    nvidiaSettings = true;
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+
+    # Configure PRIME Offload
+    prime = {
+      offload = {
+        enable = true;
+        enableOffloadCmd = true; # Provides the 'nvidia-offload' helper
+      };
+
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
+    };
+  };
+
   boot.initrd.availableKernelModules = [
     "xhci_pci"
     "ahci"
@@ -42,6 +72,7 @@
       libvdpau-va-gl
       mesa
       libdrm
+      nvidia-vaapi-driver
     ];
   };
   # hardware.nvidia.modesetting.enable = true;
