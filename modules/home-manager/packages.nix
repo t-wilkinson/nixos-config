@@ -38,7 +38,8 @@ with pkgs;
   aspell
   aspellDicts.en
   bat
-  btop # pretty top
+  # btop
+  btop-cuda # pretty top
   clac
   colordiff
   difftastic # syntastic-aware diff
