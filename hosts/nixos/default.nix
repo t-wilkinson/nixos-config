@@ -55,6 +55,9 @@
     };
     sessionVariables = {
       MOZ_ENABLE_WAYLAND = "1";
+      WLR_DRM_DEVICES = "/dev/dri/card1:/dev/dri/card0";
+      #  pci-0000:00:02.0-card -> ../card1
+      #  pci-0000:01:00.0-card -> ../card0
       #   # WLR_NO_HARDWARE_CURSORS = "1"; # if your cursor becomes invisible
       #   NIXOS_OZONE_WL = "1"; # hint to electron apps to use wayland
       #   # NIXPKGS_ALLOW_UNFREE = "1";

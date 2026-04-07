@@ -50,7 +50,7 @@
         # tools
         libnotify
         showmethekey
-        # vscode
+        vscode
         ydotool # simulate mouse and keyboard
 
         # theming tools
