@@ -21,6 +21,7 @@ in
     ];
 
     networkmanager = {
+      wifi.powersave = false;
       enable = true;
       dns = "none";
 

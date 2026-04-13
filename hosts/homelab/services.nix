@@ -18,7 +18,6 @@ let
         reverse_proxy ${service.localEndpoint} {
           header_up X-Real-IP {http.request.remote.host}
           header_up X-Forwarded-Port {http.request.port}
-          header_up X-Forwarded-Proto {http.request.scheme}
         }
         tls internal
       '';
@@ -94,6 +93,12 @@ in
               httpHostHeader = "jupyter.${config.homelab.publicDomain}";
             };
           };
+          "${services.vault.publicDomain}" = {
+            service = "http://${services.vault.localEndpoint}";
+            originRequest = {
+              httpHostHeader = services.vault.domain;
+            };
+          };
           "${services.actual-budget.publicDomain}" = {
             service = "http://${services.actual-budget.localEndpoint}";
             originRequest = {
@@ -142,6 +147,19 @@ in
           reverse_proxy localhost:${toString services.dashboard.port}
         }
 
+        tls internal
+      '';
+      "${services.vault.domain}".extraConfig = ''
+        @forbiddenAdmin {
+          path /admin*
+          not remote_ip 10.1.0.1/30 127.0.0.1
+        }
+        respond @forbiddenAdmin "Access Denied" 403
+
+        reverse_proxy ${services.vault.localEndpoint} {
+          header_up X-Real-IP {http.request.remote.host}
+          header_up X-Forwarded-Port {http.request.port}
+        }
         tls internal
       '';
     };
@@ -270,15 +288,29 @@ in
     settings.PasswordAuthentication = false;
   };
 
+  sops.templates."vaultwarden-env".content = ''
+    ADMIN_TOKEN=${config.sops.placeholder.vaultwarden_admin_hash}
+    SMTP_PASSWORD=${config.sops.placeholder.google_app_password}
+  '';
+
   # PASSWORD MANAGER
   services.vaultwarden = {
     enable = true;
     package = unstable.vaultwarden;
+    environmentFile = config.sops.templates."vaultwarden-env".path;
     config = {
       ROCKET_PORT = services.vault.port;
-      SIGNUPS_ALLOWED = true;
+      SIGNUPS_ALLOWED = false;
+      INVITATIONS_ALLOWED = false;
       SHOW_PASSWORD_HINT = false;
-      DOMAIN = "https://${services.vault.domain}";
+      WEBSOCKET_ENABLED = true;
+      DOMAIN = "https://${services.vault.publicDomain}";
+
+      SMTP_HOST = "smtp.gmail.com";
+      SMTP_FROM = "winston.trey.wilkinson@gmail.com";
+      SMTP_PORT = 587;
+      SMTP_SECURITY = "starttls";
+      SMTP_USERNAME = "winston.trey.wilkinson@gmail.com";
     };
   };
 
@@ -324,45 +356,44 @@ in
     '';
   };
 
-  # services.fail2ban = {
-  #   enable = true;
-  #   bantime = "24h";
+  services.fail2ban = {
+    enable = true;
+    bantime = "24h";
 
-  #   ignoreIP = [
-  #     "${config.homelab.vpnNetwork}.0/24"
-  #     "10.1.0.1"
-  #   ];
+    ignoreIP = [
+      "10.1.0.1"
+    ];
 
-  #   jails = {
-  #     # SSH (Standard jail)
-  #     # sshd = ''
-  #     #   enabled = true
-  #     #   mode = aggressive
-  #     # '';
+    jails = {
+      # Already enabled for SSHD
+      # sshd = ''
+      #   enabled = true;
+      #   maxretry = 3;
+      # '';
 
-  #     # Nextcloud
-  #     # Converted to string to avoid "backend option does not exist" error
-  #     nextcloud = ''
-  #       enabled = true
-  #       backend = auto
-  #       port = 80,443
-  #       protocol = tcp
-  #       filter = nextcloud
-  #       maxretry = 3
-  #       bantime = 86400
-  #       findtime = 43200
-  #     '';
-  #     # logpath = /var/lib/nextcloud/data/nextcloud.log
+      #     # Nextcloud
+      #     # Converted to string to avoid "backend option does not exist" error
+      #     nextcloud = ''
+      #       enabled = true
+      #       backend = auto
+      #       port = 80,443
+      #       protocol = tcp
+      #       filter = nextcloud
+      #       maxretry = 3
+      #       bantime = 86400
+      #       findtime = 43200
+      #     '';
+      #     # logpath = /var/lib/nextcloud/data/nextcloud.log
 
-  #     # Vaultwarden
-  #     vaultwarden = ''
-  #       enabled = true
-  #       backend = systemd
-  #       filter = vaultwarden
-  #       maxretry = 3
-  #       bantime = 86400
-  #       findtime = 14400
-  #     '';
-  #   };
-  # };
+      vaultwarden = ''
+        enabled = true
+        filter = vaultwarden
+        maxretry = 3
+        bantime = 86400
+        findtime = 14400
+        backend = systemd
+        journalmatch = _SYSTEMD_UNIT=vaultwarden.service
+      '';
+    };
+  };
 }

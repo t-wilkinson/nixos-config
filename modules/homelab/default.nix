@@ -40,7 +40,7 @@
         port = 8000;
         name = "Vaultwarden";
         description = "Password manager";
-        # isPublic = true;
+        isPublic = true;
       };
       dashboard = {
         port = 8082;

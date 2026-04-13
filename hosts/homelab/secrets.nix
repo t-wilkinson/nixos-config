@@ -33,6 +33,7 @@
 
         nextcloud_admin_pass = root;
         nextcloud_database_pass = root;
+        vaultwarden_admin_hash = root;
       };
   };
 }
