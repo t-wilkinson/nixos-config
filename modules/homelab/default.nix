@@ -1,3 +1,4 @@
+# modules/homelab/default.nix
 { username, ... }:
 {
   imports = [

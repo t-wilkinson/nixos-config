@@ -121,6 +121,7 @@ return {
           -- { "ZZ", "<cmd>ZortexSearchSections<cr>" },
           -- { "Zz", "<cmd>ZortexSearchSections<cr>" },
           { "Zs", "<cmd>e " .. require("zortex.config").notes_dir .. "/structure.zortex<cr>" },
+          { "Zp", "<cmd>e " .. require("zortex.config").notes_dir .. "/projects.zortex<cr>" },
           -- { "Zp", "<cmd>ZortexProjects<cr>" },
           -- { "Zc", "<cmd>ZortexCalendar<cr>" },
           -- { "Zx", "<cmd>ZortexTaskToggle<cr>" },

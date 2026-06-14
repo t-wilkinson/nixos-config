@@ -152,6 +152,7 @@
     nix-ld = {
       enable = true;
       libraries = with pkgs; [
+        stdenv.cc.cc.lib # pip-installed packages
         # Add any missing dynamic libraries for unpackaged programs
         # here, NOT in environment.systemPackages
       ];

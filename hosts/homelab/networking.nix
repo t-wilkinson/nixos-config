@@ -1,3 +1,4 @@
+# hosts/homelab/networking.nix
 { config, hostname, ... }:
 let
   directIP = "10.1.0.2"; # IP from direct ethernet connection to PC

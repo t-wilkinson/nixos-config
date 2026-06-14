@@ -1,3 +1,4 @@
+# modules/homelab/module.nix
 { lib, config, ... }:
 with lib;
 let
