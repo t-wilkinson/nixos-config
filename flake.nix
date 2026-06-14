@@ -237,16 +237,12 @@
     # Utilities
     flake-utils.url = "github:numtide/flake-utils";
     sops-nix.url = "github:Mic92/sops-nix";
-    # use "impurity-nix" to avoid overwritting (mergine @inputs in specialArgs) module that impurity injects named "impurity"
+    # use "impurity-nix" to avoid overwritting (merging @inputs in specialArgs) module that impurity injects named "impurity"
     impurity-nix.url = "github:outfoxxed/impurity.nix";
     agenix = {
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
-    # secrets = {
-    #   url = "git+ssh://git@github.com/dustinlyons/nix-secrets.git";
-    #   flake = false;
-    # };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs-nixos";
@@ -323,8 +319,6 @@
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
-
-    # zortex
     zortex.url = "github:t-wilkinson/zortex.nvim";
 
     # Virtualization
