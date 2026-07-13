@@ -16,7 +16,8 @@
   homelab = {
     inherit username;
     domain = "home.lab";
-    homelabIP = "100.112.52.7";
+    # homelabIP = "100.112.52.7";
+    homelabIP = "10.1.0.2";
     publicDomain = "treywilkinson.com";
     containerNetwork = "192.168.100";
     containerStateVersion = "24.11";

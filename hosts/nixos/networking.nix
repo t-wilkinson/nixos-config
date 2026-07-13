@@ -94,19 +94,19 @@ in
     };
   };
 
-  networking.networkmanager.dispatcherScripts = [
-    {
-      source = pkgs.writeShellScript "homelab-routes" ''
-        case "$2" in
-          up)
-            ${pkgs.iproute2}/bin/ip route replace ${homelab.homelabIP}/32 via ${homelabDirectGateway} dev enp4s0
-            ${pkgs.iproute2}/bin/ip route replace ${homelab.containerNetwork}.0/24 via ${homelabDirectGateway} dev enp4s0
-            ;;
-        esac
-      '';
-      type = "basic";
-    }
-  ];
+  # networking.networkmanager.dispatcherScripts = [
+  #   {
+  #     source = pkgs.writeShellScript "homelab-routes" ''
+  #       case "$2" in
+  #         up)
+  #           ${pkgs.iproute2}/bin/ip route replace 10.1.0.2/32 via ${homelabDirectGateway} dev enp4s0
+  #           ${pkgs.iproute2}/bin/ip route replace ${homelab.containerNetwork}.0/24 via ${homelabDirectGateway} dev enp4s0
+  #           ;;
+  #       esac
+  #     '';
+  #     type = "basic";
+  #   }
+  # ];
 
   # systemd.services.add-custom-routes = {
   #   description = "Add custom routes for homelab direct connection";

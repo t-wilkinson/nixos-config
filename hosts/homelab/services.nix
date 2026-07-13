@@ -70,6 +70,8 @@ in
   services.tailscale = {
     enable = true;
     openFirewall = true;
+    useRoutingFeatures = "server";
+    extraSetFlags = [ "--advertise-routes=10.1.0.0/30" ];
   };
 
   # CLOUDFLARE TUNNEL

@@ -33,3 +33,7 @@ Install nix from [determinate systems](https://determinate.systems/) `curl --pro
 ## TODO:
 
 Run scripts like this when first installing or indempotently? `rustup default nightly`
+
+# Tailscale
+
+The homelab exposes itself as an opt-in subnet. You need to enable this on tailscale and opt-in on devices. On client devices run `sudo tailscale up --accept-routes`
