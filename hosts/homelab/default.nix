@@ -129,6 +129,17 @@
     ripgrep
     fd
     lsof
+    (pkgs.writeShellApplication {
+      name = "wol-pc";
+      runtimeInputs = [ pkgs.wakeonlan ];
+      text = ''
+        wakeonlan -i 10.1.0.1 04:7c:16:e6:d1:10
+      '';
+    })
+    (pkgs.writeShellScriptBin "hl-help" ''
+      echo "wol-pc : waake pc on ethernet"
+      echo ""
+    '')
   ];
 
   nix.settings = {
