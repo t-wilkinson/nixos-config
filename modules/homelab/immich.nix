@@ -41,9 +41,7 @@ in
           ];
         };
         users.groups.immich.gid = 1000;
-        users.groups.personaldata = {
-          gid = homelab.groups.personaldata;
-        };
+        users.groups.personaldata.gid = homelab.groups.personaldata;
 
         networking.firewall.allowedTCPPorts = [ cfg.port ];
 

@@ -13,7 +13,7 @@ in
     nat = {
       enable = true;
       internalInterfaces = [ "ve-+" ]; # for containers
-      externalInterface = "wlan0";
+      externalInterface = "wlp1s0u1u4";
     };
 
     nameservers = [
@@ -29,26 +29,26 @@ in
       # Declaratively configure connections so they persist on reboot/rebuild
       ensureProfiles.profiles = {
         # 1. WI-FI PROFILE (Internet Access)
-        "wifi-connection" = {
-          connection = {
-            id = "KOI_POND_5G";
-            type = "wifi";
-            interface-name = "wlan0";
-            autoconnect = "true";
-          };
-          wifi = {
-            ssid = "KOI_POND_5G";
-            mode = "infrastructure";
-          };
-          wifi-security = {
-            key-mgmt = "wpa-psk";
-            # psk-file = config.sops.secrets.wifi_psk.path;
-            psk = "November13th"; # Note: This exposes the password in the Nix store
-          };
-          ipv4 = {
-            method = "auto";
-          };
-        };
+        # "wifi-connection" = {
+        #   connection = {
+        #     id = "KOI_POND_5G";
+        #     type = "wifi";
+        #     interface-name = "wlan0";
+        #     autoconnect = "true";
+        #   };
+        #   wifi = {
+        #     ssid = "KOI_POND_5G";
+        #     mode = "infrastructure";
+        #   };
+        #   wifi-security = {
+        #     key-mgmt = "wpa-psk";
+        #     # psk-file = config.sops.secrets.wifi_psk.path;
+        #     psk = "November13th"; # Note: This exposes the password in the Nix store
+        #   };
+        #   ipv4 = {
+        #     method = "auto";
+        #   };
+        # };
 
         # 2. ETHERNET PROFILE (Direct Link to PC)
         "direct-ethernet" = {

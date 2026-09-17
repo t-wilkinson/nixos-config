@@ -53,7 +53,7 @@ in
 
       paths = [
         "/srv/sync"
-        "/srv/pubdrive"
+        # "/srv/pubdrive"
         "/var/lib/nextcloud"
         "/var/lib/vaultwarden"
         "/var/lib/minecraft"

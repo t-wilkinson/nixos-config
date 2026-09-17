@@ -26,7 +26,6 @@
       in
       {
         wifi_psk = root;
-        homelab_password_hash = root;
         wg_homelab_private_key = root;
         cloudflared_creds = root;
         google_app_password = root;

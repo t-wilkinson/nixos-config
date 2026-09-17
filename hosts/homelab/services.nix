@@ -10,6 +10,7 @@ let
   tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # .cfargotunnel.com - CNAME cloudflared tunnel
   homelab = config.homelab;
   services = config.homelab.services;
+  pcIP = "10.1.0.1";
 
   mkCaddyProxy = name: service: {
     name = service.domain;
@@ -113,16 +114,25 @@ in
               httpHostHeader = services.mealie.domain;
             };
           };
+          "${services.wastebin.publicDomain}" = {
+            service = "http://${services.wastebin.localEndpoint}";
+            originRequest = {
+              httpHostHeader = services.wastebin.domain;
+            };
+          };
+
           "${services.immich.publicDomain}" = {
-            service = "http://${services.immich.localEndpoint}";
+            # service = "http://${services.immich.localEndpoint}";
+            service = "http://${pcIP}:2283";
             originRequest = {
               httpHostHeader = services.immich.domain;
             };
           };
           "${services.nextcloud.publicDomain}" = {
-            service = "http://${services.nextcloud.localEndpoint}";
+            # service = "http://${services.nextcloud.localEndpoint}";
+            service = "http://${pcIP}:8081";
             originRequest = {
-              httpHostHeader = services.nextcloud.publicDomain;
+              httpHostHeader = services.nextcloud.domain;
             };
           };
         };
@@ -162,6 +172,14 @@ in
           header_up X-Real-IP {http.request.remote.host}
           header_up X-Forwarded-Port {http.request.port}
         }
+        tls internal
+      '';
+      "${services.immich.domain}".extraConfig = ''
+        reverse_proxy 10.1.0.1:2283
+        tls internal
+      '';
+      "${services.nextcloud.domain}".extraConfig = ''
+        reverse_proxy 10.1.0.1:8081
         tls internal
       '';
     };
@@ -262,9 +280,10 @@ in
     lockdPort = 4001;
     mountdPort = 4002;
     statdPort = 4000;
+
+    # /srv/pubdrive 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
+    # /srv/misc 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
     exports = ''
-      /srv/pubdrive 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
-      /srv/misc 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
       /srv/sync/personal 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
       /var/lib/minecraft 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
     '';

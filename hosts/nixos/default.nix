@@ -20,7 +20,12 @@
     ./vmware.nix
     ../../modules/shared.nix
     ../../modules/virtualisation.nix
+
+    ./nextcloud.nix
+    ./immich.nix
   ];
+
+  services.usbmuxd.enable = true;
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
@@ -105,6 +110,8 @@
   };
 
   environment.systemPackages = with pkgs; [
+    libimobiledevice
+    ifuse # for mounting the filesystem
     droidcam
 
     adwaita-qt
@@ -133,6 +140,11 @@
   ];
 
   programs = {
+    command-not-found.enable = false;
+    nix-index = {
+      enable = true;
+      enableFishIntegration = true;
+    };
     ssh.startAgent = true;
     kdeconnect = {
       enable = true;
@@ -223,6 +235,10 @@
     defaultSopsFile = ./secrets.yaml;
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     secrets = {
+      nextcloud_admin_pass = {
+        sopsFile = ../homelab/secrets.yaml;
+        owner = "nextcloud";
+      };
       wg_nixos_private_key = {
         owner = "root";
       };

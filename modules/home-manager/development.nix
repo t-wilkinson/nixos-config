@@ -4,6 +4,9 @@
   hostname,
   ...
 }:
+let
+  nodePackages = unstable;
+in
 with pkgs;
 [
   # LANGUAGES
@@ -35,11 +38,11 @@ with pkgs;
   unstable.nodejs
   unstable.typescript
   unstable.eslint
-  # unstable.nodePackages.live-server # removed because it was unmaintained
-  unstable.nodePackages.nodemon
-  unstable.nodePackages.prettier
-  # unstable.nodePackages.npm # nodejs already includes this?
-  unstable.nodePackages.neovim
+  # nodePackages.live-server # removed because it was unmaintained
+  nodePackages.nodemon
+  nodePackages.prettier
+  # nodePackages.npm # nodejs already includes this?
+  nodePackages.neovim
   # unstable.vimPlugins.nvim-treesitter.withPlugins
   # unstable.neovimUtils.makeNeovim
 

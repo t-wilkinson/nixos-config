@@ -15,14 +15,15 @@
   ];
 
   homelab.enableServices = [
+    "wastebin"
     "ntfy"
     "vault"
     "dashboard"
     "syncthing"
     "zortex"
     "glances"
-    "nextcloud"
-    "immich"
+    # "nextcloud"
+    # "immich"
     "borg"
     "mealie"
     "actual-budget"
@@ -45,8 +46,8 @@
       drives = config.homelab.drives;
     in
     [
-      "d ${drives.pubdrive} 0770 ${username} ${groups.serverdata} - -"
-      "Z ${drives.pubdrive} 0770 ${username} ${groups.serverdata} - -"
+      # "d ${drives.pubdrive} 0770 ${username} ${groups.serverdata} - -"
+      # "Z ${drives.pubdrive} 0770 ${username} ${groups.serverdata} - -"
       "d ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
       "Z ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
       "d ${drives.minecraft} 0775 ${username} ${groups.serverdata} - -"
@@ -60,6 +61,16 @@
     fsType = "ext4";
     options = [ "noatime" ];
   };
+  # fileSystems."/srv/pubdrive" = {
+  #   device = "10.1.0.1:/pubdrive";
+  #   fsType = "nfs4";
+  #   options = [
+  #     "x-systemd.automount"
+  #     "noauto"
+  #     "x-systemd.device-timeout=10s" # Fail fast if machine is off
+  #     "_netdev" # Wait for network before mounting
+  #   ];
+  # };
 
   # fileSystems."/mnt/backup" = {
   #   device = "/dev/disk/by-uuid/D404BD3804BD1E84";
@@ -102,7 +113,7 @@
   users.users.${username} = {
     isNormalUser = true;
     shell = pkgs.fish;
-    hashedPasswordFile = config.sops.secrets.homelab_password_hash.path;
+    initialPassword = "password";
     extraGroups = [
       "serverdata"
       "personaldata"
@@ -143,8 +154,14 @@
   ];
 
   nix.settings = {
-    substituters = [ "https://nix-community.cachix.org" ];
-    trusted-public-keys = [ "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
+    substituters = [
+      "https://nix-community.cachix.org"
+      "https://cache.nixos.org"
+    ];
+    trusted-public-keys = [
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+    ];
   };
 
   nix.settings.experimental-features = [

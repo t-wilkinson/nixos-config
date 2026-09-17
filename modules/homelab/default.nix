@@ -11,19 +11,21 @@
     ./syncthing.nix
     ./mealie.nix
     ./actual-budget.nix
+    ./wastebin.nix
   ];
 
   homelab = {
     inherit username;
     domain = "home.lab";
     # homelabIP = "100.112.52.7";
+
     homelabIP = "10.1.0.2";
     publicDomain = "treywilkinson.com";
     containerNetwork = "192.168.100";
     containerStateVersion = "24.11";
     drives = {
       minecraft = "/var/lib/minecraft";
-      pubdrive = "/srv/pubdrive";
+      pubdrive = "/mnt/storage/pubdrive";
       personal = "/srv/sync/personal";
       misc = "/srv/misc";
       actual-budget = "/var/lib/actual-budget";
@@ -32,6 +34,7 @@
     groups = {
       personaldata = 987; # for exposing to synced directory to services
       serverdata = 980; # for exposing server files to services
+      storage-media = 981;
     };
 
     services = {
@@ -91,8 +94,13 @@
       };
 
       # Cloud
+      wastebin = {
+        port = 8088;
+        subdomain = "bin";
+        isPublic = true;
+      };
       nextcloud = {
-        id = 10;
+        # id = 10;
         port = 8081;
         subdomain = "cloud";
         isPublic = true;

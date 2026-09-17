@@ -62,12 +62,16 @@ in
         allowedUDPPortRanges = [ kdePortRanges ];
         allowedUDPPorts = [
           9 # wol
+          2049 # NFS
         ];
         allowedTCPPorts = [
           mcServerPort
           rconPort
           22
           8888 # jupyter notebook
+          2049 # NFS
+          2283 # Immich
+          8081 # Nextcloud
           # 6229 # ssh
           # 5900 # vnc
         ];
