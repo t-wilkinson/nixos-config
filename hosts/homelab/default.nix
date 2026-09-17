@@ -27,6 +27,7 @@
     "borg"
     "mealie"
     "actual-budget"
+    "wakeonlan"
     # "prometheus"
     # "grafana"
   ];

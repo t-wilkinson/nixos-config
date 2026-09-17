@@ -122,6 +122,28 @@ in
       // {
         "${net.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
         "${services.dashboard.domain}".extraConfig = ''
+          @tailscaleNetwork {
+            path /hooks/*
+            remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 ${net.cidr} 127.0.0.1 ::1
+          }
+
+          @forbiddenNetwork {
+            path /hooks/*
+            not remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 ${net.cidr} 127.0.0.1 ::1
+          }
+          respond @forbiddenNetwork "Access Denied: VPN connection required" 403
+
+          ${
+            let
+              wolEnabled = (lib.attrByPath [ "wakeonlan" "enable" ] false services);
+            in
+            lib.optionalString wolEnabled ''
+              handle @tailscaleNetwork {
+                reverse_proxy 127.0.0.1:${toString services.wakeonlan.port}
+              }
+            ''
+          }
+
           # Serve the Root CRT at /root.crt
           handle /root.crt {
             root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
@@ -237,13 +259,48 @@ in
               description = "Remote Data Science Environment";
             };
           }
-
         ]
+        ++ (lib.optional (lib.attrByPath [ "wakeonlan" "enable" ] false services) {
+          "Wake PC" = {
+            icon = "mdi-power";
+            # href = "https://${services.dashboard.domain}/hooks/wake-pc";
+            href = "#wake-pc";
+            description = "Send magic packet";
+            ping = homelab.nodes.pc.ipv4;
+          };
+        })
         ++ (lib.mapAttrsToList mkHomepageEntry (
           lib.filterAttrs (n: v: n != "dashboard" && v.expose) services
         ));
       }
     ];
+    customJS = ''
+      document.addEventListener('click', async (e) => {
+        const link = e.target.closest('a[href="#wake-pc"]');
+        if (!link) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        link.style.opacity = '0.5';
+
+        try {
+          const res = await fetch('/hooks/wake-pc');
+          const responseText = await res.text();
+
+          if (res.ok) {
+            alert(`Success (''${res.status}):\n''${responseText.trim()}`);
+          } else {
+            alert(`Failed (''${res.status}):\n''${responseText.trim()}`);
+          }
+        } catch (err) {
+          alert(`Error triggering WOL:\n''${err.message}`);
+        } finally {
+          link.style.opacity = '1';
+        }
+      });
+    '';
+
   };
 
   # NFS

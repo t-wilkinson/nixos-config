@@ -1,6 +1,5 @@
 { config, lib, ... }:
 let
-  homelab = config.homelab;
   services = config.homelab.services;
   enabled = services.glances.enable or services.prometheus.enable or services.grafana.enable;
 in

@@ -15,6 +15,7 @@ in
     ./syncthing.nix
     ./mealie.nix
     ./actual-budget.nix
+    ./wakeonlan.nix
 
     ./nextcloud.nix
     ./immich.nix
@@ -98,6 +99,11 @@ in
         isPublic = true;
         description = "Personal finance manager";
       };
+      wakeonlan = {
+        port = 9099;
+        enable = true;
+        expose = false;
+      };
 
       # Monitor
       prometheus = {
@@ -118,7 +124,6 @@ in
         subdomain = "bin";
         isPublic = true;
       };
-
       nextcloud = {
         # id = 10;
         port = 8081;
