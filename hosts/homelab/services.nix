@@ -10,7 +10,9 @@ let
   tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # .cfargotunnel.com - CNAME cloudflared tunnel
   homelab = config.homelab;
   services = config.homelab.services;
-  pcIP = "10.1.0.1";
+  # exposedServices = lib.filterAttrs (n: v: v.expose) services;
+  # publicServices = lib.filterAttrs (n: v: v.isPublic) exposedServices;
+  net = config.homelab.network;
 
   mkCaddyProxy = name: service: {
     name = service.domain;
@@ -29,6 +31,20 @@ let
     ${name} = {
       description = service.description;
       href = "https://${service.domain}";
+    };
+  };
+
+  mkIngressTunnel = name: service: {
+    name = service.publicDomain;
+    value = {
+      service =
+        if service.reverseProxy != null then
+          "http://${service.reverseProxy}:${toString service.port}"
+        else
+          "http://${service.localEndpoint}";
+      originRequest = {
+        httpHostHeader = service.domain;
+      };
     };
   };
 in
@@ -51,8 +67,8 @@ in
         customTTL = "1h";
         mapping = {
           # Map main domain and all subdomains to the Pi's Direct IP
-          "home.lab" = homelab.homelabIP;
-          "*.home.lab" = homelab.homelabIP;
+          "home.lab" = homelab.nodes.pi.ipv4;
+          "*.home.lab" = homelab.nodes.pi.ipv4;
         };
       };
 
@@ -72,7 +88,7 @@ in
     enable = true;
     openFirewall = true;
     useRoutingFeatures = "server";
-    extraSetFlags = [ "--advertise-routes=10.1.0.0/30" ];
+    extraSetFlags = [ "--advertise-routes=${net.cidr}" ];
   };
 
   # CLOUDFLARE TUNNEL
@@ -83,59 +99,17 @@ in
         # creds generated with 'cloudflared tunnel create'
         credentialsFile = config.sops.secrets."cloudflared_creds".path;
         default = "http_status:404"; # Default Rule: Hide everything else!
-        ingress = {
-          # "${services.mc-server.publicDomain}" = {
-          #   service = "tcp://127.0.0.1:${toString services.mc-server.port}";
-          #   originRequest = {
-          #     httpHostHeader = services.mc-server.domain;
-          #   };
-          # };
-          "jupyter.${config.homelab.publicDomain}" = {
-            service = "http://10.1.0.1:8888";
-            originRequest = {
-              httpHostHeader = "jupyter.${config.homelab.publicDomain}";
-            };
-          };
-          "${services.vault.publicDomain}" = {
-            service = "http://${services.vault.localEndpoint}";
-            originRequest = {
-              httpHostHeader = services.vault.domain;
-            };
-          };
-          "${services.actual-budget.publicDomain}" = {
-            service = "http://${services.actual-budget.localEndpoint}";
-            originRequest = {
-              httpHostHeader = services.actual-budget.domain;
-            };
-          };
-          "${services.mealie.publicDomain}" = {
-            service = "http://${services.mealie.localEndpoint}";
-            originRequest = {
-              httpHostHeader = services.mealie.domain;
-            };
-          };
-          "${services.wastebin.publicDomain}" = {
-            service = "http://${services.wastebin.localEndpoint}";
-            originRequest = {
-              httpHostHeader = services.wastebin.domain;
-            };
+        ingress =
+          # Public tunnels that do not proxy to another server
+          (lib.mapAttrs' mkIngressTunnel (lib.filterAttrs (n: v: v.expose && v.isPublic) services)) // {
+            # "${services.mc-server.publicDomain}" = {
+            #   service = "tcp://127.0.0.1:${toString services.mc-server.port}";
+            #   originRequest = {
+            #     httpHostHeader = services.mc-server.domain;
+            #   };
+            # };
           };
 
-          "${services.immich.publicDomain}" = {
-            # service = "http://${services.immich.localEndpoint}";
-            service = "http://${pcIP}:2283";
-            originRequest = {
-              httpHostHeader = services.immich.domain;
-            };
-          };
-          "${services.nextcloud.publicDomain}" = {
-            # service = "http://${services.nextcloud.localEndpoint}";
-            service = "http://${pcIP}:8081";
-            originRequest = {
-              httpHostHeader = services.nextcloud.domain;
-            };
-          };
-        };
       };
     };
   };
@@ -143,53 +117,55 @@ in
   # CADDY Reverse Proxy (HTTPS / Dashboard)
   services.caddy = {
     enable = true;
-    virtualHosts = (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose) services)) // {
-      "${config.homelab.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
-      "${services.dashboard.domain}".extraConfig = ''
-        # Serve the Root CRT at /root.crt
-        handle /root.crt {
-          root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
-          file_server {
-            hide root.key
+    virtualHosts =
+      (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose && (v.reverseProxy == null)) services))
+      // {
+        "${net.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
+        "${services.dashboard.domain}".extraConfig = ''
+          # Serve the Root CRT at /root.crt
+          handle /root.crt {
+            root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
+            file_server {
+              hide root.key
+            }
           }
-        }
 
-        # Proxy everything else to Homepage
-        handle {
-          reverse_proxy localhost:${toString services.dashboard.port}
-        }
+          # Proxy everything else to Homepage
+          handle {
+            reverse_proxy localhost:${toString services.dashboard.port}
+          }
 
-        tls internal
-      '';
-      "${services.vault.domain}".extraConfig = ''
-        @forbiddenAdmin {
-          path /admin*
-          not remote_ip 10.1.0.1/30 127.0.0.1
-        }
-        respond @forbiddenAdmin "Access Denied" 403
+          tls internal
+        '';
+        "${services.vault.domain}".extraConfig = ''
+          @forbiddenAdmin {
+            path /admin*
+            not remote_ip ${homelab.nodes.pc.cidr} 127.0.0.1
+          }
+          respond @forbiddenAdmin "Access Denied" 403
 
-        reverse_proxy ${services.vault.localEndpoint} {
-          header_up X-Real-IP {http.request.remote.host}
-          header_up X-Forwarded-Port {http.request.port}
-        }
-        tls internal
-      '';
-      "${services.immich.domain}".extraConfig = ''
-        reverse_proxy 10.1.0.1:2283
-        tls internal
-      '';
-      "${services.nextcloud.domain}".extraConfig = ''
-        reverse_proxy 10.1.0.1:8081
-        tls internal
-      '';
-    };
+          reverse_proxy ${services.vault.localEndpoint} {
+            header_up X-Real-IP {http.request.remote.host}
+            header_up X-Forwarded-Port {http.request.port}
+          }
+          tls internal
+        '';
+        # "${services.immich.domain}".extraConfig = ''
+        #   reverse_proxy 10.1.0.1:2283
+        #   tls internal
+        # '';
+        # "${services.nextcloud.domain}".extraConfig = ''
+        #   reverse_proxy 10.1.0.1:8081
+        #   tls internal
+        # '';
+      };
   };
 
   # HOMEPAGE DASHBOARD
   services.homepage-dashboard = {
     enable = true;
     listenPort = services.dashboard.port;
-    allowedHosts = "${services.dashboard.domain},${config.homelab.domain},localhost,127.0.0.1";
+    allowedHosts = "${services.dashboard.domain},${net.domain},localhost,127.0.0.1";
     widgets = [
       {
         resources = {
@@ -198,34 +174,31 @@ in
           disk = "/";
         };
       }
-      # {
-      #   # New Widget: Wake PC
-      #   search = {
-      #     provider = "custom";
-      #     url = "http://10.1.0.1:8000"; # Optional: if you run a status agent on PC
-      #     target = "_blank";
-      #   };
-      # }
     ];
     services = [
       {
         # "Compute Node" = [
-        #   {
-        #     "My Gaming PC" = {
-        #       icon = "mdi-desktop-tower";
-        #       # Ping the PC to see if it's online
-        #       ping = "10.1.0.1";
-        #       widget = {
-        #         type = "glances";
-        #         url = "http://10.1.0.1:61208"; # Glances on PC
-        #       };
-        #       # The Magic Button
-        #       siteMonitor = "http://10.1.0.1:61208";
-        #     };
-        #   }
         # ];
 
         "My Services" = [
+          # {
+          #   "My Gaming PC" = {
+          #     icon = "mdi-desktop-tower";
+          #     # Ping the PC to see if it's online
+          #     ping = homelab.nodes.pc.ipv4;
+          #     network = {
+          #       mac = homelab.nodes.pc.mac;
+          #     };
+          #     widget = {
+          #       type = "glances";
+          #       url = "http://${homelab.nodes.pc.ipv4}:61208"; # Glances on PC
+          #     };
+          #     # wakeonlan -i 10.1.0.1 04:7c:16:e6:d1:10
+          #     # The Magic Button
+          #     siteMonitor = "http://${homelab.nodes.pc.ipv4}:61208";
+          #   };
+          # }
+
           {
             "Root Certificate" = {
               icon = "mdi-file-certificate";
@@ -260,7 +233,7 @@ in
           {
             "Jupyter Lab" = {
               icon = "mdi-notebook-outline";
-              href = "https://jupyter.${config.homelab.publicDomain}";
+              href = "https://jupyter.${net.publicDomain}";
               description = "Remote Data Science Environment";
             };
           }
@@ -382,7 +355,7 @@ in
     bantime = "24h";
 
     ignoreIP = [
-      "10.1.0.1"
+      homelab.nodes.pc.ipv4
     ];
 
     jails = {

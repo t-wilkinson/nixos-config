@@ -1,34 +1,53 @@
 # modules/homelab/default.nix
 { username, ... }:
+let
+  pcIP = "10.1.0.1";
+  piIP = "10.1.0.2";
+  cidr = "10.1.0.0/30";
+in
 {
   imports = [
     ./module.nix
+
     ./mc-server.nix
-    ./nextcloud.nix
-    ./immich.nix
     ./monitoring.nix
     ./borg.nix
     ./syncthing.nix
     ./mealie.nix
     ./actual-budget.nix
-    ./wastebin.nix
+
+    ./nextcloud.nix
+    ./immich.nix
+    ./pastebin.nix
   ];
 
   homelab = {
     inherit username;
-    domain = "home.lab";
-    # homelabIP = "100.112.52.7";
-
-    homelabIP = "10.1.0.2";
-    publicDomain = "treywilkinson.com";
-    containerNetwork = "192.168.100";
     containerStateVersion = "24.11";
+
     drives = {
       minecraft = "/var/lib/minecraft";
       pubdrive = "/mnt/storage/pubdrive";
       personal = "/srv/sync/personal";
       misc = "/srv/misc";
       actual-budget = "/var/lib/actual-budget";
+    };
+
+    nodes = {
+      pc = {
+        ipv4 = pcIP;
+        mac = "04:7c:16:e6:d1:10";
+      };
+      pi = {
+        ipv4 = piIP;
+      };
+    };
+
+    network = {
+      cidr = cidr;
+      domain = "home.lab";
+      publicDomain = "treywilkinson.com";
+      containerNetwork = "192.168.100";
     };
 
     groups = {
@@ -99,16 +118,24 @@
         subdomain = "bin";
         isPublic = true;
       };
+
       nextcloud = {
         # id = 10;
         port = 8081;
         subdomain = "cloud";
         isPublic = true;
+        reverseProxy = pcIP;
       };
       immich = {
         port = 2283;
         subdomain = "photos";
         isPublic = true;
+        reverseProxy = pcIP;
+      };
+      jupyter = {
+        port = 8888;
+        isPublic = true;
+        reverseProxy = pcIP;
       };
     };
   };

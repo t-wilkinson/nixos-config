@@ -3,7 +3,6 @@ let
   homelab = config.homelab;
   cfg = config.homelab.services.nextcloud;
   secrets = config.sops.secrets;
-  pcIP = "10.1.0.1";
 in
 {
   services.nginx.virtualHosts."${cfg.domain}" = {
@@ -54,18 +53,15 @@ in
         cfg.localIP
         cfg.domain
         cfg.publicDomain
-        homelab.homelabIP
-        pcIP
+        homelab.nodes.pi.ipv4
+        homelab.nodes.pc.ipv4
         "127.0.0.1"
       ];
       trusted_proxies = [
         "127.0.0.1"
-        homelab.homelabIP
+        homelab.nodes.pi.ipv4
       ];
-    };
 
-    extraOptions = {
-      enable_previews = true;
       preview_ffmpeg_path = "${pkgs.ffmpeg}/bin/ffmpeg";
       enabledPreviewProviders = [
         "OC\\Preview\\Movie"
@@ -75,6 +71,8 @@ in
         "OC\\Preview\\JPEG"
         "OC\\Preview\\WebP"
       ];
+
     };
+
   };
 }

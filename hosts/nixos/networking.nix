@@ -9,7 +9,7 @@ let
   homelab = config.homelab;
   mcServerPort = 25565;
   rconPort = 25575;
-  homelabDirectGateway = "10.1.0.2";
+  homelabDirectGateway = homelab.nodes.pi.ipv4;
 in
 {
   services.resolved = {
@@ -37,7 +37,7 @@ in
     # Add route to get to homelab IP through direct ethernet connection
     # interfaces.enp4s0.ipv4.routes = [
     #   {
-    #     address = config.homelab.homelabIP;
+    #     address = homelab.nodes.pi.ipv4;
     #     prefixLength = 32;
     #     via = homelabDirectGateway;
     #   }
@@ -88,11 +88,11 @@ in
       # "802-3-ethernet".wake-on-lan = "magic"; # sudo ethtool -s enp4s0 wol gp (magic physical)
 
       ipv4.method = "manual";
-      ipv4.addresses = "10.1.0.1/30";
+      ipv4.addresses = "${homelab.nodes.pc.cidr}";
       # ipv4.gateway = "10.1.0.2";
-      ipv4.dns = "10.1.0.2";
+      ipv4.dns = homelab.nodes.pi.ipv4;
       # ipv4.dns-search = "~home.lab,home.lab";
-      ipv4.dns-search = "~home.lab";
+      ipv4.dns-search = "~${homelab.network.domain}";
       ipv4.never-default = "true";
       # ipv4.routes = "${homelab.homelabIP}/32 next-hop=${homelabDirectGateway}, ${homelab.containerNetwork}.0/24 ${homelabDirectGateway}";
     };

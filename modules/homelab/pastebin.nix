@@ -3,6 +3,7 @@ let
   cfg = config.homelab.services.wastebin;
 in
 {
+  # microbin has easily shareable links
   services.microbin = {
     enable = true;
     settings = {
@@ -13,6 +14,7 @@ in
       MICROBIN_ENCRYPTION_CLIENT_SIDE = true;
     };
   };
+
   # services.wastebin = {
   #   enable = true;
   #   settings = {

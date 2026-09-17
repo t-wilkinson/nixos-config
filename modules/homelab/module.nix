@@ -2,7 +2,7 @@
 { lib, config, ... }:
 with lib;
 let
-  cfg = config.homelab;
+  hlcfg = config.homelab; # homelab config
   capitalizeFirst =
     s:
     if builtins.stringLength s == 0 then
@@ -46,28 +46,67 @@ in
       default = config.system.stateVersion;
     };
 
-    homelabIP = mkOption {
-      type = types.str;
+    nodes = mkOption {
+      type = types.attrsOf (
+        types.submodule (
+          { config, ... }:
+          {
+            options = {
+              mac = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+              };
+              ipv4 = mkOption {
+                type = types.str;
+                example = "192.168.1.10";
+              };
+              cidr = mkOption {
+                type = types.str;
+                default = "${config.ipv4}/${toString hlcfg.network.prefixLength}";
+              };
+            };
+          }
+        )
+      );
+      description = "Set of nodes available across the homelab.";
     };
-    # homelabNetwork = mkOption {
-    #   type = types.str;
-    # };
-    domain = mkOption {
-      type = types.str;
-      default = "home.lab";
-    };
-    publicDomain = mkOption {
-      type = types.nullOr types.str;
-      default = null;
-      description = "Base public domain (e.g., example.com)";
-    };
-    containerNetwork = mkOption {
-      type = types.str;
-      default = "192.168.100";
-    };
-    hostContainerIP = mkOption {
-      type = types.str;
-      default = "${cfg.containerNetwork}.1";
+
+    network = {
+      cidr = mkOption {
+        type = types.str;
+        example = "10.1.0.0/30";
+      };
+      baseAddress = mkOption {
+        type = types.str;
+        readOnly = true;
+        default = builtins.head (lib.splitString "/" config.homelab.network.cidr);
+      };
+      prefixLength = mkOption {
+        type = types.ints.between 0 32;
+        readOnly = true;
+        default = lib.toInt (lib.last (lib.splitString "/" config.homelab.network.cidr));
+      };
+
+      # homelabNetwork = mkOption {
+      #   type = types.str;
+      # };
+      domain = mkOption {
+        type = types.str;
+        default = "home.lab";
+      };
+      publicDomain = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "Base public domain (e.g., example.com)";
+      };
+      containerNetwork = mkOption {
+        type = types.str;
+        default = "192.168.100";
+      };
+      hostContainerIP = mkOption {
+        type = types.str;
+        default = "${hlcfg.network.containerNetwork}.1";
+      };
     };
 
     services = mkOption {
@@ -79,6 +118,12 @@ in
               enable = mkOption {
                 type = types.bool;
                 default = false;
+              };
+
+              reverseProxy = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                description = "Reverse proxy ip address";
               };
 
               data = mkOption {
@@ -110,7 +155,10 @@ in
               localIP = mkOption {
                 readOnly = true;
                 default =
-                  if config.id != null then "${cfg.containerNetwork}.${toString config.id}" else "127.0.0.1";
+                  if config.id != null then
+                    "${hlcfg.network.containerNetwork}.${toString config.id}"
+                  else
+                    "127.0.0.1";
                 type = types.str;
                 description = "The calculated internal IP address.";
               };
@@ -129,6 +177,7 @@ in
               expose = mkOption {
                 type = types.bool;
                 default = true;
+                description = "Determines whether to create (sub)domain and expose service through cloudflare/caddy.";
               };
 
               subdomain = mkOption {
@@ -137,7 +186,7 @@ in
               };
               domain = mkOption {
                 type = types.nullOr types.str;
-                default = if config.expose then "${config.subdomain}.${cfg.domain}" else null;
+                default = if config.expose then "${config.subdomain}.${hlcfg.network.domain}" else null;
               };
 
               isPublic = mkOption {
@@ -152,15 +201,15 @@ in
                 type = types.nullOr types.str;
                 default =
                   let
-                    defaultDomain = "${config.subdomain}.${cfg.publicDomain}";
-                    publicDomain = "${config.publicSubdomain}.${cfg.publicDomain}";
+                    defaultDomain = "${config.subdomain}.${hlcfg.network.publicDomain}";
+                    publicDomain = "${config.publicSubdomain}.${hlcfg.network.publicDomain}";
                   in
-                  if cfg.publicDomain != null && config.publicSubdomain != null then
+                  if hlcfg.network.publicDomain != null && config.publicSubdomain != null then
                     # public subdomain . public domain
-                    "${config.publicSubdomain}.${cfg.publicDomain}"
-                  else if cfg.publicDomain != null && config.isPublic then
+                    "${config.publicSubdomain}.${hlcfg.network.publicDomain}"
+                  else if hlcfg.network.publicDomain != null && config.isPublic then
                     # subdomain . public domain
-                    "${config.subdomain}.${cfg.publicDomain}"
+                    "${config.subdomain}.${hlcfg.network.publicDomain}"
                   else
                     null;
               };
@@ -182,22 +231,22 @@ in
   };
 
   config = {
-    users.groups = mapAttrs (name: gid: { inherit gid; }) cfg.groups;
+    users.groups = mapAttrs (name: gid: { inherit gid; }) hlcfg.groups;
     containers =
       let
-        containerServices = filterAttrs (n: v: v.id != null && v.enable) cfg.services;
+        containerServices = filterAttrs (n: v: v.id != null && v.enable) hlcfg.services;
       in
       mapAttrs (n: v: {
         config =
           { config, ... }:
           {
-            system.stateVersion = lib.mkDefault cfg.containerStateVersion;
-            users.groups = mapAttrs (name: gid: { inherit gid; }) cfg.groups;
+            system.stateVersion = lib.mkDefault hlcfg.containerStateVersion;
+            users.groups = mapAttrs (name: gid: { inherit gid; }) hlcfg.groups;
             networking.firewall.allowedTCPPorts = [ v.port ] ++ v.extraPorts;
           };
 
         privateNetwork = true;
-        hostAddress = cfg.hostContainerIP;
+        hostAddress = hlcfg.network.hostContainerIP;
         localAddress = v.localIP;
         forwardPorts = lib.mkDefault (
           map (p: {
@@ -208,7 +257,7 @@ in
         );
       }) containerServices;
 
-    homelab.services = lib.genAttrs cfg.enableServices (name: {
+    homelab.services = lib.genAttrs hlcfg.enableServices (name: {
       enable = true;
     });
     homelab.lib = {
@@ -219,7 +268,7 @@ in
         };
       };
 
-      mkSecretMounts = secretsList: foldl' (acc: s: acc // (cfg.lib.mkRoMount s.path)) { } secretsList;
+      mkSecretMounts = secretsList: foldl' (acc: s: acc // (hlcfg.lib.mkRoMount s.path)) { } secretsList;
     };
   };
 }
