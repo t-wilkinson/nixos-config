@@ -21,7 +21,7 @@ in
 
   systemd.services.phpfpm-nextcloud.serviceConfig = {
     ReadWritePaths = [
-      "/mnt/storage/pubdrive"
+      homelab.drives.pubdrive
     ];
   };
 

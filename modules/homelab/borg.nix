@@ -100,11 +100,11 @@ in
         fi
 
         # NEXTCLOUD
-        echo "Backing up nextcloud..."
-        ${pkgs.nixos-container}/bin/nixos-container run nextcloud -- \
-          sudo -u postgres ${pkgs.postgresql}/bin/pg_dump -h /run/postgresql nextcloud > /var/lib/nextcloud/nextcloud-sql-dump.sql
-        chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/nextcloud/nextcloud-sql-dump.sql
-        chmod 660 /var/lib/nextcloud/nextcloud-sql-dump.sql
+        # echo "Backing up nextcloud..."
+        # ${pkgs.nixos-container}/bin/nixos-container run nextcloud -- \
+        #   sudo -u postgres ${pkgs.postgresql}/bin/pg_dump -h /run/postgresql nextcloud > /var/lib/nextcloud/nextcloud-sql-dump.sql
+        # chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/nextcloud/nextcloud-sql-dump.sql
+        # chmod 660 /var/lib/nextcloud/nextcloud-sql-dump.sql
 
         # VAULTWARDEN
         echo "Backing up vaultwarden..."
@@ -115,11 +115,11 @@ in
         fi
 
         # IMMICH
-        echo "Backing up immich..."
-        ${pkgs.nixos-container}/bin/nixos-container run immich -- \
-          sudo -u immich ${pkgs.postgresql}/bin/pg_dump immich > /var/lib/immich/immich-sql-dump.sql
-        chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/immich/immich-sql-dump.sql
-        chmod 660 /var/lib/immich/immich-sql-dump.sql
+        # echo "Backing up immich..."
+        # ${pkgs.nixos-container}/bin/nixos-container run immich -- \
+        #   sudo -u immich ${pkgs.postgresql}/bin/pg_dump immich > /var/lib/immich/immich-sql-dump.sql
+        # chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/immich/immich-sql-dump.sql
+        # chmod 660 /var/lib/immich/immich-sql-dump.sql
 
         # MINECRAFT
         echo "Backing up Minecraft..."

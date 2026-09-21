@@ -10,14 +10,19 @@ let
   tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # .cfargotunnel.com - CNAME cloudflared tunnel
   homelab = config.homelab;
   services = config.homelab.services;
+  net = config.homelab.network;
+  nodes = config.homelab.nodes;
   # exposedServices = lib.filterAttrs (n: v: v.expose) services;
   # publicServices = lib.filterAttrs (n: v: v.isPublic) exposedServices;
-  net = config.homelab.network;
 
   mkCaddyProxy = name: service: {
     name = service.domain;
     value = {
       extraConfig = ''
+        @httpProto {
+          header X-Forwarded-Proto http
+        }
+        redir @httpProto https://{host}{uri} permanent
         reverse_proxy ${service.localEndpoint} {
           header_up X-Real-IP {http.request.remote.host}
           header_up X-Forwarded-Port {http.request.port}
@@ -37,19 +42,21 @@ let
   mkIngressTunnel = name: service: {
     name = service.publicDomain;
     value = {
-      service =
-        if service.reverseProxy != null then
-          "http://${service.reverseProxy}:${toString service.port}"
-        else
-          "http://${service.localEndpoint}";
+      service = "https://127.0.0.1:443";
+      # if service.reverseProxy != null then
+      #   "http://${service.reverseProxy}:${toString service.port}"
+      # else
+      #   "http://${service.localEndpoint}";
       originRequest = {
         httpHostHeader = service.domain;
+        originServerName = service.domain;
+        noTLSVerify = true;
       };
     };
   };
 in
 {
-  # BLOCY
+  # BLOCKY
   services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
   services.resolved.extraConfig = "DNSStubListener=no";
   services.blocky = {
@@ -67,8 +74,8 @@ in
         customTTL = "1h";
         mapping = {
           # Map main domain and all subdomains to the Pi's Direct IP
-          "home.lab" = homelab.nodes.pi.ipv4;
-          "*.home.lab" = homelab.nodes.pi.ipv4;
+          "${net.domain}" = nodes.pi.ipv4;
+          "*.${net.domain}" = nodes.pi.ipv4;
         };
       };
 
@@ -117,70 +124,68 @@ in
   # CADDY Reverse Proxy (HTTPS / Dashboard)
   services.caddy = {
     enable = true;
-    virtualHosts =
-      (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose && (v.reverseProxy == null)) services))
-      // {
-        "${net.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
-        "${services.dashboard.domain}".extraConfig = ''
-          @tailscaleNetwork {
-            path /hooks/*
-            remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 ${net.cidr} 127.0.0.1 ::1
-          }
+    virtualHosts = (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose) services)) // {
+      "${net.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
+      "${services.dashboard.domain}".extraConfig = ''
+        @tailscaleNetwork {
+          path /hooks/*
+          remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 ${net.cidr} 127.0.0.1 ::1
+        }
 
-          @forbiddenNetwork {
-            path /hooks/*
-            not remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 ${net.cidr} 127.0.0.1 ::1
-          }
-          respond @forbiddenNetwork "Access Denied: VPN connection required" 403
+        @forbiddenNetwork {
+          path /hooks/*
+          not remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 ${net.cidr} 127.0.0.1 ::1
+        }
+        respond @forbiddenNetwork "Access Denied: VPN connection required" 403
 
-          ${
-            let
-              wolEnabled = (lib.attrByPath [ "wakeonlan" "enable" ] false services);
-            in
-            lib.optionalString wolEnabled ''
-              handle @tailscaleNetwork {
-                reverse_proxy 127.0.0.1:${toString services.wakeonlan.port}
-              }
-            ''
-          }
-
-          # Serve the Root CRT at /root.crt
-          handle /root.crt {
-            root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
-            file_server {
-              hide root.key
+        ${
+          let
+            wolEnabled = (lib.attrByPath [ "wakeonlan" "enable" ] false services);
+          in
+          lib.optionalString wolEnabled ''
+            handle @tailscaleNetwork {
+              reverse_proxy 127.0.0.1:${toString services.wakeonlan.port}
             }
-          }
+          ''
+        }
 
-          # Proxy everything else to Homepage
-          handle {
-            reverse_proxy localhost:${toString services.dashboard.port}
+        # Serve the Root CRT at /root.crt
+        handle /root.crt {
+          root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
+          file_server {
+            hide root.key
           }
+        }
 
-          tls internal
-        '';
-        "${services.vault.domain}".extraConfig = ''
-          @forbiddenAdmin {
-            path /admin*
-            not remote_ip ${homelab.nodes.pc.cidr} 127.0.0.1
-          }
-          respond @forbiddenAdmin "Access Denied" 403
+        # Proxy everything else to Homepage
+        handle {
+          reverse_proxy localhost:${toString services.dashboard.port}
+        }
 
-          reverse_proxy ${services.vault.localEndpoint} {
-            header_up X-Real-IP {http.request.remote.host}
-            header_up X-Forwarded-Port {http.request.port}
-          }
-          tls internal
-        '';
-        # "${services.immich.domain}".extraConfig = ''
-        #   reverse_proxy 10.1.0.1:2283
-        #   tls internal
-        # '';
-        # "${services.nextcloud.domain}".extraConfig = ''
-        #   reverse_proxy 10.1.0.1:8081
-        #   tls internal
-        # '';
-      };
+        tls internal
+      '';
+      "${services.vault.domain}".extraConfig = ''
+        @forbiddenAdmin {
+          path /admin*
+          not remote_ip ${homelab.nodes.pc.cidr} 127.0.0.1
+        }
+        respond @forbiddenAdmin "Access Denied" 403
+
+        reverse_proxy ${services.vault.localEndpoint} {
+          header_up X-Real-IP {http.request.remote.host}
+          header_up X-Forwarded-Port {http.request.port}
+        }
+        tls internal
+      '';
+      # "${services.immich.domain}".extraConfig = ''
+      #   reverse_proxy 10.1.0.1:2283
+      #   tls internal
+      # '';
+      # "${services.nextcloud.domain}".extraConfig = ''
+      #   reverse_proxy 10.1.0.1:8081
+      #   tls internal
+      # '';
+    };
   };
 
   # HOMEPAGE DASHBOARD
@@ -188,56 +193,77 @@ in
     enable = true;
     listenPort = services.dashboard.port;
     allowedHosts = "${services.dashboard.domain},${net.domain},localhost,127.0.0.1";
+    settings = {
+      title = "Wilkinson Homelab";
+      favicon = "https://nixos.org/favicon.png";
+      theme = "dark";
+      color = "slate";
+      layout = {
+        "Infrastructure" = {
+          style = "row";
+          columns = 2;
+        };
+        "Applications" = {
+          style = "row";
+          columns = 2;
+        };
+      };
+    };
+
     widgets = [
       {
-        resources = {
+        glances = {
+          # Use internal localhost/container IP to avoid hairpin routing through Caddy
+          url = "http://127.0.0.1:${toString services.glances.port}";
+          # url = "https://${services.glances.domain}"; # alternatively via your domain
+          version = 4; # nixpkgs 24.11 / unstable defaults to Glances v4
           cpu = true;
-          memory = true;
-          disk = "/";
+          mem = true;
+          cputemp = true;
+          uptime = true;
+          disk = [
+            "/"
+            homelab.drives.pi-pubdrive
+          ];
+        };
+      }
+      # {
+      #   resources = {
+      #     cpu = true;
+      #     memory = true;
+      #     disk = "/";
+      #     cputemp = true;
+      #   };
+      # }
+      {
+        search = {
+          provider = "duckduckgo";
+          target = "_blank";
+          showSearch = true;
+        };
+      }
+      {
+        datetime = {
+          format = {
+            timeStyle = "short";
+            dateStyle = "full";
+          };
         };
       }
     ];
+
     services = [
       {
-        # "Compute Node" = [
-        # ];
-
-        "My Services" = [
-          # {
-          #   "My Gaming PC" = {
-          #     icon = "mdi-desktop-tower";
-          #     # Ping the PC to see if it's online
-          #     ping = homelab.nodes.pc.ipv4;
-          #     network = {
-          #       mac = homelab.nodes.pc.mac;
-          #     };
-          #     widget = {
-          #       type = "glances";
-          #       url = "http://${homelab.nodes.pc.ipv4}:61208"; # Glances on PC
-          #     };
-          #     # wakeonlan -i 10.1.0.1 04:7c:16:e6:d1:10
-          #     # The Magic Button
-          #     siteMonitor = "http://${homelab.nodes.pc.ipv4}:61208";
-          #   };
-          # }
-
+        "Applications" = [
           {
-            "Root Certificate" = {
-              icon = "mdi-file-certificate";
-              href = "https://${services.dashboard.domain}/root.crt";
-              description = "Download to trust HTTPS";
-            };
-
-          }
-          {
-            "Zortex service" = {
+            "Zortex Hub" = {
               icon = "mdi-bell-ring";
               href = "https://${services.zortex.domain}";
-              description = "Notification Hub";
+              description = "Notification & Organization Hub";
               widget = {
                 type = "customapi";
                 url = "https://${services.zortex.domain}/api/summary";
-                refresh = 60000; # Refresh every minute
+                refresh = 10000; # Every 10 seconds
                 mappings = [
                   {
                     field = "pending_count";
@@ -246,34 +272,190 @@ in
                   }
                   {
                     field = "next_event";
-                    label = "Next";
+                    label = "Next Event";
                   }
                 ];
               };
             };
           }
           {
-            "Jupyter Lab" = {
-              icon = "mdi-notebook-outline";
-              href = "https://jupyter.${net.publicDomain}";
-              description = "Remote Data Science Environment";
+            "Actual Budget" = {
+              icon = "mdi-finance";
+              href = "https://${services.actual-budget.domain}";
+              description = "Envelope Budgeting";
+              ping = "https://${services.actual-budget.domain}";
             };
           }
-        ]
-        ++ (lib.optional (lib.attrByPath [ "wakeonlan" "enable" ] false services) {
-          "Wake PC" = {
-            icon = "mdi-power";
-            # href = "https://${services.dashboard.domain}/hooks/wake-pc";
-            href = "#wake-pc";
-            description = "Send magic packet";
-            ping = homelab.nodes.pc.ipv4;
-          };
-        })
-        ++ (lib.mapAttrsToList mkHomepageEntry (
-          lib.filterAttrs (n: v: n != "dashboard" && v.expose) services
-        ));
+          {
+            "Mealie" = {
+              icon = "mdi-silverware-fork-knife";
+              href = "https://${services.mealie.domain}";
+              description = "Recipe Manager";
+              # ping = "https://${services.mealie.domain}";
+            };
+          }
+          {
+            "Nextcloud" = {
+              icon = "nextcloud";
+              href = "https://${services.nextcloud.domain}";
+              description = "Files & Sync";
+            };
+          }
+          {
+            "Immich" = {
+              icon = "immich";
+              href = "https://${services.immich.domain}";
+              description = "Photos";
+            };
+          }
+          {
+            "Pastebin" = {
+              icon = "";
+              href = "https://${services.pastebin.domain}";
+              description = "Pastebin (microbin)";
+            };
+          }
+          {
+            "Ntfy" = {
+              icon = "";
+              href = "https://${services.ntfy.domain}";
+              description = "Notifications";
+            };
+          }
+        ];
+      }
+      {
+        "Infrastructure" = [
+          {
+            "Syncthing" = {
+              icon = "syncthing";
+              href = "https://${services.syncthing.domain}";
+              description = "P2P File Synchronization";
+              # ping = services.syncthing.localEndpoint;
+            };
+          }
+          {
+            "Vaultwarden" = {
+              icon = "vaultwarden";
+              href = "https://${services.vault.domain}";
+              description = "Password Manager";
+              # ping = "https://${services.vault.domain}";
+            };
+          }
+          {
+            "Blocky DNS" = {
+              icon = "mdi-dns";
+              href = "http://${nodes.pi.ipv4}:4000"; # If you enable Blocky's HTTP port
+              description = "Ad-blocking & Local DNS";
+            };
+          }
+          {
+            "Root Certificate" = {
+              icon = "mdi-file-certificate";
+              href = "https://${services.dashboard.domain}/root.crt";
+              description = "Trust local HTTPS";
+            };
+          }
+        ];
+      }
+      {
+        "Compute Nodes" = [
+          {
+            "Glances" = {
+              icon = "";
+              href = "https://${services.glances.domain}";
+              description = "Monitoring";
+            };
+          }
+          {
+            "Jupyter Lab" = {
+              icon = "jupyter";
+              href = "https://${services.jupyter.domain}";
+              description = "Remote Data Science";
+            };
+          }
+          (lib.mkIf (services.wakeonlan.enable or false) {
+            "Gaming PC (WOL)" = {
+              icon = "mdi-power";
+              href = "#wake-pc";
+              description = "Send magic packet";
+              # ping = nodes.pc.ipv4;
+            };
+          })
+        ];
       }
     ];
+
+    # services = [
+    #   {
+    #     "Applications" = [
+    #       # {
+    #       #   "My Gaming PC" = {
+    #       #     icon = "mdi-desktop-tower";
+    #       #     # Ping the PC to see if it's online
+    #       #     ping = homelab.nodes.pc.ipv4;
+    #       #     network = {
+    #       #       mac = homelab.nodes.pc.mac;
+    #       #     };
+    #       #     widget = {
+    #       #       type = "glances";
+    #       #       url = "http://${homelab.nodes.pc.ipv4}:61208"; # Glances on PC
+    #       #     };
+
+    #       {
+    #         "Root Certificate" = {
+    #           icon = "mdi-file-certificate";
+    #           href = "https://${services.dashboard.domain}/root.crt";
+    #           description = "Download to trust HTTPS";
+    #         };
+
+    #       }
+    #       {
+    #         "Zortex service" = {
+    #           icon = "mdi-bell-ring";
+    #           href = "https://${services.zortex.domain}";
+    #           description = "Notification Hub";
+    #           widget = {
+    #             type = "customapi";
+    #             url = "https://${services.zortex.domain}/api/summary";
+    #             refresh = 60000; # Refresh every minute
+    #             mappings = [
+    #               {
+    #                 field = "pending_count";
+    #                 label = "Pending";
+    #                 format = "number";
+    #               }
+    #               {
+    #                 field = "next_event";
+    #                 label = "Next";
+    #               }
+    #             ];
+    #           };
+    #         };
+    #       }
+    #       {
+    #         "Jupyter Lab" = {
+    #           icon = "mdi-notebook-outline";
+    #           href = "https://jupyter.${net.publicDomain}";
+    #           description = "Remote Data Science Environment";
+    #         };
+    #       }
+    #     ]
+    #     ++ (lib.optional (lib.attrByPath [ "wakeonlan" "enable" ] false services) {
+    #       "Wake PC" = {
+    #         icon = "mdi-power";
+    #         # href = "https://${services.dashboard.domain}/hooks/wake-pc";
+    #         href = "#wake-pc";
+    #         description = "Send magic packet";
+    #         ping = nodes.pc.ipv4;
+    #       };
+    #     })
+    #     ++ (lib.mapAttrsToList mkHomepageEntry (
+    #       lib.filterAttrs (n: v: n != "dashboard" && v.expose) services
+    #     ));
+    #   }
+    # ];
+
     customJS = ''
       document.addEventListener('click', async (e) => {
         const link = e.target.closest('a[href="#wake-pc"]');
@@ -314,8 +496,8 @@ in
     # /srv/pubdrive 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
     # /srv/misc 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
     exports = ''
-      /srv/sync/personal 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
-      /var/lib/minecraft 10.1.0.1(rw,sync,no_subtree_check,no_root_squash)
+      ${homelab.drives.personal} ${nodes.pc.ipv4}(rw,sync,no_subtree_check,no_root_squash)
+      ${homelab.drives.minecraft} ${nodes.pc.ipv4}(rw,sync,no_subtree_check,no_root_squash)
     '';
   };
   networking.firewall.allowedTCPPorts = [
@@ -412,7 +594,7 @@ in
     bantime = "24h";
 
     ignoreIP = [
-      homelab.nodes.pc.ipv4
+      nodes.pc.ipv4
     ];
 
     jails = {

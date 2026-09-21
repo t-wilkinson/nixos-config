@@ -27,10 +27,10 @@ in
     containerStateVersion = "24.11";
 
     drives = {
-      minecraft = "/var/lib/minecraft";
       pubdrive = "/mnt/storage/pubdrive";
+      pi-pubdrive = "/srv/pubdrive";
       personal = "/srv/sync/personal";
-      misc = "/srv/misc";
+      minecraft = "/var/lib/minecraft";
       actual-budget = "/var/lib/actual-budget";
     };
 
@@ -101,7 +101,6 @@ in
       };
       wakeonlan = {
         port = 9099;
-        enable = true;
         expose = false;
       };
 
@@ -119,7 +118,7 @@ in
       };
 
       # Cloud
-      wastebin = {
+      pastebin = {
         port = 8088;
         subdomain = "bin";
         isPublic = true;

@@ -25,11 +25,7 @@ in
           isReadOnly = false;
         };
         "/mnt/media/pubdrive" = {
-          hostPath = homelab.drives.pubdrive;
-          isReadOnly = false;
-        };
-        "/mnt/media/misc" = {
-          hostPath = homelab.drives.misc;
+          hostPath = homelab.drives.pi-pubdrive;
           isReadOnly = false;
         };
       }

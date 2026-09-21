@@ -1,6 +1,6 @@
 { config, ... }:
 let
-  cfg = config.homelab.services.wastebin;
+  cfg = config.homelab.services.pastebin;
 in
 {
   # microbin has easily shareable links

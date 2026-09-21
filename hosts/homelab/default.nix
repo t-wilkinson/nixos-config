@@ -6,6 +6,10 @@
   lib,
   ...
 }:
+let
+  homelab = config.homelab;
+  nodes = config.homelab.nodes;
+in
 {
   imports = [
     ./networking.nix
@@ -15,15 +19,15 @@
   ];
 
   homelab.enableServices = [
-    "wastebin"
+    "pastebin"
     "ntfy"
     "vault"
     "dashboard"
     "syncthing"
     "zortex"
     "glances"
-    # "nextcloud"
-    # "immich"
+    # "nextcloud" moved to nixos-pc
+    # "immich" moved to nixos-pc
     "borg"
     "mealie"
     "actual-budget"
@@ -47,8 +51,8 @@
       drives = config.homelab.drives;
     in
     [
-      # "d ${drives.pubdrive} 0770 ${username} ${groups.serverdata} - -"
-      # "Z ${drives.pubdrive} 0770 ${username} ${groups.serverdata} - -"
+      "d ${drives.pi-pubdrive} 0770 ${username} ${groups.storage-media} - -"
+      "Z ${drives.pi-pubdrive} 0770 ${username} ${groups.storage-media} - -"
       "d ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
       "Z ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
       "d ${drives.minecraft} 0775 ${username} ${groups.serverdata} - -"
@@ -62,16 +66,17 @@
     fsType = "ext4";
     options = [ "noatime" ];
   };
-  # fileSystems."/srv/pubdrive" = {
-  #   device = "10.1.0.1:/pubdrive";
-  #   fsType = "nfs4";
-  #   options = [
-  #     "x-systemd.automount"
-  #     "noauto"
-  #     "x-systemd.device-timeout=10s" # Fail fast if machine is off
-  #     "_netdev" # Wait for network before mounting
-  #   ];
-  # };
+  fileSystems."${homelab.drives.pi-pubdrive}" = {
+    device = "${homelab.nodes.pc.ipv4}:/pubdrive";
+    fsType = "nfs4";
+    options = [
+      "x-systemd.automount"
+      "noauto"
+      "x-systemd.device-timeout=10s" # Fail fast if machine is off
+      "x-systemd.after=network-online.target"
+      "_netdev" # Wait for network before mounting
+    ];
+  };
 
   # fileSystems."/mnt/backup" = {
   #   device = "/dev/disk/by-uuid/D404BD3804BD1E84";
@@ -118,6 +123,7 @@
     extraGroups = [
       "serverdata"
       "personaldata"
+      "storage-media"
       "wheel"
       "video"
       "docker"
@@ -133,7 +139,6 @@
 
   environment.systemPackages = with pkgs; [
     mcrcon # necessary for accessing mc-server on other pc
-    # wol # Wake on LAN util for turning on the PC through ethernet
     wakeonlan
     # wireguard-tools
     syncthing
@@ -145,11 +150,11 @@
       name = "wol-pc";
       runtimeInputs = [ pkgs.wakeonlan ];
       text = ''
-        wakeonlan -i 10.1.0.1 04:7c:16:e6:d1:10
+        wakeonlan -i ${nodes.pc.ipv4} ${nodes.pc.mac}
       '';
     })
     (pkgs.writeShellScriptBin "hl-help" ''
-      echo "wol-pc : waake pc on ethernet"
+      echo "wol-pc : wake pc on ethernet"
       echo ""
     '')
   ];

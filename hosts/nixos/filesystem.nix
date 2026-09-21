@@ -1,6 +1,7 @@
 { config, username, ... }:
 let
   homelab = config.homelab;
+  nodes = config.homelab.nodes;
 in
 {
   users.groups.storage-media = { };
@@ -43,7 +44,7 @@ in
   services.nfs.server = {
     enable = true;
     exports = ''
-      /mnt/storage 10.1.0.2(rw,sync,no_subtree_check,crossmnt,fsid=0,no_root_squash)
+      /mnt/storage ${nodes.pi.ipv4}(rw,sync,no_subtree_check,crossmnt,fsid=0,no_root_squash)
     '';
   };
 
@@ -84,40 +85,20 @@ in
         ];
       };
 
-      # "/" =
-      #   { device = "/dev/disk/by-uuid/ce486d8c-d24e-4387-8592-27355e8490c9";
-      #     fsType = "ext4";
-      #   };
-
-      # "/boot" =
-      #   { device = "/dev/disk/by-uuid/09BA-392B";
-      #     fsType = "vfat";
-      #     options = [ "fmask=0022" "dmask=0022" ];
-      #   };
-
-      # "/mnt/homelab/misc" = {
-      #   device = "10.1.0.2:/srv/misc";
-      #   fsType = "nfs";
-      #   options = homelabOptions;
-      # };
-      # "/mnt/homelab/pubdrive" = {
-      #   device = "10.1.0.2:/srv/pubdrive";
-      #   fsType = "nfs";
-      #   options = homelabOptions;
-      # };
       "/mnt/homelab/personal" = {
-        device = "10.1.0.2:/srv/sync/personal";
+        device = "${nodes.pi.ipv4}:/srv/sync/personal";
         fsType = "nfs";
         options = homelabOptions;
       };
       "/var/lib/minecraft" = {
-        device = "10.1.0.2:/var/lib/minecraft";
+        device = "${nodes.pi.ipv4}:/var/lib/minecraft";
         fsType = "nfs";
         options = homelabOptions ++ [
           "rw"
           "soft"
-        ]; # Only mount when accessed
+        ];
       };
+
       "/mnt/storage" = {
         device = "/dev/disk/by-uuid/a92044b3-8a07-43d8-a676-abbac9f6e667";
         fsType = "btrfs";
@@ -129,7 +110,6 @@ in
           "x-systemd.device-timeout=10s"
         ];
       };
-
       "/mnt/storage/.snapshots" = {
         device = "/dev/disk/by-uuid/a92044b3-8a07-43d8-a676-abbac9f6e667";
         fsType = "btrfs";

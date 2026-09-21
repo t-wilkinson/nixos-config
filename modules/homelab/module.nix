@@ -123,6 +123,7 @@ in
               reverseProxy = mkOption {
                 type = types.nullOr types.str;
                 default = null;
+                example = "100.1.0.10";
                 description = "Reverse proxy ip address";
               };
 
@@ -157,6 +158,8 @@ in
                 default =
                   if config.id != null then
                     "${hlcfg.network.containerNetwork}.${toString config.id}"
+                  else if config.reverseProxy != null then
+                    config.reverseProxy
                   else
                     "127.0.0.1";
                 type = types.str;
