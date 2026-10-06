@@ -1,0 +1,6 @@
+default-host: https://ntfy.home.lab
+publish:
+  - topic: zortex-notify
+subscribe:
+  - topic: zortex-notify
+    command: 'notify-send "$title" "$message"'

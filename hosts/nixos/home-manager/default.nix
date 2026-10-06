@@ -66,6 +66,7 @@ in
             "fuzzel"
             "hypr"
             "mpv"
+            "ntfy"
             "qt5ct"
             "rofi"
             "thorium-flags.conf"

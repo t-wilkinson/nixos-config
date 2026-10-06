@@ -1,4 +1,7 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
+let
+  enableNtfy = true;
+in
 {
   services = {
     hardware.openrgb.enable = true;
@@ -95,4 +98,36 @@
       };
     };
   };
+
+  systemd.user.services.ntfy-client = lib.mkIf enableNtfy {
+    description = "Ntfy Client Subscription Service";
+    wantedBy = [ "default.target" ];
+    after = [ "network.target" ];
+
+    # Injects these packages into the service's $PATH
+    path = with pkgs; [
+      ntfy-sh
+      libnotify
+      bash
+      pulseaudio
+    ];
+
+    # Using 'script' executes via bash, preserving standard shell quoting and variables
+    script = ''
+      ntfy subscribe https://ntfy.home.lab/zortex-notify '$HOME/.config/ntfy/notify.sh "$title" "$message" "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/message.oga"'
+    '';
+
+    serviceConfig = {
+      Restart = "always";
+      RestartSec = "10s";
+    };
+  };
+
+  environment.systemPackages =
+    with pkgs;
+    lib.optionals enableNtfy [
+      ntfy-sh # systemctl --user enable --now ntfy-client
+      libnotify
+      pulseaudio
+    ];
 }

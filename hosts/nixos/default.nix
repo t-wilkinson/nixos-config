@@ -76,6 +76,7 @@
     users.${username} = {
       isNormalUser = true;
       shell = pkgs.fish;
+      linger = true; # for ntfy
       extraGroups = [
         "wheel"
         "video"
