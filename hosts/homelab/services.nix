@@ -177,14 +177,14 @@ in
         }
         tls internal
       '';
-      # "${services.immich.domain}".extraConfig = ''
-      #   reverse_proxy 10.1.0.1:2283
-      #   tls internal
-      # '';
-      # "${services.nextcloud.domain}".extraConfig = ''
-      #   reverse_proxy 10.1.0.1:8081
-      #   tls internal
-      # '';
+      "${services.immich.domain}".extraConfig = ''
+        reverse_proxy 10.1.0.1:2283
+        tls internal
+      '';
+      "${services.nextcloud.domain}".extraConfig = ''
+        reverse_proxy 10.1.0.1:8081
+        tls internal
+      '';
     };
   };
 

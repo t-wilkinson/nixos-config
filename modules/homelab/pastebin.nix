@@ -12,6 +12,7 @@ in
       # Enables the /pastalist directory on the web UI
       MICROBIN_ENABLE_PASTA_LIST = true;
       MICROBIN_ENCRYPTION_CLIENT_SIDE = true;
+      MICROBIN_MAX_FILE_SIZE_UNENCRYPTED_MB = 500;
     };
   };
 
