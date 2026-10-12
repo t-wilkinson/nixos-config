@@ -78,6 +78,7 @@ in
       };
       zortex = {
         port = 5000;
+        paths."/notes" = "127.0.0.1:8090";
       };
       mc-server = {
         port = 25565;

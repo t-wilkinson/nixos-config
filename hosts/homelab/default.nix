@@ -51,6 +51,10 @@ in
       drives = config.homelab.drives;
     in
     [
+      # Type  Path                  Mode  User Group Age Argument
+      "z      /srv                  0771  -    -     -   -"
+      "z      /srv/sync             0771  -    -     -   -"
+      "z      /srv/sync/personal    0771  -    -     -   -"
       "d ${drives.pi-pubdrive} 0770 ${username} ${groups.storage-media} - -"
       "Z ${drives.pi-pubdrive} 0770 ${username} ${groups.storage-media} - -"
       "d ${drives.personal} 0770 ${username} ${groups.personaldata} - -"

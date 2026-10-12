@@ -10,7 +10,7 @@ notify-send "$TITLE" "$MESSAGE"
 
 SOUNDS=("message.oga" "wilhelm.ogg")
 ROLL=$((RANDOM % 100))
-if ((ROLL < 70)); then
+if ((ROLL < 80)); then
   SOUND=${SOUNDS[0]}
 else
   SOUND=${SOUNDS[1]}

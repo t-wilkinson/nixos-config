@@ -15,22 +15,41 @@ let
   # exposedServices = lib.filterAttrs (n: v: v.expose) services;
   # publicServices = lib.filterAttrs (n: v: v.isPublic) exposedServices;
 
-  mkCaddyProxy = name: service: {
-    name = service.domain;
-    value = {
-      extraConfig = ''
-        @httpProto {
-          header X-Forwarded-Proto http
-        }
-        redir @httpProto https://{host}{uri} permanent
-        reverse_proxy ${service.localEndpoint} {
+  mkCaddyProxy =
+    name: service:
+    let
+      proxyTo = endpoint: ''
+        reverse_proxy ${endpoint} {
           header_up X-Real-IP {http.request.remote.host}
           header_up X-Forwarded-Port {http.request.port}
         }
-        tls internal
       '';
+      # service.paths = { "/notes" = "127.0.0.1:8090"; }: the prefix is passed on
+      pathRoutes = lib.concatStrings (
+        lib.mapAttrsToList (path: endpoint: ''
+          redir ${path} ${path}/
+          handle ${path}/* {
+            ${proxyTo endpoint}
+          }
+        '') (service.paths or { })
+      );
+    in
+    {
+      name = service.domain;
+      value = {
+        extraConfig = ''
+          @httpProto {
+            header X-Forwarded-Proto http
+          }
+          redir @httpProto https://{host}{uri} permanent
+          ${pathRoutes}
+          handle {
+          ${proxyTo service.localEndpoint}
+          }
+          tls internal
+        '';
+      };
     };
-  };
 
   mkHomepageEntry = name: service: {
     ${name} = {
@@ -560,10 +579,15 @@ in
   # ZORTEX: notes, calendar, etc.
   services.zortex = {
     enable = true;
+    web.enable = true;
+    web.port = 8090;
+    web.basePath = "/notes";
     port = services.zortex.port;
     timezone = "America/New_York";
     ntfy.url = "https://${services.ntfy.domain}";
     ntfy.topic = "zortex-notify";
+    notesDir = "/srv/sync/personal/notes";
+    notesGroup = "personaldata"; # lib.toString homelab.groups.personaldata;
     # dataDir = "/var/lib/zortex";
   };
 

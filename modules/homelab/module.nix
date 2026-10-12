@@ -226,6 +226,14 @@ in
                 type = types.str;
                 default = "";
               };
+              paths = mkOption {
+                type = types.attrsOf types.str;
+                description = "Maps of paths to endpoints";
+                example = {
+                  "/notes" = "127.0.0.1:8090";
+                };
+                default = { };
+              };
             };
           }
         )
