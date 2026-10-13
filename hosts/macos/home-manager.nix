@@ -111,6 +111,8 @@
                 id = "personal"; # remove this line?
                 path = "/Users/trey/dev/t-wilkinson/personal";
                 devices = [ "homelab" ];
+                fsWatcherEnabled = true;
+                fsWatcherDelayS = 1;
               };
             };
           };

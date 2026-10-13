@@ -50,19 +50,33 @@ in
       groups = lib.mapAttrs (n: v: toString v) config.homelab.groups;
       drives = config.homelab.drives;
     in
+    # d(D) := create (empty) directory
+    # z(Z) := (recursively) modifies path
+    # f(F) := creates a (truncated) file
     [
       # Type  Path                  Mode  User Group Age Argument
-      "z      /srv                  0771  -    -     -   -"
-      "z      /srv/sync             0771  -    -     -   -"
-      "z      /srv/sync/personal    0771  -    -     -   -"
-      "d ${drives.pi-pubdrive} 0770 ${username} ${groups.storage-media} - -"
-      "Z ${drives.pi-pubdrive} 0770 ${username} ${groups.storage-media} - -"
-      "d ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
-      "Z ${drives.personal} 0770 ${username} ${groups.personaldata} - -"
-      "d ${drives.minecraft} 0775 ${username} ${groups.serverdata} - -"
-      "Z ${drives.minecraft} 0775 ${username} ${groups.serverdata} - -"
-      "d ${drives.actual-budget} 0775 ${username} ${groups.serverdata} - -"
-      "Z ${drives.actual-budget} 0775 ${username} ${groups.serverdata} - -"
+      "d      /srv                  0701  ${username}    -     -   -"
+      "z      /srv                  0701  ${username}    -     -   -"
+      "d      /srv/sync             0701  ${username}    -     -   -"
+      "z      /srv/sync             0701  ${username}    -     -   -"
+
+      # /srv/sync/personal: owned by personaldata, traversal-only for zortexdata
+      "d ${drives.personal} 2770 ${username} ${groups.personaldata} - -"
+      "z ${drives.personal} 2770 ${username} ${groups.personaldata} - -"
+      "a ${drives.personal} -    -          -                    - group:${groups.zortexdata}:--x"
+
+      # /srv/sync/personal/notes: read-only for zortexdata
+      "d ${drives.personal}/notes 2770 ${username} ${groups.personaldata} - -"
+      # Apply access ACL recursively to existing contents, and default ACL to notes directory
+      "A ${drives.personal}/notes - - - - group:${groups.zortexdata}:rwx"
+      "a ${drives.personal}/notes - - - - default:group:${groups.zortexdata}:rwx"
+
+      "d ${drives.pi-pubdrive} 2770 ${username} ${groups.storage-media} - -"
+      "Z ${drives.pi-pubdrive} 2770 ${username} ${groups.storage-media} - -"
+      "d ${drives.minecraft} 2775 ${username} ${groups.serverdata} - -"
+      "Z ${drives.minecraft} 2775 ${username} ${groups.serverdata} - -"
+      "d ${drives.actual-budget} 2775 ${username} ${groups.serverdata} - -"
+      "Z ${drives.actual-budget} 2775 ${username} ${groups.serverdata} - -"
     ];
 
   fileSystems."/" = {

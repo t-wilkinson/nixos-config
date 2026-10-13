@@ -37,6 +37,16 @@
         #     };
         #   }
         # ];
+        "monitor.bluez.rules" = [
+          {
+            matches = [ { "node.name" = "~bluez_output.*"; } ];
+            actions = {
+              update-props = {
+                "session.suspend-timeout-seconds" = 0;
+              };
+            };
+          }
+        ];
         "monitor.alsa.rules" = [
           {
             matches = [
@@ -52,6 +62,7 @@
             actions = {
               update-props = {
                 "session.suspend-on-idle" = false;
+                "session.suspend-timeout-seconds" = 0; # disable auto-suspend
               };
             };
           }

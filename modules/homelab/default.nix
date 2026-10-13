@@ -55,6 +55,7 @@ in
       personaldata = 987; # for exposing to synced directory to services
       serverdata = 980; # for exposing server files to services
       storage-media = 981;
+      zortexdata = 986;
     };
 
     services = {
@@ -77,8 +78,8 @@ in
         subdomain = "sync";
       };
       zortex = {
-        port = 5000;
-        paths."/notes" = "127.0.0.1:8090";
+        port = 8090;
+        # paths."/notes" = "127.0.0.1:8090";
       };
       mc-server = {
         port = 25565;

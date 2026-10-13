@@ -94,6 +94,8 @@ in
           id = "personal"; # remove this line?
           path = "/home/trey/dev/t-wilkinson/personal";
           devices = [ "homelab" ];
+          fsWatcherEnabled = true;
+          fsWatcherDelayS = 1;
         };
       };
     };
@@ -102,19 +104,29 @@ in
   systemd.user.services.ntfy-client = lib.mkIf enableNtfy {
     description = "Ntfy Client Subscription Service";
     wantedBy = [ "default.target" ];
-    after = [ "network.target" ];
+    after = [
+      "network-online.target"
+      "pipewire.service"
+    ];
+    wants = [ "pipewire.service" ];
 
     # Injects these packages into the service's $PATH
     path = with pkgs; [
       ntfy-sh
       libnotify
       bash
-      pulseaudio
+      # pulseaudio # paplay
+      pipewire # pw-play
+      sound-theme-freedesktop
     ];
+
+    environment = {
+      ZORTEX_SOUND_DEFAULT = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/message.oga";
+    };
 
     # Using 'script' executes via bash, preserving standard shell quoting and variables
     script = ''
-      ntfy subscribe https://ntfy.home.lab/zortex-notify '$HOME/.config/ntfy/notify.sh "$title" "$message" "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/message.oga"'
+      exec ntfy subscribe https://ntfy.home.lab/zortex-notify "$HOME/.config/ntfy/notify.sh"
     '';
 
     serviceConfig = {

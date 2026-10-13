@@ -579,15 +579,13 @@ in
   # ZORTEX: notes, calendar, etc.
   services.zortex = {
     enable = true;
-    web.enable = true;
-    web.port = 8090;
-    web.basePath = "/notes";
-    port = services.zortex.port;
+    web.port = services.zortex.port;
+    web.writable = true;
     timezone = "America/New_York";
     ntfy.url = "https://${services.ntfy.domain}";
     ntfy.topic = "zortex-notify";
     notesDir = "/srv/sync/personal/notes";
-    notesGroup = "personaldata"; # lib.toString homelab.groups.personaldata;
+    notesGroup = toString homelab.groups.zortexdata; # "zortexdata"; # lib.toString homelab.groups.personaldata;
     # dataDir = "/var/lib/zortex";
   };
 

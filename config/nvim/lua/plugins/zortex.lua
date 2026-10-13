@@ -118,8 +118,8 @@ return {
       if ok then
         wk.add({
           { "<CR>", "<cmd>ZortexLinkOpen<cr>" },
-          { "Zr", "<cmd>ZortexFoldsReload<cr>", desc = "Reload Zortex folds" },
-          { "ZR", "<cmd>Lazy reload zortex.nvim<cr>", desc = "Reload Zortex plugin" },
+          --- { "Zr", "<cmd>ZortexFoldsReload<cr>", desc = "Reload Zortex folds" },
+          --- { "ZR", "<cmd>Lazy reload zortex.nvim<cr>", desc = "Reload Zortex plugin" },
           -- { "ZZ", "<cmd>ZortexSearchSections<cr>" },
           -- { "Zz", "<cmd>ZortexSearchSections<cr>" },
           -- { "Zs", "<cmd>e " .. require("zortex.config").notes_dir .. "/structure.zortex<cr>" },
