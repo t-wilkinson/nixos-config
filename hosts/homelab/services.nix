@@ -18,12 +18,20 @@ let
   mkCaddyProxy =
     name: service:
     let
+      domains = [
+        service.domain
+      ]
+      # If service is public, allow either private or public domain
+      ++ (lib.optional (service.isPublic && service.publicDomain != null) service.publicDomain);
+      hostnames = lib.concatStringsSep ", " domains;
+
       proxyTo = endpoint: ''
         reverse_proxy ${endpoint} {
           header_up X-Real-IP {http.request.remote.host}
           header_up X-Forwarded-Port {http.request.port}
         }
       '';
+
       # service.paths = { "/notes" = "127.0.0.1:8090"; }: the prefix is passed on
       pathRoutes = lib.concatStrings (
         lib.mapAttrsToList (path: endpoint: ''
@@ -35,7 +43,7 @@ let
       );
     in
     {
-      name = service.domain;
+      name = hostnames;
       value = {
         extraConfig = ''
           @httpProto {
@@ -44,7 +52,7 @@ let
           redir @httpProto https://{host}{uri} permanent
           ${pathRoutes}
           handle {
-          ${proxyTo service.localEndpoint}
+            ${proxyTo service.localEndpoint}
           }
           tls internal
         '';
