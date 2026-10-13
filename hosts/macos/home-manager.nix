@@ -81,7 +81,7 @@
           packages = with pkgs; [
             fswatch
             dockutil
-            prismlauncher
+            # prismlauncher
           ];
           file = {
             ".gnupg/gpg-agent.conf".source = "${homedir}/.gnupg/gpg-agent.conf.mac";

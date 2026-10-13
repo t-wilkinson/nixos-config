@@ -5,7 +5,7 @@
   ...
 }:
 let
-  nodePackages = unstable;
+  nodePackages = unstable.nodePackages;
 in
 with pkgs;
 [

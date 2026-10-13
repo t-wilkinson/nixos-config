@@ -14,14 +14,14 @@ return {
       require("zortex").setup({
         notes_dir = vim.fn.expand("~/.zortex/"),
         special_articles = { "structure", "inbox" },
-        debug = false,
         keymaps = {
           prefix = "Z",
         },
         core = {
           logger = {
-            enabled = true,
-            log_events = true,
+            enabled = false,
+            log_events = false,
+            level = 3,
           },
         },
 
@@ -29,38 +29,14 @@ return {
           enabled = true,
           api_endpoint = "https://zortex.home.lab",
           user_id = "default",
-          -- api_key = "your-secure-api-key-here", -- Same as in Docker .env
         },
 
         notifications = {
-          channels = {
-            calendar = { "vim", "ntfy" },
-            alarm = { "vim", "ntfy" },
-            timer = { "vim", "ntfy" },
-            pomodoro = { "vim", "ntfy" },
-            digest = { "ses" },
-            task_due = { "ntfy", "ses" },
-            default = { "vim", "ntfy" },
-          },
-
           providers = {
-            -- aws = {
-            --   enabled = true,
-            --   api_endpoint = "https://qd5wcnxpn8.execute-api.us-east-1.amazonaws.com/prod/manifest",
-            --   user_id = 229817327380,
-            -- },
             ntfy = {
               enabled = true,
               topic = "zortex-notify",
               server_url = "https://ntfy.home.lab",
-            },
-            ses = {
-              enabled = false,
-              region = "us-east-1", -- Your AWS region
-              from_email = "noreply@treywilkinson.com",
-              default_to_email = "winston.trey.wilkinson@gmail.com",
-              domain = "treywilkinson.com",
-              use_api = false, -- Use AWS CLI for now
             },
           },
 
@@ -73,44 +49,21 @@ return {
               auto_start_break = true,
               auto_start_work = false,
               sound = "default",
-            },
-
-            -- Daily digest settings
-            digest = {
-              enabled = false,
-              auto_send = false,
-              days_ahead = 7,
-              send_hour = 7, -- 7 AM
-              check_interval_minutes = 60,
-              digest_email = "winston.trey.wilkinson@gmail.com", -- Can be different from default
+              use_server = true,
+              ntfy_only = true,
             },
           },
         },
 
         -- UI Configuration
         ui = {
-          preview = { on_hover = true },
-          -- Calendar UI settings
-          calendar = {
-            window = {
-              -- width = 0.85,
-              -- height = 0.85,
-            },
-            colors = {},
-            keymaps = {
-              -- You can override default keymaps here
-              close = { "q", "<Esc>", "<C-c>" },
-              today = { "t", "T" },
-              add_entry = { "a", "i", "A" },
+          highlights = { preset = "rose-pine" },
+          preview = { on_hover = false },
+          planner = {
+            templates = {
+              weekday = { "07:30 Meditate", "07:40 Planner", "08:00 MSCS" },
             },
           },
-        },
-
-        -- Feature toggles
-        features = {
-          auto_progress = true,
-          xp_notifications = true,
-          skill_tree = true,
         },
       })
 

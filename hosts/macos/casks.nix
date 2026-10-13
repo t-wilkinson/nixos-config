@@ -41,4 +41,5 @@ _: [
 
   # AI
   # "diffusionbee"
+  "prismlauncher"
 ]
