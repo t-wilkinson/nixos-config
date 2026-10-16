@@ -589,6 +589,7 @@ in
     enable = true;
     web.port = services.zortex.port;
     web.writable = true;
+    web.htmlScripts = true;
     timezone = "America/New_York";
     ntfy.url = "https://${services.ntfy.domain}";
     ntfy.topic = "zortex-notify";

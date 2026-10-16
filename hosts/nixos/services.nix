@@ -19,6 +19,7 @@ in
         PasswordAuthentication = true;
         AllowUsers = null;
         PermitRootLogin = "no";
+        KbdInteractiveAuthentication = false;
       };
     };
     greetd = {

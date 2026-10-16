@@ -20,6 +20,9 @@
 
         discord
 
+        # HOMELAB
+        cloudlfared
+
         # VIRTUALIZATION
         k3s
         incus

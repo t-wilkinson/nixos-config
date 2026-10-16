@@ -57,6 +57,7 @@ return {
 
         -- UI Configuration
         ui = {
+          search = { keys = { cycle_mode = "<M-m>" } },
           highlights = { preset = "rose-pine" },
           preview = { on_hover = false },
           planner = {
@@ -73,8 +74,8 @@ return {
           { "<CR>", "<cmd>ZortexLinkOpen<cr>" },
           --- { "Zr", "<cmd>ZortexFoldsReload<cr>", desc = "Reload Zortex folds" },
           --- { "ZR", "<cmd>Lazy reload zortex.nvim<cr>", desc = "Reload Zortex plugin" },
-          -- { "ZZ", "<cmd>ZortexSearchSections<cr>" },
-          -- { "Zz", "<cmd>ZortexSearchSections<cr>" },
+          { "ZZ", "<cmd>ZortexSearch<cr>" },
+          { "Zz", "<cmd>ZortexSearchArticles<cr>" },
           -- { "Zs", "<cmd>e " .. require("zortex.config").notes_dir .. "/structure.zortex<cr>" },
           -- { "Zp", "<cmd>e " .. require("zortex.config").notes_dir .. "/projects.zortex<cr>" },
           -- { "Zp", "<cmd>ZortexProjects<cr>" },
