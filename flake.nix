@@ -166,7 +166,7 @@
                 nixpkgs.hostPlatform = system;
                 boot.kernelPackages = pkgs.linuxPackages;
                 sdImage.compressImage = false;
-                sdImage.imageName = "homelab-rpi4.img";
+                image.fileName = "homelab-rpi4.img"; # was sdImage.imageName (renamed in 26.05)
               }
             )
             ./hosts/homelab
@@ -227,10 +227,10 @@
     # NixPkgs
     # nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    nixpkgs-nixos.url = "github:NixOS/nixpkgs/nixos-25.05";
-    nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-25.05-darwin";
+    nixpkgs-nixos.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgs-darwin.url = "github:NixOS/nixpkgs/nixpkgs-26.05-darwin";
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05"; # "follows" doesn't seem to work?
+      url = "github:nix-community/home-manager/release-26.05"; # "follows" doesn't seem to work?
       inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
 
@@ -256,7 +256,7 @@
 
     # macOS
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs-darwin";
     };
     nix-homebrew = {
@@ -285,7 +285,9 @@
     thorium.url = "github:end-4/nix-thorium";
     ags = {
       url = "github:Aylur/ags/v1";
-      inputs.nixpkgs.follows = "nixpkgs-nixos";
+      # AGS v1 uses nodePackages, which 26.05 removed, so it keeps its own pinned nixpkgs
+      # (pkgs.ags_1 in nixpkgs is the alternative)
+      # inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
     flake-parts = {
       url = "github:hercules-ci/flake-parts";

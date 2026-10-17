@@ -31,7 +31,7 @@ in
       enable = true;
       settings = {
         default_session = {
-          command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
+          command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd Hyprland";
           user = "greeter";
         };
       };
@@ -47,12 +47,14 @@ in
       enable = true;
       videoDrivers = [ "modesetting" ];
       displayManager.startx.enable = true;
-      desktopManager.gnome = {
-        enable = true;
-        extraGSettingsOverridePackages = [ pkgs.nautilus-open-any-terminal ];
-      };
       # xkb.layout = "us";
       # xkb.options = "eurosign:e,caps:escape";
+    };
+
+    # 26.05: moved out of services.xserver
+    desktopManager.gnome = {
+      enable = true;
+      extraGSettingsOverridePackages = [ pkgs.nautilus-open-any-terminal ];
     };
 
     keyd = {

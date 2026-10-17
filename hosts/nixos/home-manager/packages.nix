@@ -12,7 +12,7 @@
 
         i3
         sway
-        pinentry
+        pinentry-gnome3
         foot
         bitwarden-desktop
         bitwarden-cli
@@ -31,7 +31,7 @@
         # GUI
         kdePackages.okular # pdf viewer
         # zathura # pdf viewer
-        blueberry
+        blueman # blueberry was removed (unmaintained)
         (mpv.override { scripts = [ mpvScripts.mpris ]; })
         d-spy
         kdePackages.dolphin
@@ -40,7 +40,7 @@
         dconf-editor # gnome
         libsForQt5.qt5.qtimageformats
         yad
-        tor-browser-bundle-bin
+        tor-browser
         (google-chrome.override {
           commandLineArgs = [
             "--enable-features=UseOzonePlatform"
@@ -57,7 +57,7 @@
         ydotool # simulate mouse and keyboard
 
         # theming tools
-        gradience
+        # gradience # removed in 26.05 (archived upstream)
         gnome-tweaks
 
         # hyprland
@@ -70,12 +70,12 @@
         tesseract
         pavucontrol
         playerctl
-        rofi-wayland
+        rofi # rofi-wayland was merged into rofi
         swappy
         swaylock-effects
         swayidle
         slurp
-        swww
+        awww # swww was renamed
         wayshot
         wlsunset
         wl-clipboard

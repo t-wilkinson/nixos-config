@@ -7,8 +7,9 @@ in
 
   networking = {
     hostName = hostname;
-    # Disable wpa_supplicant to avoid conflicts with NetworkManager
-    wireless.enable = false;
+    # 26.05: NetworkManager drives wpa_supplicant through networking.wireless itself,
+    # so forcing it off now conflicts.
+    # wireless.enable = false;
 
     nat = {
       enable = true;

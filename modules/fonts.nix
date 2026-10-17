@@ -6,7 +6,7 @@
     hack-font
     meslo-lgs-nf
     noto-fonts
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     # liberation_ttf
   ];
 

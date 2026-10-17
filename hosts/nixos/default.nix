@@ -28,6 +28,12 @@
   ];
 
   services.usbmuxd.enable = true;
+  # 26.05: GNOME's gcr-ssh-agent conflicts with programs.ssh.startAgent (only one SSH agent)
+  services.gnome.gcr-ssh-agent.enable = false;
+  # Root is on ZFS (rpool). true = the current behaviour, stated explicitly to silence the 26.05
+  # warning. false is safer long term but can leave the pool unimportable at boot if it was
+  # not exported cleanly; switch only after checking networking.hostId matches the pool.
+  boot.zfs.forceImportRoot = true;
 
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
@@ -124,7 +130,7 @@
     kdePackages.kdeconnect-kde
     libsForQt5.qtstyleplugin-kvantum # The engine
     kdePackages.qtstyleplugin-kvantum # For Qt6 apps
-    xdragon # for lf
+    dragon-drop # for lf (was xdragon)
 
     # inputs.agenix.packages."${config.system}".default
     # inputs.agenix.packages."x86_64-linux".default
@@ -158,7 +164,7 @@
     firefox = {
       enable = true;
       nativeMessagingHosts.packages = [
-        pkgs.libsForQt5.plasma-browser-integration
+        pkgs.kdePackages.plasma-browser-integration
         pkgs.gnomeExtensions.gsconnect
       ];
     };
@@ -224,11 +230,11 @@
   };
 
   # Suspend on power button press
-  services.logind.extraConfig = ''
-    HandlePowerKey=suspend
-    HandleLidSwitch=suspend
-    HandleLidSwitchExternalPower=ignore
-  '';
+  services.logind.settings.Login = {
+    HandlePowerKey = "suspend";
+    HandleLidSwitch = "suspend";
+    HandleLidSwitchExternalPower = "ignore";
+  };
 
   # Prevent the computer from waking up from super sensitive mouse
   services.udev.extraRules = ''

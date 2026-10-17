@@ -99,7 +99,8 @@ in
   #   ];
   # };
 
-  documentation.man.generateCaches = false; # Fish enables this by default but it takes a lot of time.
+  documentation.man.cache.enable = false; # Fish enables this by default but it takes a lot of time.
+  boot.zfs.forceImportRoot = false; # no ZFS here; silences the 26.05 warning about the old default
   security.sudo.wheelNeedsPassword = false; # So remote building doesn't keep asking for passwords
 
   # Use generic extlinux compatible bootloader (standard for Pi images)

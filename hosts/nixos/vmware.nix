@@ -6,7 +6,7 @@
       "vmware"
       "modesetting"
     ];
-    services.xserver.desktopManager.gnome.enable = lib.mkForce false;
+    services.desktopManager.gnome.enable = lib.mkForce false;
 
     # Fix for the black screen/cursor issues in virtualized Wayland
     environment.sessionVariables = {

@@ -18,8 +18,8 @@
     type = "fcitx5";
     enable = true;
     fcitx5.addons = with pkgs; [
-      fcitx5-unikey
-      fcitx5-with-addons
+      qt6Packages.fcitx5-unikey
+      qt6Packages.fcitx5-with-addons
     ];
   };
 }

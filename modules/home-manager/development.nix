@@ -98,7 +98,7 @@ with pkgs;
   # terraform-ls
   # tflint
 
-  nixfmt-rfc-style
+  nixfmt
   # nixpkgs-fmt
   # nixfmt-classic
 ]

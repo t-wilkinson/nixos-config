@@ -33,7 +33,7 @@ lib.mkIf cfg.runsHere {
 
   services.nextcloud = {
     enable = true;
-    package = pkgs.nextcloud32;
+    package = pkgs.nextcloud33; # one major at a time: 32 -> 33
     hostName = cfg.domain;
     https = true;
     configureRedis = true;

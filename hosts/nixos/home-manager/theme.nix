@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ config, pkgs, inputs, ... }:
 let
   gtk-theme = "adw-gtk3-dark";
 
@@ -102,6 +102,7 @@ in
     enable = true;
     font.name = "Rubik";
     theme.name = gtk-theme;
+    gtk4.theme = config.gtk.theme; # 26.05 stopped inheriting this by default
     cursorTheme = {
       name = cursor-theme;
       package = cursor-package;

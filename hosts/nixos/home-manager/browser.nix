@@ -10,12 +10,14 @@
       source = inputs.firefox-gnome-theme;
     };
     packages = with pkgs; [
-      libsForQt5.plasma-browser-integration
+      kdePackages.plasma-browser-integration
     ];
   };
 
   programs.firefox = {
     enable = true;
+    # Keep the pre-26.05 profile location; the firefox-gnome-theme link above targets it
+    configPath = ".mozilla/firefox";
     profiles.default = {
       name = "Default";
       settings = {
@@ -40,7 +42,7 @@
       '';
     };
     nativeMessagingHosts = [
-      pkgs.libsForQt5.plasma-browser-integration
+      pkgs.kdePackages.plasma-browser-integration
       pkgs.browserpass
     ];
   };

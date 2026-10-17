@@ -90,18 +90,21 @@ in
         };
         git = {
           enable = true;
-          userName = "t-wilkinson";
-          userEmail = "winston.trey.wilkinson@gmail.com";
-          extraConfig = {
+          # 26.05: userName/userEmail/extraConfig/aliases all live under settings
+          settings = {
+            user = {
+              name = "t-wilkinson";
+              email = "winston.trey.wilkinson@gmail.com";
+            };
             init = {
               defaultBranch = "main";
             };
             credential.helper = "${git-credential-pass}/bin/git-credential-pass";
-          };
-          aliases = {
-            pu = "push";
-            co = "checkout";
-            cm = "commit";
+            alias = {
+              pu = "push";
+              co = "checkout";
+              cm = "commit";
+            };
           };
         };
       };

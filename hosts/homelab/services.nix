@@ -110,7 +110,7 @@ in
 {
   # BLOCKY
   services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
-  services.resolved.extraConfig = "DNSStubListener=no";
+  # services.resolved.extraConfig = "DNSStubListener=no"; # removed in 26.05; resolved is off anyway
   services.blocky = {
     enable = true;
     settings = {
@@ -594,9 +594,8 @@ in
   # token as the password.
   services.ntfy-sh = {
     enable = true;
-    # Declarative users/tokens (auth-users / auth-tokens) need ntfy >= 2.14; 25.05 ships 2.12.
-    # After the 26.05 upgrade the default package is new enough and this line can go.
-    package = unstable.ntfy-sh;
+    # Declarative users/tokens (auth-users / auth-tokens) need ntfy >= 2.14; 26.05 ships 2.26.
+    # package = unstable.ntfy-sh;
     settings = {
       base-url = "https://${services.ntfy.domain}";
       listen-http = "127.0.0.1:${toString services.ntfy.port}"; # only Caddy and local clients
