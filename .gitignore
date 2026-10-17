@@ -9,3 +9,5 @@ ssh_host_ed25519_key
 __pycache__
 *.bak
 *.old
+*.pyc
+extension-errors.log
