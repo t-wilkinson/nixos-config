@@ -18,6 +18,12 @@ jobs:
       - name: Evaluate homelab (Pi)
         run: nix eval --raw .#nixosConfigurations.homelab.config.system.build.toplevel.drvPath
 
+      - name: Evaluate bootstrap images (void)
+        run: |
+          for i in void-iso void-disk void-sd; do
+            nix eval --raw ".#images.$i.drvPath"; echo
+          done
+
       - name: Validate generated Caddyfile
         run: bash .github/scripts/check-caddyfile.sh .
 
