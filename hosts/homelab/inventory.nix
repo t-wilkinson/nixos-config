@@ -39,7 +39,7 @@
       cidr = "10.1.0.0/30";
       domain = "home.lab";
       publicDomain = "treywilkinson.com";
-      cloudflareTunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # <id>.cfargotunnel.com - CNAME cloudflared tunnel
+      cloudflareTunnelId = "39990619-972b-46ab-9812-ee8fe70d87f0"; # <id>.cfargotunnel.com - CNAME cloudflared tunnel
       containerNetwork = "192.168.100";
     };
 

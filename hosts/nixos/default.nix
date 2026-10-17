@@ -4,6 +4,7 @@
   lib,
   username,
   config,
+  inputs,
   ...
 }:
 {
@@ -40,6 +41,7 @@
       # };
     };
   };
+  nix.registry.unstable.flake = inputs.nixpkgs-unstable;
   nix.settings = {
     auto-optimise-store = true;
     substituters = [
