@@ -15,8 +15,6 @@
       homebrew-bundle,
       homebrew-cask,
       homebrew-core,
-      hyprland,
-      hyprland-plugins,
       impurity-nix,
       more-waita,
       nix-darwin,
@@ -302,11 +300,12 @@
     darwin-docker.url = "github:konradmalik/darwin-docker";
 
     # nixos
-    hyprland.url = "github:hyprwm/Hyprland/v0.40.0";
-    hyprland-plugins = {
-      url = "github:hyprwm/hyprland-plugins";
-      inputs.nixpkgs.follows = "hyprland";
-    };
+    # Hyprland comes from nixpkgs (pkgs.hyprland, pkgs.hyprlandPlugins); the old v0.40 pin is gone
+    # hyprland.url = "github:hyprwm/Hyprland/v0.40.0";
+    # hyprland-plugins = {
+    #   url = "github:hyprwm/hyprland-plugins";
+    #   inputs.nixpkgs.follows = "hyprland";
+    # };
     thorium.url = "github:end-4/nix-thorium";
     ags = {
       url = "github:Aylur/ags/v1";

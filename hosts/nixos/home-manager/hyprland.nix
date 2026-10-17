@@ -1,7 +1,9 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 let
-  hyprland = inputs.hyprland.packages.${pkgs.stdenv.hostPlatform.system}.hyprland;
-  plugins = inputs.hyprland-plugins.packages.${pkgs.stdenv.hostPlatform.system};
+  # nixpkgs' Hyprland (0.55 on 26.05), the same one greetd starts. The flake's hyprland input
+  # was pinned to v0.40 (2024), so this launcher ran a different Hyprland from the session.
+  hyprland = pkgs.hyprland;
+  # plugins = pkgs.hyprlandPlugins; # hyprexpo, hyprbars, ... built against this Hyprland
 
   launcher = pkgs.writeShellScriptBin "hypr" ''
     #!/${pkgs.bash}/bin/bash
