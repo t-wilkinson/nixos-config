@@ -1,0 +1,30 @@
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/determinate-nix-action@v3
+
+      # Evaluating the system catches option errors, removed packages and failed assertions,
+      # including modules/sops-check.nix (a declared secret missing from secrets.yaml).
+      - name: Evaluate homelab (Pi)
+        run: nix eval --raw .#nixosConfigurations.homelab.config.system.build.toplevel.drvPath
+
+      - name: Validate generated Caddyfile
+        run: bash .github/scripts/check-caddyfile.sh .
+
+      - name: Evaluate PC (impure)
+        run: |
+          # The PC config reads /home/trey/.ssh/authorized_keys at eval time (openssh keyFiles);
+          # give the runner a placeholder so evaluation can proceed.
+          sudo mkdir -p /home/trey/.ssh
+          echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ ci" | sudo tee /home/trey/.ssh/authorized_keys > /dev/null
+          IMPURITY_PATH=$PWD nix eval --impure --raw .#nixosConfigurations.x86_64-linux-impure.config.system.build.toplevel.drvPath

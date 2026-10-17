@@ -1,0 +1,28 @@
+name: Update flake.lock
+
+on:
+  workflow_dispatch: # run by hand from the Actions tab
+  schedule:
+    - cron: "0 9 * * 1" # Mondays 09:00 UTC
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: DeterminateSystems/determinate-nix-action@v3
+      - uses: DeterminateSystems/update-flake-lock@v29
+        with:
+          pr-title: "flake.lock: weekly update"
+          pr-labels: |
+            dependencies
+            automated
+          # PRs opened with the default GITHUB_TOKEN don't trigger other workflows, so the
+          # "Check" workflow won't run on them. Add a fine-grained token (Contents + Pull requests:
+          # read/write) as the repo secret GH_TOKEN_FOR_UPDATES to get CI on these PRs.
+          token: ${{ secrets.GH_TOKEN_FOR_UPDATES || github.token }}
