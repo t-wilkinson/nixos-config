@@ -16,7 +16,7 @@ in
         6229
       ];
       settings = {
-        PasswordAuthentication = true;
+        PasswordAuthentication = false;
         AllowUsers = null;
         PermitRootLogin = "no";
         KbdInteractiveAuthentication = false;

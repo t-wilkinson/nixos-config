@@ -545,7 +545,11 @@ in
   # OPENSSH
   services.openssh = {
     enable = true;
-    settings.PasswordAuthentication = false;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "no";
+    };
   };
 
   sops.templates."vaultwarden-env".content = ''
