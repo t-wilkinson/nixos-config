@@ -38,6 +38,17 @@ let
         pkgs.openssh
         pkgs.nixos-rebuild
       ];
+      # deploy-rs (flake.nix deploy.nodes): `nix run .#deploy -- .#homelab [--remote-build]`
+      "deploy" = {
+        type = "app";
+        program = "${deploy-rs.packages.${system}.default}/bin/deploy";
+      };
+      "h-deploy" = {
+        type = "app";
+        program = "${pkgs.writeShellScript "h-deploy" ''
+          exec ${deploy-rs.packages.${system}.default}/bin/deploy "''${FLAKE:-.}#homelab" "$@"
+        ''}";
+      };
       "h" = h-remote-switch;
       "h-remote-switch" = mkHomelabApp "remote-switch" [
         pkgs.openssh

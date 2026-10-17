@@ -5,4 +5,4 @@ export NIX_SSHOPTS="-t"
 
 nixos-rebuild build \
   --flake .#homelab \
-  --target-host trey@homelab
+  --target-host root@home.lab

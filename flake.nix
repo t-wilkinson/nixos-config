@@ -190,14 +190,26 @@
       };
 
       images.homelab = homelab.config.system.build.sdImage;
-      deploy.nodes.homelab = {
-        hostname = "home.lab";
-        profiles.system = {
+
+      # deploy-rs: `nix run .#deploy` (all nodes) or `nix run .#deploy -- .#homelab`.
+      # Builds on this machine (the Mac's linux-builder, or the PC's aarch64 emulation) and
+      # copies the closure as root; add `--remote-build` to build on the Pi instead.
+      # Magic rollback: if the new system can't confirm the SSH connection within the timeout
+      # (e.g. a broken network or sshd config), the Pi reverts to the previous generation.
+      deploy.nodes.homelab =
+        let
+          pi = homelab.config.homelab.nodes.${homelab.config.homelab.thisNode};
+        in
+        {
+          hostname = pi.sshHost; # hosts/homelab/inventory.nix
+          sshUser = "root"; # key only (PermitRootLogin prohibit-password); trey's sudo needs a password
           user = "root";
-          sshUser = "trey";
-          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.homelab;
+          magicRollback = true;
+          autoRollback = true;
+          remoteBuild = false;
+          confirmTimeout = 60; # the Pi restarts Wi-Fi/Caddy/etc. on some changes
+          profiles.system.path = deploy-rs.lib.${pi.system}.activate.nixos homelab;
         };
-      };
 
       checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
 
