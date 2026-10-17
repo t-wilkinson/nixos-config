@@ -7,7 +7,8 @@
   ...
 }:
 let
-  tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # .cfargotunnel.com - CNAME cloudflared tunnel
+  # tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # .cfargotunnel.com - CNAME cloudflared tunnel
+  tunnelId = "39990619-972b-46ab-9812-ee8fe70d87f0";
   homelab = config.homelab;
   services = config.homelab.services;
   net = config.homelab.network;
