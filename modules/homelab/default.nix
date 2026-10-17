@@ -16,6 +16,7 @@
     ./fail2ban.nix
 
     # Services (each runs on the node named by its `host`)
+    ./authelia.nix
     ./dashboard.nix
     ./vaultwarden.nix
     ./ntfy.nix

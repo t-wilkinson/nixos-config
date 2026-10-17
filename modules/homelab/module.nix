@@ -330,6 +330,21 @@ in
                     null;
               };
 
+              auth = mkOption {
+                type = types.bool;
+                default = false;
+                description = ''
+                  Put the service behind the homelab login (Authelia, homelab.services.auth): Caddy
+                  asks Authelia before proxying, so one password covers every such service.
+                '';
+              };
+              authBypass = mkOption {
+                type = types.listOf types.str;
+                default = [ ];
+                example = [ "/api/*" ];
+                description = "Caddy path patterns that skip the login (e.g. an API that has its own token).";
+              };
+
               extraConfig = mkOption {
                 type = types.lines;
                 default = "";
@@ -409,6 +424,10 @@ in
     ++ mapAttrsToList (name: s: {
       assertion = !s.enable || (s.host != null && hasAttr s.host hlcfg.nodes);
       message = "homelab.services.${name} is enabled but its host (${toString s.host}) is not in homelab.nodes.";
+    }) hlcfg.services
+    ++ mapAttrsToList (name: s: {
+      assertion = !(s.enable && s.auth) || (hlcfg.services ? auth && hlcfg.services.auth.enable);
+      message = "homelab.services.${name}.auth = true needs the auth service (Authelia) enabled.";
     }) hlcfg.services;
 
     users.groups = mapAttrs (name: gid: { inherit gid; }) hlcfg.groups;

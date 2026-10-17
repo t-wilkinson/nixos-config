@@ -77,6 +77,7 @@
       "mealie"
       "actual-budget"
       "wakeonlan"
+      "auth" # Authelia: needs the authelia_* secrets (see modules/homelab/authelia.nix)
       # "prometheus"
       # "grafana"
 
@@ -110,6 +111,16 @@
         port = 8082;
         subdomain = "dash";
         dashboard.category = null;
+        auth = true;
+        authBypass = [ "/root.crt" ]; # new devices fetch the CA before they trust HTTPS
+      };
+      auth = {
+        # Authelia login portal for services with auth = true (LAN/tailnet only, like them)
+        host = "pi";
+        port = 9091;
+        name = "Login";
+        description = "Single sign-on for private services";
+        dashboard.category = null;
       };
       syncthing = {
         host = "pi";
@@ -117,6 +128,7 @@
         name = "Syncthing";
         subdomain = "sync";
         description = "P2P File Synchronization";
+        auth = true; # in front of Syncthing's own GUI password
         dashboard = {
           category = "Infrastructure";
           icon = "syncthing";
@@ -128,6 +140,8 @@
         name = "Zortex Hub";
         description = "Notification & Organization Hub";
         dashboard.icon = "mdi-bell-ring"; # widget: modules/homelab/zortex.nix
+        auth = true;
+        authBypass = [ "/api/*" ]; # Neovim (zortex.nvim) and the dashboard widget
         # paths."/notes" = "127.0.0.1:8090";
       };
       mc-server = {
@@ -217,6 +231,7 @@
         port = 8888;
         monitor = false; # not always running, so homelab-status shouldn't alert on it
         name = "Jupyter Lab";
+        auth = true; # in front of Jupyter's token
         description = "Remote Data Science";
         dashboard = {
           category = "Compute Nodes";

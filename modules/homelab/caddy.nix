@@ -37,6 +37,14 @@ let
         @notLan not client_ip ${privateRanges}
         respond @notLan "Not found" 404
       '';
+      # Login (Authelia) for services with auth = true; authBypass paths skip it
+      authCheck = lib.optionalString service.auth ''
+        ${lib.optionalString (service.authBypass != [ ]) "@needsAuth not path ${lib.concatStringsSep " " service.authBypass}"}
+        forward_auth ${lib.optionalString (service.authBypass != [ ]) "@needsAuth "}${services.auth.localEndpoint} {
+          uri /api/authz/forward-auth
+          copy_headers Remote-User Remote-Groups Remote-Email Remote-Name
+        }
+      '';
       # Everything below runs inside `route`, i.e. in the order written. (At the top level Caddy
       # sorts `handle` before `respond`, so access checks written as `respond` would never fire.)
 
@@ -60,6 +68,7 @@ let
           redir @httpProto https://{host}{uri} permanent
           route {
             ${lanOnly}
+            ${authCheck}
             ${service.extraConfig}
             ${pathRoutes}
             handle {

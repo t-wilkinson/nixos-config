@@ -144,6 +144,7 @@ in
         mealie = [ "container@mealie.service" ];
         actual-budget = [ "container@actual-budget.service" ];
         wakeonlan = [ "webhook.service" ];
+        auth = [ "authelia-main.service" ];
         borg = [ "borgbackup-job-homelab.timer" ];
         nextcloud = [
           "phpfpm-nextcloud.service"
