@@ -19,7 +19,11 @@
       #cudaCapabilities = ["8.0"];
       allowBroken = true;
       allowInsecure = false;
-      allowUnsupportedSystem = true;
+      # Not here: allowUnsupportedSystem makes meta.available lie. nixpkgs' CUDA packages add
+      # cuda_compat (Jetson/aarch64 only) whenever it claims to be available, so on the PC every
+      # CUDA package pulled in a cuda_compat with no x86_64 source and the build failed.
+      # macOS keeps it (hosts/macos/default.nix).
+      # allowUnsupportedSystem = true;
     };
   };
 }

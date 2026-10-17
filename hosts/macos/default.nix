@@ -42,6 +42,9 @@ in
     gnupg.sshKeyPaths = [ ];
   };
 
+  # Was in modules/nix.nix (shared); kept for macOS only, see the note there
+  nixpkgs.config.allowUnsupportedSystem = true;
+
   nix = {
     package = pkgs.nix;
     # Builds aarch64-linux (the Pi) in a small NixOS VM; Nix sends Linux builds to it as a
