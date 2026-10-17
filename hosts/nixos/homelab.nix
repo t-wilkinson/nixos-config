@@ -1,11 +1,11 @@
 { username, ... }:
 {
   imports = [
-    ../homelab/inventory.nix
+    ../inventory.nix
     ../../modules/homelab
   ];
 
-  # Which services run here is decided by `host` in ../homelab/inventory.nix
+  # Which services run here is decided by `host` in ../inventory.nix
   homelab.thisNode = "pc";
 
   users.users.${username} = {

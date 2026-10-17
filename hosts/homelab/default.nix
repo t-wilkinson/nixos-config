@@ -12,7 +12,7 @@ let
 in
 {
   imports = [
-    ./inventory.nix
+    ../inventory.nix
     ./networking.nix
     ./wifi.nix
     ./secrets.nix
@@ -20,7 +20,7 @@ in
     ../../modules/sops-check.nix
   ];
 
-  # Services and their hosts are listed in ./inventory.nix
+  # Services and their hosts are listed in ../inventory.nix
   homelab.thisNode = "pi";
 
   services.automatic-timezoned.enable = true;

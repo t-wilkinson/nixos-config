@@ -5,7 +5,7 @@
 #   void-disk  x86_64 raw EFI disk    -> write straight to the target drive, boot it
 #   void-sd    aarch64 SD-card image  -> write to an SD card / USB SSD for a Pi
 # All of them boot with:
-#   - SSH as root with the admin keys from hosts/homelab/inventory.nix (key only)
+#   - SSH as root with the admin keys from hosts/inventory.nix (key only)
 #   - mDNS, so `ssh root@void.local` works on the LAN without knowing the address
 #   - NetworkManager (`nmtui` for Wi-Fi), Tailscale (run `tailscale up` to join the tailnet)
 #   - flakes, git, and the usual install tools
@@ -17,7 +17,7 @@
   ...
 }:
 let
-  inventory = (import ../homelab/inventory.nix { inherit username; }).homelab;
+  inventory = (import ../inventory.nix { inherit username; }).homelab;
   isx86 = pkgs.stdenv.hostPlatform.isx86_64;
 in
 {

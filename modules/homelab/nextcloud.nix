@@ -10,7 +10,7 @@ let
   cfg = config.homelab.services.nextcloud;
   secrets = config.sops.secrets;
 in
-# Runs natively on its host (the PC; host = "pc" in hosts/homelab/inventory.nix) and is reached
+# Runs natively on its host (the PC; host = "pc" in hosts/inventory.nix) and is reached
 # through the gateway's Caddy. The old Pi container version is ./nextcloud-container.nix.
 lib.mkIf cfg.runsHere {
   sops.secrets.nextcloud_admin_pass = {

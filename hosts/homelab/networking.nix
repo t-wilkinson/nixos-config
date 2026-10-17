@@ -44,7 +44,7 @@ in
         #   wifi-security = {
         #     key-mgmt = "wpa-psk";
         #     # psk-file = config.sops.secrets.wifi_psk.path;
-        #     psk = "November13th"; # Note: This exposes the password in the Nix store
+        #     psk = "password"; # Note: This exposes the password in the Nix store
         #   };
         #   ipv4 = {
         #     method = "auto";

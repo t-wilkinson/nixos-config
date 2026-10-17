@@ -47,8 +47,8 @@ in
       gtksourceview
       gtksourceview4
       ollama
-      python311Packages.material-color-utilities
-      python311Packages.pywayland
+      # python311Packages.material-color-utilities
+      # python311Packages.pywayland
       pywal
       sassc
       webkitgtk_4_1

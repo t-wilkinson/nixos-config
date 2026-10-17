@@ -1,4 +1,4 @@
-# hosts/homelab/inventory.nix
+# hosts/inventory.nix
 #
 # Data describing the homelab: nodes, network, drives and the service registry.
 # Imported by every machine that is part of the homelab (the Pi and the PC).
@@ -93,80 +93,6 @@
     ];
 
     services = {
-      ntfy = {
-        host = "pi";
-        port = 8083;
-        isPublic = true;
-        description = "Notifications";
-      };
-      vault = {
-        host = "pi";
-        port = 8000;
-        name = "Vaultwarden";
-        description = "Password Manager";
-        isPublic = true;
-        dashboard = {
-          category = "Infrastructure";
-          icon = "vaultwarden";
-        };
-      };
-      dashboard = {
-        host = "pi";
-        port = 8082;
-        subdomain = "dash";
-        dashboard.category = null;
-        auth = true;
-        authBypass = [ "/root.crt" ]; # new devices fetch the CA before they trust HTTPS
-      };
-      auth = {
-        # Authelia login portal for services with auth = true (LAN/tailnet only, like them)
-        host = "pi";
-        port = 9091;
-        name = "Login";
-        description = "Single sign-on for private services";
-        dashboard.category = null;
-      };
-      syncthing = {
-        host = "pi";
-        port = 8384;
-        name = "Syncthing";
-        subdomain = "sync";
-        description = "P2P File Synchronization";
-        auth = true; # in front of Syncthing's own GUI password
-        dashboard = {
-          category = "Infrastructure";
-          icon = "syncthing";
-        };
-      };
-      zortex = {
-        host = "pi";
-        port = 8090;
-        name = "Zortex Hub";
-        description = "Notification & Organization Hub";
-        dashboard.icon = "mdi-bell-ring"; # widget: modules/homelab/zortex.nix
-        auth = true;
-        authBypass = [ "/api/*" ]; # Neovim (zortex.nvim) and the dashboard widget
-        # paths."/notes" = "127.0.0.1:8090";
-      };
-      mc-server = {
-        host = "pc";
-        port = 25565;
-        subdomain = "mc";
-        isPublic = true;
-        expose = false;
-      };
-      borg = {
-        host = "pi";
-        expose = false;
-      };
-      mealie = {
-        host = "pi";
-        id = 20;
-        port = 9925;
-        isPublic = true;
-        description = "Recipe Manager";
-        dashboard.icon = "mdi-silverware-fork-knife";
-      };
       actual-budget = {
         host = "pi";
         id = 21;
@@ -180,41 +106,13 @@
           extra.ping = "https://budget.home.lab";
         };
       };
-      wakeonlan = {
+      auth = {
+        # Authelia login portal for services with auth = true (LAN/tailnet only, like them)
         host = "pi";
-        port = 9099;
-        expose = false;
-      };
-
-      # Monitor
-      prometheus = {
-        host = "pi";
-        name = "Prometheus";
-        port = 9090;
-        subdomain = "metrics";
-      };
-      grafana = {
-        host = "pi";
-        port = 3000;
-      };
-      glances = {
-        host = "pi";
-        port = 61208;
-        description = "Monitoring";
-        dashboard.category = "Compute Nodes";
-      };
-      gatus = {
-        # Uptime checks + status page, generated from this file; alerts to ntfy
-        host = "pi";
-        port = 8084;
-        subdomain = "status";
-        name = "Gatus";
-        description = "Uptime & status";
-        auth = true;
-        dashboard = {
-          category = "Infrastructure";
-          icon = "gatus";
-        };
+        port = 9091;
+        name = "Login";
+        description = "Single sign-on for private services";
+        dashboard.category = null;
       };
       beszel = {
         # Metrics hub; an agent runs on every node once data.hubKey is set
@@ -236,23 +134,40 @@
           };
         };
       };
-
-      # Cloud
-      pastebin = {
+      borg = {
         host = "pi";
-        port = 8088;
-        subdomain = "bin";
-        isPublic = true;
-        description = "Pastebin (microbin)";
+        expose = false;
       };
-      nextcloud = {
-        host = "pc";
-        # id = 10;
-        port = 8081;
-        subdomain = "cloud";
-        isPublic = true;
-        description = "Files & Sync";
-        dashboard.icon = "nextcloud";
+      dashboard = {
+        host = "pi";
+        port = 8082;
+        subdomain = "dash";
+        dashboard.category = null;
+        auth = true;
+        authBypass = [ "/root.crt" ]; # new devices fetch the CA before they trust HTTPS
+      };
+      gatus = {
+        # Uptime checks + status page, generated from this file; alerts to ntfy
+        host = "pi";
+        port = 8084;
+        subdomain = "status";
+        name = "Gatus";
+        description = "Uptime & status";
+        auth = true;
+        dashboard = {
+          category = "Infrastructure";
+          icon = "gatus";
+        };
+      };
+      glances = {
+        host = "pi";
+        port = 61208;
+        description = "Monitoring";
+        dashboard.category = "Compute Nodes";
+      };
+      grafana = {
+        host = "pi";
+        port = 3000;
       };
       immich = {
         host = "pc";
@@ -274,6 +189,86 @@
           category = "Compute Nodes";
           icon = "jupyter";
         };
+      };
+      mc-server = {
+        host = "pc";
+        port = 25565;
+        subdomain = "mc";
+        isPublic = true;
+        expose = false;
+      };
+      mealie = {
+        host = "pi";
+        id = 20;
+        port = 9925;
+        isPublic = true;
+        description = "Recipe Manager";
+        dashboard.icon = "mdi-silverware-fork-knife";
+      };
+      nextcloud = {
+        host = "pc";
+        # id = 10;
+        port = 8081;
+        subdomain = "cloud";
+        isPublic = true;
+        description = "Files & Sync";
+        dashboard.icon = "nextcloud";
+      };
+      ntfy = {
+        host = "pi";
+        port = 8083;
+        isPublic = true;
+        description = "Notifications";
+      };
+      pastebin = {
+        host = "pi";
+        port = 8088;
+        subdomain = "bin";
+        isPublic = true;
+        description = "Pastebin (microbin)";
+      };
+      prometheus = {
+        host = "pi";
+        name = "Prometheus";
+        port = 9090;
+        subdomain = "metrics";
+      };
+      syncthing = {
+        host = "pi";
+        port = 8384;
+        name = "Syncthing";
+        subdomain = "sync";
+        description = "P2P File Synchronization";
+        auth = true; # in front of Syncthing's own GUI password
+        dashboard = {
+          category = "Infrastructure";
+          icon = "syncthing";
+        };
+      };
+      vault = {
+        host = "pi";
+        port = 8000;
+        name = "Vaultwarden";
+        description = "Password Manager";
+        isPublic = true;
+        dashboard = {
+          category = "Infrastructure";
+          icon = "vaultwarden";
+        };
+      };
+      wakeonlan = {
+        host = "pi";
+        port = 9099;
+        expose = false;
+      };
+      zortex = {
+        host = "pi";
+        port = 8090;
+        name = "Zortex Hub";
+        description = "Notification & Organization Hub";
+        dashboard.icon = "mdi-bell-ring"; # widget: modules/homelab/zortex.nix
+        auth = true;
+        authBypass = [ "/api/*" ]; # Neovim (zortex.nvim) and the dashboard widget
       };
     };
   };

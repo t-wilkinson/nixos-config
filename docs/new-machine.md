@@ -1,7 +1,7 @@
 # Bringing up a machine
 
 Every new machine starts as **void**: a blank NixOS that boots, gets on the network and lets
-you in over SSH with the admin key (`adminKeys` in `hosts/homelab/inventory.nix`). The real
+you in over SSH with the admin key (`adminKeys` in `hosts/inventory.nix`). The real
 configuration is then deployed onto it. Images are built from `hosts/void`:
 
 | Image | Build | Use it for |

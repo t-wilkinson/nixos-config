@@ -5,16 +5,12 @@
     {
       self,
 
-      agenix,
       ags,
       anyrun,
       darwin-docker,
       deploy-rs,
       disko,
       firefox-gnome-theme,
-      flake-parts,
-      flake-utils,
-      gross,
       home-manager,
       homebrew-bundle,
       homebrew-cask,
@@ -22,7 +18,6 @@
       hyprland,
       hyprland-plugins,
       impurity-nix,
-      matugen,
       more-waita,
       nix-darwin,
       nix-homebrew,
@@ -221,7 +216,7 @@
           pi = homelab.config.homelab.nodes.${homelab.config.homelab.thisNode};
         in
         {
-          hostname = pi.sshHost; # hosts/homelab/inventory.nix
+          hostname = pi.sshHost; # hosts/inventory.nix
           sshUser = "root"; # key only (PermitRootLogin prohibit-password); trey's sudo needs a password
           user = "root";
           magicRollback = true;
@@ -266,14 +261,13 @@
     };
 
     # Utilities
-    flake-utils.url = "github:numtide/flake-utils";
     sops-nix.url = "github:Mic92/sops-nix";
     # use "impurity-nix" to avoid overwritting (merging @inputs in specialArgs) module that impurity injects named "impurity"
     impurity-nix.url = "github:outfoxxed/impurity.nix";
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs-nixos";
-    };
+    # agenix = {
+    #   url = "github:ryantm/agenix";
+    #   inputs.nixpkgs.follows = "nixpkgs-nixos";
+    # };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs-nixos";
@@ -320,19 +314,19 @@
       # (pkgs.ags_1 in nixpkgs is the alternative)
       # inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs-nixos";
-    };
-    gross = {
-      url = "github:fufexan/gross";
-      inputs.nixpkgs.follows = "nixpkgs-nixos";
-      inputs.flake-parts.follows = "flake-parts";
-    };
-    matugen = {
-      url = "github:/InioX/Matugen";
-      # ref = "refs/tags/matugen-v0.10.0"
-    };
+    # flake-parts = {
+    #   url = "github:hercules-ci/flake-parts";
+    #   inputs.nixpkgs-lib.follows = "nixpkgs-nixos";
+    # };
+    # gross = {
+    #   url = "github:fufexan/gross";
+    #   inputs.nixpkgs.follows = "nixpkgs-nixos";
+    #   inputs.flake-parts.follows = "flake-parts";
+    # };
+    # matugen = {
+    #   url = "github:/InioX/Matugen";
+    #   # ref = "refs/tags/matugen-v0.10.0"
+    # };
     more-waita = {
       url = "github:somepaulo/MoreWaita";
       flake = false;

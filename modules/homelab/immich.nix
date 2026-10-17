@@ -8,7 +8,7 @@
 let
   cfg = config.homelab.services.immich;
 in
-# Runs natively on its host (the PC; host = "pc" in hosts/homelab/inventory.nix), with machine
+# Runs natively on its host (the PC; host = "pc" in hosts/inventory.nix), with machine
 # learning in a CUDA container. The old Pi container version is ./immich-container.nix.
 lib.mkIf cfg.runsHere {
   services.immich = {

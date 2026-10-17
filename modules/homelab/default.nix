@@ -1,6 +1,6 @@
 # modules/homelab/default.nix
 # Options and service implementations, one file per service. The data (nodes, services, ...)
-# lives in hosts/homelab/inventory.nix; each host sets homelab.thisNode. A service module gates
+# lives in hosts/inventory.nix; each host sets homelab.thisNode. A service module gates
 # on homelab.services.<n>.runsHere; gateway modules gate on homelab.isGateway.
 { ... }:
 {
