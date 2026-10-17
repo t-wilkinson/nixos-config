@@ -9,6 +9,12 @@
   homelab = {
     inherit username;
     containerStateVersion = "24.11";
+    gateway = "pi"; # runs Caddy, Blocky, the Cloudflare tunnel, the subnet router, NFS exports
+
+    # Admin SSH keys: the user on every node, root on the Pi (deploys), the bootstrap images
+    adminKeys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
+    ];
 
     drives = {
       pubdrive = "/mnt/storage/pubdrive";
@@ -20,17 +26,25 @@
 
     nodes = {
       pc = {
+        name = "Gaming PC";
+        system = "x86_64-linux"; # nixosConfigurations.x86_64-linux(-impure), hostname "nixos"
         ipv4 = "10.1.0.1";
-        mac = "04:7c:16:e6:d1:10";
+        lanInterface = "enp4s0";
+        mac = "04:7c:16:e6:d1:10"; # enp4s0
+        wakeOnLan = true;
         syncthingId = "KKNEQ5H-UN3RKTW-BKSIL55-R43FWNR-4OHY5FA-DDYL6N2-R27WQ7B-IJSXPQ3";
         # syncthingId = "X6Q657S-5M3JA3P-MMWO5VX-EPHF7BB-XQI3MPS-NV2NFSA-BCPHPOV-VFCRZAG";
       };
       pi = {
+        system = "aarch64-linux"; # nixosConfigurations.homelab
         ipv4 = "10.1.0.2";
+        lanInterface = "end0";
+        sshHost = "home.lab"; # deploy-rs target (Blocky on the LAN; tailnet via the subnet route)
         syncthingId = "HIAD4WE-UUAOBRY-KXKOWTA-P5HAXBL-FH3NQKF-BZLSGSO-YKNVFFI-4VUZQQE";
       };
       macos = {
         # Not on the direct link; reaches the homelab over the tailnet
+        system = "aarch64-darwin"; # darwinConfigurations.aarch64-darwin(-impure)
         syncthingId = "A6IABFJ-IS7YU6H-RASNO76-KLURNQV-QRU676J-K4GXR2H-6P2733W-ORLEMQU";
       };
     };
@@ -78,28 +92,42 @@
         host = "pi";
         port = 8083;
         isPublic = true;
+        description = "Notifications";
       };
       vault = {
         host = "pi";
         port = 8000;
         name = "Vaultwarden";
-        description = "Password manager";
+        description = "Password Manager";
         isPublic = true;
+        dashboard = {
+          category = "Infrastructure";
+          icon = "vaultwarden";
+        };
       };
       dashboard = {
         host = "pi";
         port = 8082;
         subdomain = "dash";
+        dashboard.category = null;
       };
       syncthing = {
         host = "pi";
         port = 8384;
         name = "Syncthing";
         subdomain = "sync";
+        description = "P2P File Synchronization";
+        dashboard = {
+          category = "Infrastructure";
+          icon = "syncthing";
+        };
       };
       zortex = {
         host = "pi";
         port = 8090;
+        name = "Zortex Hub";
+        description = "Notification & Organization Hub";
+        dashboard.icon = "mdi-bell-ring"; # widget: modules/homelab/zortex.nix
         # paths."/notes" = "127.0.0.1:8090";
       };
       mc-server = {
@@ -118,6 +146,8 @@
         id = 20;
         port = 9925;
         isPublic = true;
+        description = "Recipe Manager";
+        dashboard.icon = "mdi-silverware-fork-knife";
       };
       actual-budget = {
         host = "pi";
@@ -125,7 +155,12 @@
         port = 5006;
         subdomain = "budget";
         isPublic = true;
-        description = "Personal finance manager";
+        name = "Actual Budget";
+        description = "Envelope Budgeting";
+        dashboard = {
+          icon = "mdi-finance";
+          extra.ping = "https://budget.home.lab";
+        };
       };
       wakeonlan = {
         host = "pi";
@@ -147,6 +182,8 @@
       glances = {
         host = "pi";
         port = 61208;
+        description = "Monitoring";
+        dashboard.category = "Compute Nodes";
       };
 
       # Cloud
@@ -155,6 +192,7 @@
         port = 8088;
         subdomain = "bin";
         isPublic = true;
+        description = "Pastebin (microbin)";
       };
       nextcloud = {
         host = "pc";
@@ -162,18 +200,28 @@
         port = 8081;
         subdomain = "cloud";
         isPublic = true;
+        description = "Files & Sync";
+        dashboard.icon = "nextcloud";
       };
       immich = {
         host = "pc";
         port = 2283;
         subdomain = "photos";
         isPublic = true;
+        description = "Photos";
+        dashboard.icon = "immich";
       };
       jupyter = {
         # Run by hand on the PC; LAN/tailnet only (a public Jupyter is remote code execution)
         host = "pc";
         port = 8888;
         monitor = false; # not always running, so homelab-status shouldn't alert on it
+        name = "Jupyter Lab";
+        description = "Remote Data Science";
+        dashboard = {
+          category = "Compute Nodes";
+          icon = "jupyter";
+        };
       };
     };
   };

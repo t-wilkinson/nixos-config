@@ -9,6 +9,18 @@ let
       ""
     else
       (lib.toUpper (builtins.substring 0 1 s)) + (builtins.substring 1 (builtins.stringLength s - 1) s);
+
+  # IPv4 arithmetic for the link's broadcast address (Wake-on-LAN target)
+  ipToInt = ip: foldl' (acc: o: acc * 256 + toInt o) 0 (splitString "." ip);
+  intToIp =
+    n:
+    concatMapStringsSep "." toString [
+      (n / 16777216)
+      (mod (n / 65536) 256)
+      (mod (n / 256) 256)
+      (mod n 256)
+    ];
+  blockSize = prefix: foldl' (acc: _: acc * 2) 1 (range 1 (32 - prefix));
 in
 {
   options.homelab = {
@@ -19,6 +31,11 @@ in
     };
     username = mkOption {
       type = types.str;
+    };
+    adminKeys = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = "SSH public keys allowed to log in as the admin user (and root, for deploys) on homelab nodes and bootstrap images.";
     };
     thisNode = mkOption {
       type = types.str;
@@ -47,6 +64,21 @@ in
       description = "Services deployed somewhere in the homelab. Each runs on its own host.";
     };
 
+    gateway = mkOption {
+      type = types.str;
+      example = "pi";
+      description = ''
+        Node that fronts the homelab: Caddy (both names for every exposed service), Blocky
+        (LAN DNS), the Cloudflare tunnel, the Tailscale subnet router and the NFS exports.
+      '';
+    };
+    isGateway = mkOption {
+      type = types.bool;
+      readOnly = true;
+      default = hlcfg.thisNode == hlcfg.gateway;
+      description = "True on the gateway node. Gateway modules (caddy.nix, blocky.nix, ...) gate on this.";
+    };
+
     containerStateVersion = mkOption {
       type = types.str;
       default = config.system.stateVersion;
@@ -55,12 +87,40 @@ in
     nodes = mkOption {
       type = types.attrsOf (
         types.submodule (
-          { config, ... }:
+          { name, config, ... }:
           {
             options = {
+              name = mkOption {
+                type = types.str;
+                default = capitalizeFirst name;
+                description = "Pretty name (dashboard buttons).";
+              };
+              system = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                example = "aarch64-linux";
+                description = "Nix system double; used for deploys and bootstrap images.";
+              };
               mac = mkOption {
                 type = types.nullOr types.str;
                 default = null;
+                description = "MAC address of lanInterface (Wake-on-LAN target).";
+              };
+              lanInterface = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                example = "enp4s0";
+                description = "Interface on the homelab link (ipv4 lives here).";
+              };
+              wakeOnLan = mkOption {
+                type = types.bool;
+                default = false;
+                description = "The node sleeps and can be woken with a magic packet (needs mac and lanInterface).";
+              };
+              sshHost = mkOption {
+                type = types.nullOr types.str;
+                default = config.ipv4;
+                description = "Address deploy-rs and admins use to reach the node over SSH.";
               };
               ipv4 = mkOption {
                 type = types.nullOr types.str;
@@ -99,6 +159,16 @@ in
         type = types.ints.between 0 32;
         readOnly = true;
         default = lib.toInt (lib.last (lib.splitString "/" config.homelab.network.cidr));
+      };
+      broadcast = mkOption {
+        type = types.str;
+        readOnly = true;
+        default =
+          let
+            size = blockSize hlcfg.network.prefixLength;
+          in
+          intToIp ((ipToInt hlcfg.network.baseAddress / size) * size + size - 1);
+        description = "Broadcast address of the homelab link (10.1.0.3 for 10.1.0.0/30).";
       };
 
       # homelabNetwork = mkOption {
@@ -290,6 +360,27 @@ in
                 default = { };
               };
 
+              dashboard = {
+                category = mkOption {
+                  type = types.nullOr types.str;
+                  default = if config.expose then "Applications" else null;
+                  description = "Homepage group the service's tile goes in; null = no tile.";
+                };
+                icon = mkOption {
+                  type = types.str;
+                  default = "";
+                  example = "mdi-bell-ring";
+                };
+                extra = mkOption {
+                  type = types.attrs;
+                  default = { };
+                  example = {
+                    ping = "https://budget.home.lab";
+                  };
+                  description = "Extra homepage tile settings (widget, ping, ...).";
+                };
+              };
+
               units = mkOption {
                 type = types.listOf types.str;
                 default = [ ];
@@ -340,8 +431,8 @@ in
         forwardPorts = lib.mkDefault (
           map (p: {
             protocol = "tcp";
-            hostPort = v.port;
-            containerPort = v.port;
+            hostPort = p;
+            containerPort = p;
           }) ([ v.port ] ++ v.extraPorts)
         );
       }) containerServices;
@@ -350,6 +441,9 @@ in
       enable = true;
     });
     homelab.lib = {
+      # Caddy client_ip matcher arguments for "LAN or tailnet" (see network.privateRanges)
+      caddyPrivateRanges = concatStringsSep " " (hlcfg.network.privateRanges ++ [ hlcfg.network.cidr ]);
+
       mkRoMount = path: {
         "${path}" = {
           hostPath = path;

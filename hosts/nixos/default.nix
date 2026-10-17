@@ -22,9 +22,6 @@
     ../../modules/shared.nix
     ../../modules/virtualisation.nix
     ../../modules/sops-check.nix
-
-    ./nextcloud.nix
-    ./immich.nix
   ];
 
   services.usbmuxd.enable = true;
@@ -245,10 +242,7 @@
     defaultSopsFile = ./secrets.yaml;
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
     secrets = {
-      nextcloud_admin_pass = {
-        sopsFile = ../homelab/secrets.yaml;
-        owner = "nextcloud";
-      };
+      # nextcloud_admin_pass: declared in modules/homelab/nextcloud.nix
       # wg_nixos_private_key = {
       #   owner = "root";
       # };

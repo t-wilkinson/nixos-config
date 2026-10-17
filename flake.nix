@@ -158,7 +158,6 @@
           modules = [
             "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             nixos-hardware.nixosModules.raspberry-pi-4
-            zortex.nixosModules.default
             sops-nix.nixosModules.sops
             (
               { lib, pkgs, ... }:
