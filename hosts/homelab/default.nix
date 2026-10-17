@@ -152,6 +152,7 @@ in
     ripgrep
     fd
     lsof
+    cloudflared
     (pkgs.writeShellApplication {
       name = "wol-pc";
       runtimeInputs = [ pkgs.wakeonlan ];

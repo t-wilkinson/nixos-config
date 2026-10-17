@@ -21,8 +21,9 @@ lib.mkIf cfg.runsHere {
       MICROBIN_PORT = cfg.port;
       MICROBIN_BIND = "127.0.0.1"; # only Caddy talks to it
       # MICROBIN_ENABLE_PASTA_LIST isn't a microbin option; the /pastalist page is on unless NO_LISTING is set
-      MICROBIN_NO_LISTING = true;
+      MICROBIN_NO_LISTING = false;
       MICROBIN_ENCRYPTION_CLIENT_SIDE = true;
+      MICROBIN_ENCRYPTION_SERVER_SIDE = true;
       MICROBIN_MAX_FILE_SIZE_UNENCRYPTED_MB = 500;
       MICROBIN_PUBLIC_PATH = "https://${cfg.publicDomain}/";
     };

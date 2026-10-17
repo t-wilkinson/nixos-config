@@ -77,6 +77,7 @@
       ntfy = {
         host = "pi";
         port = 8083;
+        isPublic = true;
       };
       vault = {
         host = "pi";
