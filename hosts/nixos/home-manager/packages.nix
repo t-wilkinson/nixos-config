@@ -21,7 +21,7 @@
         discord
 
         # HOMELAB
-        cloudlfared
+        cloudflared
 
         # VIRTUALIZATION
         k3s

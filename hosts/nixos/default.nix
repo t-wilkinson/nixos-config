@@ -20,6 +20,7 @@
     ./vmware.nix
     ../../modules/shared.nix
     ../../modules/virtualisation.nix
+    ../../modules/sops-check.nix
 
     ./nextcloud.nix
     ./immich.nix
@@ -240,8 +241,16 @@
         sopsFile = ../homelab/secrets.yaml;
         owner = "nextcloud";
       };
-      wg_nixos_private_key = {
-        owner = "root";
+      # wg_nixos_private_key = {
+      #   owner = "root";
+      # };
+
+      # ntfy access token for the desktop subscriber (services.nix) and Neovim (zortex.nvim reads
+      # /run/secrets/ntfy_auth); readable by the user only.
+      ntfy_auth = {
+        sopsFile = ../homelab/secrets.yaml;
+        owner = username;
+        mode = "0400";
       };
     };
   };

@@ -20,6 +20,11 @@ in
     username = mkOption {
       type = types.str;
     };
+    thisNode = mkOption {
+      type = types.str;
+      example = "pi";
+      description = "Which entry of homelab.nodes this machine is. Services run where host == thisNode.";
+    };
     groups = mkOption {
       type = types.attrsOf types.int;
       default = { };
@@ -39,6 +44,7 @@ in
     enableServices = mkOption {
       type = types.listOf types.str;
       default = [ ];
+      description = "Services deployed somewhere in the homelab. Each runs on its own host.";
     };
 
     containerStateVersion = mkOption {
@@ -57,12 +63,20 @@ in
                 default = null;
               };
               ipv4 = mkOption {
-                type = types.str;
+                type = types.nullOr types.str;
+                default = null;
                 example = "192.168.1.10";
+                description = "Address on the homelab link. Null for devices that aren't on it (e.g. a laptop).";
               };
               cidr = mkOption {
-                type = types.str;
-                default = "${config.ipv4}/${toString hlcfg.network.prefixLength}";
+                type = types.nullOr types.str;
+                default =
+                  if config.ipv4 == null then null else "${config.ipv4}/${toString hlcfg.network.prefixLength}";
+              };
+              syncthingId = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                description = "Syncthing device ID.";
               };
             };
           }
@@ -99,6 +113,27 @@ in
         default = null;
         description = "Base public domain (e.g., example.com)";
       };
+      cloudflareTunnelId = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = "UUID of the cloudflared tunnel (<id>.cfargotunnel.com).";
+      };
+      privateRanges = mkOption {
+        type = types.listOf types.str;
+        # Loopback is deliberately NOT included (unlike Caddy's `private_ranges` shorthand):
+        # cloudflared connects from 127.0.0.1, so tunnel traffic can never count as LAN, even if
+        # a request somehow arrived without Cf-Connecting-Ip. LAN clients and the Pi itself
+        # reach Caddy via 10.x / 192.168.x / the tailnet.
+        default = [
+          "10.0.0.0/8"
+          "172.16.0.0/12"
+          "192.168.0.0/16"
+          "fd00::/8"
+          "100.64.0.0/10" # tailnet (IPv4)
+          "fd7a:115c:a1e0::/48" # tailnet (IPv6)
+        ];
+        description = "Caddy client_ip ranges treated as LAN/tailnet.";
+      };
       containerNetwork = mkOption {
         type = types.str;
         default = "192.168.100";
@@ -118,13 +153,20 @@ in
               enable = mkOption {
                 type = types.bool;
                 default = false;
+                description = "Whether the service is deployed somewhere in the homelab (see host).";
               };
 
-              reverseProxy = mkOption {
+              host = mkOption {
                 type = types.nullOr types.str;
                 default = null;
-                example = "100.1.0.10";
-                description = "Reverse proxy ip address";
+                example = "pc";
+                description = "Name of the node in homelab.nodes that runs this service.";
+              };
+              runsHere = mkOption {
+                type = types.bool;
+                readOnly = true;
+                default = config.enable && config.host == hlcfg.thisNode;
+                description = "True when the service is enabled and this machine is its host. Service modules gate on this.";
               };
 
               data = mkOption {
@@ -156,14 +198,15 @@ in
               localIP = mkOption {
                 readOnly = true;
                 default =
-                  if config.id != null then
+                  if config.host != null && config.host != hlcfg.thisNode then
+                    # Runs on another node: reach it over the homelab link
+                    hlcfg.nodes.${config.host}.ipv4
+                  else if config.id != null then
                     "${hlcfg.network.containerNetwork}.${toString config.id}"
-                  else if config.reverseProxy != null then
-                    config.reverseProxy
                   else
                     "127.0.0.1";
                 type = types.str;
-                description = "The calculated internal IP address.";
+                description = "The calculated internal IP address, as seen from this machine.";
               };
               localEndpoint = mkOption {
                 readOnly = true;
@@ -195,6 +238,10 @@ in
               isPublic = mkOption {
                 type = types.bool;
                 default = false;
+                description = ''
+                  Route publicDomain through the Cloudflare tunnel. Every exposed service answers on
+                  domain and publicDomain from the LAN/tailnet; only public ones are reachable from the internet.
+                '';
               };
               publicSubdomain = mkOption {
                 type = types.nullOr types.str;
@@ -203,18 +250,26 @@ in
               publicDomain = mkOption {
                 type = types.nullOr types.str;
                 default =
-                  let
-                    defaultDomain = "${config.subdomain}.${hlcfg.network.publicDomain}";
-                    publicDomain = "${config.publicSubdomain}.${hlcfg.network.publicDomain}";
-                  in
                   if hlcfg.network.publicDomain != null && config.publicSubdomain != null then
                     # public subdomain . public domain
                     "${config.publicSubdomain}.${hlcfg.network.publicDomain}"
-                  else if hlcfg.network.publicDomain != null && config.isPublic then
-                    # subdomain . public domain
+                  else if hlcfg.network.publicDomain != null && config.subdomain != null then
+                    # subdomain . public domain (LAN-only unless isPublic)
                     "${config.subdomain}.${hlcfg.network.publicDomain}"
                   else
                     null;
+              };
+
+              extraConfig = mkOption {
+                type = types.lines;
+                default = "";
+                description = "Extra Caddyfile lines for this service's site block (placed before the default handle).";
+              };
+              proxyConfig = mkOption {
+                type = types.lines;
+                default = "";
+                example = "header_up Host {upstream_hostport}";
+                description = "Extra lines inside this service's reverse_proxy block.";
               };
 
               name = mkOption {
@@ -242,10 +297,21 @@ in
   };
 
   config = {
+    assertions = [
+      {
+        assertion = hasAttr hlcfg.thisNode hlcfg.nodes;
+        message = "homelab.thisNode = \"${hlcfg.thisNode}\" is not in homelab.nodes.";
+      }
+    ]
+    ++ mapAttrsToList (name: s: {
+      assertion = !s.enable || (s.host != null && hasAttr s.host hlcfg.nodes);
+      message = "homelab.services.${name} is enabled but its host (${toString s.host}) is not in homelab.nodes.";
+    }) hlcfg.services;
+
     users.groups = mapAttrs (name: gid: { inherit gid; }) hlcfg.groups;
     containers =
       let
-        containerServices = filterAttrs (n: v: v.id != null && v.enable) hlcfg.services;
+        containerServices = filterAttrs (n: v: v.id != null && v.runsHere) hlcfg.services;
       in
       mapAttrs (n: v: {
         config =

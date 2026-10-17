@@ -1,10 +1,16 @@
-{ config, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   homelab = config.homelab;
   cfg = config.homelab.services.nextcloud;
   secrets = config.sops.secrets;
 in
-{
+# host = "pc" in hosts/homelab/inventory.nix
+lib.mkIf cfg.runsHere {
   services.nginx.virtualHosts."${cfg.domain}" = {
     listen = [
       {

@@ -4,7 +4,7 @@ let
   # enabled = with services; glances.enable or prometheus.enable or grafana.enable;
 in
 {
-  services.glances = lib.mkIf services.glances.enable {
+  services.glances = lib.mkIf services.glances.runsHere {
     enable = true;
     port = services.glances.port;
     extraArgs = [ "-w" ];

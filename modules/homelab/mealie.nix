@@ -8,7 +8,7 @@ let
 in
 {
   # MEALIE Recipe Manager
-  containers.mealie = lib.mkIf cfg.enable {
+  containers.mealie = lib.mkIf cfg.runsHere {
     autoStart = true;
     config =
       { ... }:
@@ -23,7 +23,8 @@ in
           database.createLocally = true;
 
           settings = {
-            BASE_URL = "https://${cfg.domain}";
+            # Links in emails/shares should work off-LAN too
+            BASE_URL = "https://${if cfg.isPublic then cfg.publicDomain else cfg.domain}";
           };
         };
       };

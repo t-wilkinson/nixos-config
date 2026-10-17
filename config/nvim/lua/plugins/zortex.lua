@@ -1,3 +1,15 @@
+-- Read a secret file written by sops-nix (NixOS and nix-darwin put them in /run/secrets).
+-- Returns nil when the file is missing, so the config still loads on machines without it.
+local function read_secret(path)
+  local f = path and io.open(path, "r")
+  if not f then
+    return nil
+  end
+  local s = (f:read("*a") or ""):gsub("%s+$", "")
+  f:close()
+  return s ~= "" and s or nil
+end
+
 return {
   {
     "t-wilkinson/zortex.nvim",
@@ -37,6 +49,8 @@ return {
               enabled = true,
               topic = "zortex-notify",
               server_url = "https://ntfy.home.lab",
+              -- ntfy access token (sops secret ntfy_auth); override the path with $NTFY_TOKEN_FILE
+              auth_token = read_secret(os.getenv("NTFY_TOKEN_FILE") or "/run/secrets/ntfy_auth"),
             },
           },
 

@@ -1,7 +1,7 @@
 # hosts/homelab/networking.nix
 { config, hostname, ... }:
 let
-  directIP = "10.1.0.2"; # IP from direct ethernet connection to PC
+  pi = config.homelab.nodes.pi; # address on the direct ethernet link to the PC (inventory.nix)
 in
 {
 
@@ -59,7 +59,7 @@ in
           };
           ipv4 = {
             method = "manual";
-            address1 = "${directIP}/30";
+            address1 = pi.cidr;
             never-default = "true";
           };
         };
@@ -74,18 +74,18 @@ in
         80
         443
         22
-        51820 # WireGuard
+        # 51820 # WireGuard (no longer used)
         25565
       ];
       allowedUDPPorts = [
-        51820 # WireGuard
+        # 51820 # WireGuard (no longer used)
         9 # WoL
         53 # dns
       ];
       trustedInterfaces = [
         "tailscale0"
         "end0"
-        "wg0"
+        # "wg0"
       ];
     };
   };

@@ -1,14 +1,17 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 let
   homelab = config.homelab;
+  nodes = homelab.nodes;
   cfg = config.homelab.services.syncthing;
+  st = config.services.syncthing;
 in
 {
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.runsHere {
     # SYNCTHING
     # systemd.services.syncthing.serviceConfig = {
     #   StateDirectory = "syncthing";
@@ -18,6 +21,7 @@ in
       "d /srv/sync 0700 - - -"
       "d /srv/sync/personal 0770 - personaldata -"
     ];
+
     services.syncthing = {
       enable = true;
       user = homelab.username;
@@ -29,20 +33,20 @@ in
       guiAddress = cfg.localEndpoint;
 
       settings = {
-        gui.insecureSkipHostcheck = true;
+        # gui.insecureSkipHostcheck = true;
+        gui.user = homelab.username; # password: syncthing-gui-password below
         options = {
           # nattEnabled = false;
         };
 
         devices = {
           "nixos" = {
-            # id = "X6Q657S-5M3JA3P-MMWO5VX-EPHF7BB-XQI3MPS-NV2NFSA-BCPHPOV-VFCRZAG";
-            id = "KKNEQ5H-UN3RKTW-BKSIL55-R43FWNR-4OHY5FA-DDYL6N2-R27WQ7B-IJSXPQ3";
+            id = nodes.pc.syncthingId;
             # addresses = [ "tcp://10.1.0.1:22000" ];
             # introducer = true;
           };
           "macos" = {
-            id = "A6IABFJ-IS7YU6H-RASNO76-KLURNQV-QRU676J-K4GXR2H-6P2733W-ORLEMQU";
+            id = nodes.macos.syncthingId;
             # introducer = true;
           };
         };
@@ -65,6 +69,58 @@ in
           };
         };
       };
+    };
+
+    sops.secrets.syncthing_pass.restartUnits = [ "syncthing-gui-password.service" ];
+
+    # Sets the GUI password from sops without putting it in the Nix store (same idea as
+    # services.syncthing.guiPasswordFile in newer nixpkgs).
+    # - syncthing-init PUTs the gui section on every run, which clears the password; Requires=
+    #   makes systemd re-run this unit whenever syncthing-init (re)starts.
+    # - Syncthing 1.29 only accepts "$2a$" as a pre-hashed password; mkpasswd emits "$2b$"
+    #   (same algorithm), so the prefix is rewritten. Tested against the 1.29.5 and 2.1.3 releases.
+    # After the 26.05 upgrade (Syncthing 2.x accepts "$2b$" too) this unit can be replaced by:
+    #   services.syncthing.guiPasswordFile = config.sops.secrets.syncthing_pass.path;
+    systemd.services.syncthing-gui-password = {
+      description = "Set the Syncthing GUI password from sops";
+      after = [ "syncthing-init.service" ];
+      requires = [ "syncthing-init.service" ];
+      wantedBy = [
+        "multi-user.target"
+        "syncthing-init.service"
+      ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        RuntimeDirectory = "syncthing-gui-password";
+        RuntimeDirectoryMode = "0700";
+      };
+      path = [
+        pkgs.curl
+        pkgs.libxml2
+        pkgs.mkpasswd
+        pkgs.coreutils
+        pkgs.gnused
+      ];
+      script = ''
+        set -euo pipefail
+        apikey() { xmllint --xpath 'string(configuration/gui/apikey)' ${st.configDir}/config.xml; }
+        api="http://${st.guiAddress}"
+
+        # The GUI restarts after syncthing-init's PUT; wait until the API answers again
+        for _ in $(seq 1 60); do
+          curl -sf -H "X-API-Key: $(apikey)" "$api/rest/system/ping" > /dev/null && break
+          sleep 1
+        done
+
+        tr -d '\n' < ${config.sops.secrets.syncthing_pass.path} \
+          | mkpasswd -m bcrypt -R 10 --stdin | tr -d '\n' | sed 's/^\$2b\$/$2a$/' \
+          > "$RUNTIME_DIRECTORY/pw"
+        curl -sSf -X PATCH -H "X-API-Key: $(apikey)" \
+          --variable "pw@$RUNTIME_DIRECTORY/pw" --expand-json '{ "password": "{{pw}}" }' \
+          "$api/rest/config/gui"
+        rm -f "$RUNTIME_DIRECTORY/pw"
+      '';
     };
   };
 }

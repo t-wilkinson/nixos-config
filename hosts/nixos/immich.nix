@@ -1,12 +1,14 @@
 {
   config,
+  lib,
   unstable,
   ...
 }:
 let
   cfg = config.homelab.services.immich;
 in
-{
+# host = "pc" in hosts/homelab/inventory.nix
+lib.mkIf cfg.runsHere {
   services.immich = {
     package = unstable.immich;
     enable = true;
@@ -42,7 +44,9 @@ in
 
   virtualisation.oci-containers.containers.immich-machine-learning = {
     image = "ghcr.io/immich-app/immich-machine-learning:release-cuda";
-    ports = [ "3003:3003" ];
+    # Docker-published ports bypass the NixOS firewall, so bind to loopback only.
+    # Immich's machine-learning URL must then be http://127.0.0.1:3003 (not "localhost", which may resolve to ::1).
+    ports = [ "127.0.0.1:3003:3003" ];
     volumes = [
       "immich-model-cache:/cache"
     ];

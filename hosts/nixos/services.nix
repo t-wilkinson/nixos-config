@@ -1,4 +1,9 @@
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   enableNtfy = true;
 in
@@ -85,7 +90,7 @@ in
     settings = {
       devices = {
         "homelab" = {
-          id = "HIAD4WE-UUAOBRY-KXKOWTA-P5HAXBL-FH3NQKF-BZLSGSO-YKNVFFI-4VUZQQE";
+          id = config.homelab.nodes.pi.syncthingId;
           # addresses = [ "tcp://10.1.0.2:22000" ];
         };
       };
@@ -125,9 +130,12 @@ in
       ZORTEX_SOUND_DEFAULT = "${pkgs.sound-theme-freedesktop}/share/sounds/freedesktop/stereo/message.oga";
     };
 
-    # Using 'script' executes via bash, preserving standard shell quoting and variables
+    # Using 'script' executes via bash, preserving standard shell quoting and variables.
+    # ntfy denies anonymous access; the token goes in via NTFY_TOKEN (not argv, so not in `ps`).
     script = ''
-      exec ntfy subscribe https://ntfy.home.lab/zortex-notify "$HOME/.config/ntfy/notify.sh"
+      NTFY_TOKEN="$(cat ${config.sops.secrets.ntfy_auth.path})"
+      export NTFY_TOKEN
+      exec ntfy subscribe https://${config.homelab.services.ntfy.domain}/zortex-notify "$HOME/.config/ntfy/notify.sh"
     '';
 
     serviceConfig = {
