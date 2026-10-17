@@ -6,7 +6,7 @@
 }:
 let
   homelab = config.homelab;
-  enabled = lib.attrByPath [ "homelab" "services" "wakeonlan" "enable" ] false config;
+  enabled = lib.attrByPath [ "homelab" "services" "wakeonlan" "runsHere" ] false config;
 in
 {
   config = lib.mkIf enabled (

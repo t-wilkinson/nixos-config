@@ -7,9 +7,11 @@
 }:
 let
   homelab = config.homelab;
-  mcServerPort = 25565;
-  rconPort = 25575;
+  hs = homelab.services;
+  mcServerPort = hs.mc-server.port;
+  rconPort = hs.mc-server.data.rconPort;
   homelabDirectGateway = homelab.nodes.pi.ipv4;
+  homelabIface = "enp4s0"; # direct ethernet link to the Pi (10.1.0.0/30)
 in
 {
   services.resolved = {
@@ -62,19 +64,31 @@ in
         allowedUDPPortRanges = [ kdePortRanges ];
         allowedUDPPorts = [
           9 # wol
-          2049 # NFS
+          # 2049 # NFS -> Pi link only (below)
         ];
         allowedTCPPorts = [
-          mcServerPort
-          rconPort
           22
-          8888 # jupyter notebook
-          2049 # NFS
-          2283 # Immich
-          8081 # Nextcloud
           # 6229 # ssh
           # 5900 # vnc
         ];
+
+        # Homelab services: only the Pi reaches these (Caddy proxies them; tailnet clients come in
+        # through the Pi's subnet route and also arrive on this interface).
+        interfaces.${homelabIface} = {
+          allowedTCPPorts = [
+            mcServerPort # Minecraft
+            rconPort # RCON (borg on the Pi saves the world before backing up)
+            hs.jupyter.port # jupyter notebook
+            2049 # NFS
+            hs.immich.port # Immich
+            hs.nextcloud.port # Nextcloud
+          ];
+          allowedUDPPorts = [
+            2049 # NFS
+          ];
+        };
+        # Minecraft for tailnet players, in case Tailscale runs on this machine directly
+        interfaces.tailscale0.allowedTCPPorts = [ mcServerPort ];
       };
   };
 
@@ -83,7 +97,7 @@ in
     "wired-homelab" = {
       connection.type = "ethernet";
       connection.id = "wired-homelab";
-      connection.interface-name = "enp4s0";
+      connection.interface-name = homelabIface;
       connection.autoconnect = true;
       # "802-3-ethernet".wake-on-lan = "magic"; # sudo ethtool -s enp4s0 wol gp (magic physical)
 
@@ -92,7 +106,9 @@ in
       # ipv4.gateway = "10.1.0.2";
       ipv4.dns = homelab.nodes.pi.ipv4;
       # ipv4.dns-search = "~home.lab,home.lab";
-      ipv4.dns-search = "~${homelab.network.domain}";
+      # Send home.lab AND the public domain to Blocky on the Pi: Blocky answers private services'
+      # public names with the Pi's address and forwards everything else (public services -> Cloudflare).
+      ipv4.dns-search = "~${homelab.network.domain};~${homelab.network.publicDomain};";
       ipv4.never-default = "true";
       # ipv4.routes = "${homelab.homelabIP}/32 next-hop=${homelabDirectGateway}, ${homelab.containerNetwork}.0/24 ${homelabDirectGateway}";
     };

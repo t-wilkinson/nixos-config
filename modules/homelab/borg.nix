@@ -7,11 +7,17 @@
 let
   homelab = config.homelab;
   cfg = config.homelab.services.borg;
-  pc_ip_address = "10.1.0.1";
-  mcrconCmd = "${pkgs.mcrcon}/bin/mcrcon -H ${pc_ip_address} -p ${toString homelab.services.mc-server.data.rconPort} -p password";
+  secrets = config.sops.secrets;
+  mc = homelab.services.mc-server;
+  pc_ip_address = homelab.nodes.${mc.host}.ipv4;
+  # Password comes from the environment (MCRCON_PASS) so it never shows up in `ps`.
+  # -P is the port; -p would be the password.
+  mcrconCmd = "MCRCON_PASS=\"$(cat ${secrets.minecraft_rcon_pass.path})\" ${pkgs.mcrcon}/bin/mcrcon -H ${pc_ip_address} -P ${toString mc.data.rconPort}";
+  # ntfy requires auth (deny-all); the header file is rendered by sops (see hosts/homelab/secrets.nix)
+  ntfyCurl = "${pkgs.curl}/bin/curl -sS -H @${config.sops.templates."ntfy-auth-header".path}";
 in
 {
-  config = lib.mkIf cfg.enable {
+  config = lib.mkIf cfg.runsHere {
     environment.systemPackages = with pkgs; [
       borgbackup
     ];
@@ -39,7 +45,7 @@ in
         User = "root"; # Needs permissions to run curl/access network
       };
       script = ''
-        ${pkgs.curl}/bin/curl \
+        ${ntfyCurl} \
           -H "Title: Backup Failed on ${config.networking.hostName}" \
           -H "Priority: high" \
           -H "Tags: warning,backup" \
@@ -49,7 +55,11 @@ in
     };
 
     services.borgbackup.jobs."homelab" = {
-      repo = "/srv/backup";
+      # /srv/backup is the backup drive's mount point. The encrypted repo lives in a
+      # subdirectory; borg won't create a repo inside the old unencrypted one, so move that
+      # aside first (see the PR notes). doInit creates it on the first run, after preHook
+      # has confirmed the drive is mounted.
+      repo = "/srv/backup/homelab";
 
       paths = [
         "/srv/sync"
@@ -73,10 +83,11 @@ in
         "*.jfr.tmp"
       ];
 
-      # Encryption: 'none' is easiest for a physical drive at home,
-      # but 'repokey' is safer if the drive is lost.
+      # repokey: the key sits in the repo, protected by borg_pass. Keep an offline copy of
+      # `borg key export /srv/backup/homelab` too; without key + passphrase the backups are gone.
       encryption = {
-        mode = "none";
+        mode = "repokey-blake2";
+        passCommand = "cat ${secrets.borg_pass.path}";
       };
 
       compression = "auto,zstd";
@@ -92,7 +103,7 @@ in
       };
 
       preHook = ''
-        ${pkgs.curl}/bin/curl -d "Borg backing up homelab" http://${homelab.services.ntfy.localEndpoint}/homelab
+        ${ntfyCurl} -d "Borg backing up homelab" http://${homelab.services.ntfy.localEndpoint}/homelab || true
 
         if ! ${pkgs.util-linux}/bin/mountpoint -q /srv/backup; then
           echo "Backup drive not mounted. Skipping backup."
@@ -140,14 +151,14 @@ in
         EXIT_CODE="''${BORG_EXIT_CODE:-2}"
         echo $BORG_EXIT_CODE
         if [ "$EXIT_CODE" -eq 0 ]; then
-          ${pkgs.curl}/bin/curl \
+          ${ntfyCurl} \
             -H "Title: Backup Successful" \
             -H "Priority: low" \
             -H "Tags: white_check_mark,backup" \
-            -d "Borg finished backing up to /srv/backup successfully." \
+            -d "Borg finished backing up to /srv/backup/homelab successfully." \
             http://${homelab.services.ntfy.localEndpoint}/homelab
         elif [ "$EXIT_CODE" -eq 1 ]; then
-          ${pkgs.curl}/bin/curl \
+          ${ntfyCurl} \
             -H "Title: Backup Finished with Warnings" \
             -H "Priority: default" \
             -H "Tags: warning,backup" \

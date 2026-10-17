@@ -7,7 +7,7 @@
   ...
 }:
 let
-  tunnelId = "c74475c0-1f73-4fae-8bf2-a03f7c8fb6c5"; # .cfargotunnel.com - CNAME cloudflared tunnel
+  tunnelId = net.cloudflareTunnelId;
   homelab = config.homelab;
   services = config.homelab.services;
   net = config.homelab.network;
@@ -15,22 +15,41 @@ let
   # exposedServices = lib.filterAttrs (n: v: v.expose) services;
   # publicServices = lib.filterAttrs (n: v: v.isPublic) exposedServices;
 
+  # Deployed (anywhere in the homelab) and reachable through Caddy
+  exposedServices = lib.filterAttrs (n: v: v.enable && v.expose) services;
+  # ...and also reachable from the internet through the tunnel
+  publicServices = lib.filterAttrs (n: v: v.isPublic && v.publicDomain != null) exposedServices;
+  privateServices = lib.filterAttrs (n: v: !v.isPublic && v.publicDomain != null) exposedServices;
+
+  # LAN/tailnet client ranges. With trusted_proxies below, {client_ip} is the real visitor
+  # (Cf-Connecting-Ip) for tunnel traffic, so internet requests never match these.
+  privateRanges = lib.concatStringsSep " " (net.privateRanges ++ [ net.cidr ]);
+
+  # One site block per service, answering on both its private and public names:
+  #   LAN/tailnet: x.home.lab and x.treywilkinson.com
+  #   internet:    x.treywilkinson.com, public services only (the tunnel only routes those)
   mkCaddyProxy =
     name: service:
     let
-      domains = [
-        service.domain
-      ]
-      # If service is public, allow either private or public domain
-      ++ (lib.optional (service.isPublic && service.publicDomain != null) service.publicDomain);
+      domains = [ service.domain ] ++ lib.optional (service.publicDomain != null) service.publicDomain;
       hostnames = lib.concatStringsSep ", " domains;
 
       proxyTo = endpoint: ''
         reverse_proxy ${endpoint} {
-          header_up X-Real-IP {http.request.remote.host}
+          header_up X-Real-IP {client_ip}
           header_up X-Forwarded-Port {http.request.port}
+          ${service.proxyConfig}
         }
       '';
+
+      # Private services: refuse anything that isn't LAN/tailnet (defense in depth; the tunnel
+      # doesn't route their names anyway)
+      lanOnly = lib.optionalString (!service.isPublic) ''
+        @notLan not client_ip ${privateRanges}
+        respond @notLan "Not found" 404
+      '';
+      # Everything below runs inside `route`, i.e. in the order written. (At the top level Caddy
+      # sorts `handle` before `respond`, so access checks written as `respond` would never fire.)
 
       # service.paths = { "/notes" = "127.0.0.1:8090"; }: the prefix is passed on
       pathRoutes = lib.concatStrings (
@@ -50,9 +69,13 @@ let
             header X-Forwarded-Proto http
           }
           redir @httpProto https://{host}{uri} permanent
-          ${pathRoutes}
-          handle {
-            ${proxyTo service.localEndpoint}
+          route {
+            ${lanOnly}
+            ${service.extraConfig}
+            ${pathRoutes}
+            handle {
+              ${proxyTo service.localEndpoint}
+            }
           }
           tls internal
         '';
@@ -75,8 +98,10 @@ let
       # else
       #   "http://${service.localEndpoint}";
       originRequest = {
-        httpHostHeader = service.domain;
-        originServerName = service.domain;
+        # Keep the public Host header so apps build public links; Caddy's site block
+        # answers on both names. TLS to Caddy on loopback uses its internal CA.
+        # httpHostHeader = service.domain;
+        originServerName = service.publicDomain;
         noTLSVerify = true;
       };
     };
@@ -103,7 +128,10 @@ in
           # Map main domain and all subdomains to the Pi's Direct IP
           "${net.domain}" = nodes.pi.ipv4;
           "*.${net.domain}" = nodes.pi.ipv4;
-        };
+        }
+        # Private services also answer on their public name, but only on the LAN/tailnet.
+        # Public services keep resolving to Cloudflare (real certificate, e.g. Bitwarden mobile).
+        // lib.mapAttrs' (n: v: lib.nameValuePair v.publicDomain nodes.pi.ipv4) privateServices;
       };
 
       # Ad Blocking
@@ -134,8 +162,8 @@ in
         credentialsFile = config.sops.secrets."cloudflared_creds".path;
         default = "http_status:404"; # Default Rule: Hide everything else!
         ingress =
-          # Public tunnels that do not proxy to another server
-          (lib.mapAttrs' mkIngressTunnel (lib.filterAttrs (n: v: v.expose && v.isPublic) services)) // {
+          # Only enabled public services; everything else falls through to the 404 default
+          (lib.mapAttrs' mkIngressTunnel publicServices) // {
             # "${services.mc-server.publicDomain}" = {
             #   service = "tcp://127.0.0.1:${toString services.mc-server.port}";
             #   originRequest = {
@@ -148,70 +176,51 @@ in
     };
   };
 
+  # Per-service additions to the generated Caddy site blocks (run inside `route`, in order)
+  homelab.services.dashboard.extraConfig = ''
+    # Wake-on-LAN hook (the dashboard itself is LAN/tailnet only)
+    ${lib.optionalString services.wakeonlan.enable ''
+      handle /hooks/* {
+        reverse_proxy 127.0.0.1:${toString services.wakeonlan.port}
+      }
+    ''}
+
+    # Serve the Root CRT at /root.crt
+    handle /root.crt {
+      root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
+      file_server {
+        hide root.key
+      }
+    }
+  '';
+  # Rewrite Host to 127.0.0.1:8384 so Syncthing's host check passes behind the proxy
+  # (replaces gui.insecureSkipHostcheck)
+  homelab.services.syncthing.proxyConfig = ''
+    header_up Host {upstream_hostport}
+  '';
+  homelab.services.vault.extraConfig = ''
+    # Admin page: LAN/tailnet only. Internet traffic arrives through the tunnel carrying the
+    # visitor's real IP ({client_ip} = Cf-Connecting-Ip), so it can't pass this.
+    @adminNotLan {
+      path /admin*
+      not client_ip ${privateRanges}
+    }
+    respond @adminNotLan "Access Denied" 403
+  '';
+
   # CADDY Reverse Proxy (HTTPS / Dashboard)
   services.caddy = {
     enable = true;
-    virtualHosts = (lib.mapAttrs' mkCaddyProxy (lib.filterAttrs (n: v: v.expose) services)) // {
+    # cloudflared connects from loopback; trust its Cf-Connecting-Ip header so {client_ip}
+    # (and X-Forwarded-For / X-Real-IP sent to apps) is the real visitor, not 127.0.0.1.
+    globalConfig = ''
+      servers {
+        trusted_proxies static 127.0.0.1/32 ::1/128
+        client_ip_headers Cf-Connecting-Ip
+      }
+    '';
+    virtualHosts = (lib.mapAttrs' mkCaddyProxy exposedServices) // {
       "${net.domain}".extraConfig = "redir https://${services.dashboard.domain}\ntls internal";
-      "${services.dashboard.domain}".extraConfig = ''
-        @tailscaleNetwork {
-          path /hooks/*
-          remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 ${net.cidr} 127.0.0.1 ::1
-        }
-
-        @forbiddenNetwork {
-          path /hooks/*
-          not remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 ${net.cidr} 127.0.0.1 ::1
-        }
-        respond @forbiddenNetwork "Access Denied: VPN connection required" 403
-
-        ${
-          let
-            wolEnabled = (lib.attrByPath [ "wakeonlan" "enable" ] false services);
-          in
-          lib.optionalString wolEnabled ''
-            handle @tailscaleNetwork {
-              reverse_proxy 127.0.0.1:${toString services.wakeonlan.port}
-            }
-          ''
-        }
-
-        # Serve the Root CRT at /root.crt
-        handle /root.crt {
-          root * /var/lib/caddy/.local/share/caddy/pki/authorities/local
-          file_server {
-            hide root.key
-          }
-        }
-
-        # Proxy everything else to Homepage
-        handle {
-          reverse_proxy localhost:${toString services.dashboard.port}
-        }
-
-        tls internal
-      '';
-      "${services.vault.domain}".extraConfig = ''
-        @forbiddenAdmin {
-          path /admin*
-          not remote_ip ${homelab.nodes.pc.cidr} 127.0.0.1
-        }
-        respond @forbiddenAdmin "Access Denied" 403
-
-        reverse_proxy ${services.vault.localEndpoint} {
-          header_up X-Real-IP {http.request.remote.host}
-          header_up X-Forwarded-Port {http.request.port}
-        }
-        tls internal
-      '';
-      "${services.immich.domain}".extraConfig = ''
-        reverse_proxy 10.1.0.1:2283
-        tls internal
-      '';
-      "${services.nextcloud.domain}".extraConfig = ''
-        reverse_proxy 10.1.0.1:8081
-        tls internal
-      '';
     };
   };
 
@@ -219,7 +228,7 @@ in
   services.homepage-dashboard = {
     enable = true;
     listenPort = services.dashboard.port;
-    allowedHosts = "${services.dashboard.domain},${net.domain},localhost,127.0.0.1";
+    allowedHosts = "${services.dashboard.domain},${services.dashboard.publicDomain},${net.domain},localhost,127.0.0.1";
     settings = {
       title = "Wilkinson Homelab";
       favicon = "https://nixos.org/favicon.png";
@@ -579,14 +588,52 @@ in
   };
 
   # NTFY
+  # Private instance: nothing is readable or writable without auth. One provisioned admin user
+  # (homelab.username) with one access token, ntfy_auth (tk_ + 29 chars, from `ntfy token generate`).
+  # Clients send `Authorization: Bearer <token>`; the web UI/apps log in as <username> with the
+  # token as the password.
   services.ntfy-sh = {
     enable = true;
+    # Declarative users/tokens (auth-users / auth-tokens) need ntfy >= 2.14; 25.05 ships 2.12.
+    # After the 26.05 upgrade the default package is new enough and this line can go.
+    package = unstable.ntfy-sh;
     settings = {
       base-url = "https://${services.ntfy.domain}";
-      listen-http = ":${toString services.ntfy.port}";
-      # auth-default-access = "deny-all";
+      listen-http = "127.0.0.1:${toString services.ntfy.port}"; # only Caddy and local clients
+      behind-proxy = true;
+      auth-default-access = "deny-all";
     };
   };
+
+  # NTFY_AUTH_USERS needs a bcrypt hash, which a sops template can't compute, so build the
+  # env file at boot. EnvironmentFile is read by systemd as root, so it can stay root-only.
+  systemd.services.ntfy-sh-auth = {
+    description = "Render ntfy declarative auth from sops";
+    before = [ "ntfy-sh.service" ];
+    requiredBy = [ "ntfy-sh.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      RuntimeDirectory = "ntfy-sh-auth";
+      RuntimeDirectoryMode = "0700";
+      RuntimeDirectoryPreserve = true;
+      UMask = "0077";
+    };
+    path = [
+      pkgs.mkpasswd
+      pkgs.coreutils
+    ];
+    script = ''
+      set -euo pipefail
+      token="$(tr -d '\n' < ${config.sops.secrets.ntfy_auth.path})"
+      hash="$(printf '%s' "$token" | mkpasswd -m bcrypt -R 10 --stdin)"
+      {
+        printf "NTFY_AUTH_USERS='%s:%s:admin'\n" "${homelab.username}" "$hash"
+        printf "NTFY_AUTH_TOKENS='%s:%s:homelab'\n" "${homelab.username}" "$token"
+      } > "$RUNTIME_DIRECTORY/env"
+    '';
+  };
+  systemd.services.ntfy-sh.serviceConfig.EnvironmentFile = "/run/ntfy-sh-auth/env";
 
   # ZORTEX: notes, calendar, etc.
   services.zortex = {
@@ -597,6 +644,7 @@ in
     timezone = "America/New_York";
     ntfy.url = "https://${services.ntfy.domain}";
     ntfy.topic = "zortex-notify";
+    ntfy.authTokenFile = config.sops.secrets.ntfy_auth.path;
     notesDir = "/srv/sync/personal/notes";
     notesGroup = toString homelab.groups.zortexdata; # "zortexdata"; # lib.toString homelab.groups.personaldata;
     # dataDir = "/var/lib/zortex";

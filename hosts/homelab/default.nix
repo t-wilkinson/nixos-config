@@ -12,29 +12,16 @@ let
 in
 {
   imports = [
+    ./inventory.nix
     ./networking.nix
     ./secrets.nix
     ./services.nix
     ../../modules/homelab
+    ../../modules/sops-check.nix
   ];
 
-  homelab.enableServices = [
-    "pastebin"
-    "ntfy"
-    "vault"
-    "dashboard"
-    "syncthing"
-    "zortex"
-    "glances"
-    # "nextcloud" moved to nixos-pc
-    # "immich" moved to nixos-pc
-    "borg"
-    "mealie"
-    "actual-budget"
-    "wakeonlan"
-    # "prometheus"
-    # "grafana"
-  ];
+  # Services and their hosts are listed in ./inventory.nix
+  homelab.thisNode = "pi";
 
   services.automatic-timezoned.enable = true;
 
@@ -137,7 +124,8 @@ in
   users.users.${username} = {
     isNormalUser = true;
     shell = pkgs.fish;
-    initialPassword = "password";
+    # initialPassword = "password";
+    hashedPasswordFile = config.sops.secrets.homelab_password_hash.path;
     extraGroups = [
       "serverdata"
       "personaldata"

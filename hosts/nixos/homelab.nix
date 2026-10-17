@@ -1,14 +1,12 @@
 { username, ... }:
 {
   imports = [
+    ../homelab/inventory.nix
     ../../modules/homelab
   ];
 
-  homelab = {
-    enableServices = [
-      # "mc-server"
-    ];
-  };
+  # Which services run here is decided by `host` in ../homelab/inventory.nix
+  homelab.thisNode = "pc";
 
   users.users.${username} = {
     extraGroups = [

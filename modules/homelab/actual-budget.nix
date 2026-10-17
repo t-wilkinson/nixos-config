@@ -8,7 +8,7 @@ let
   homelab = config.homelab;
   service = homelab.services.actual-budget;
 in
-lib.mkIf service.enable {
+lib.mkIf service.runsHere {
   # ── Container configuration ────────────────────────────────────────
   containers.actual-budget = {
     autoStart = true;

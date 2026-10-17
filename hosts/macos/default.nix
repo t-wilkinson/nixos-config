@@ -22,8 +22,16 @@
     age.keyFile = "/Users/${username}/.config/sops/age/keys.txt";
     defaultSopsFile = ./secrets.yaml;
     secrets = {
-      wg_macos_private_key = {
-        owner = "root";
+      # wg_macos_private_key = {
+      #   owner = "root";
+      # };
+
+      # ntfy access token for Neovim (zortex.nvim reads /run/secrets/ntfy_auth).
+      # The homelab file is also encrypted to user_key, which this machine holds.
+      ntfy_auth = {
+        sopsFile = ../homelab/secrets.yaml;
+        owner = username;
+        mode = "0400";
       };
     };
     age.sshKeyPaths = [ ];
