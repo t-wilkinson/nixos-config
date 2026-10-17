@@ -14,6 +14,7 @@ in
   imports = [
     ./inventory.nix
     ./networking.nix
+    ./wifi.nix
     ./secrets.nix
     ../../modules/homelab
     ../../modules/sops-check.nix

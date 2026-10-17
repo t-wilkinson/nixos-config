@@ -116,6 +116,12 @@ in
                 example = "enp4s0";
                 description = "Interface on the homelab link (ipv4 lives here).";
               };
+              wanInterface = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                example = "wlan0";
+                description = "Uplink to the internet (the gateway's NAT and Wi-Fi watchdog use it).";
+              };
               wakeOnLan = mkOption {
                 type = types.bool;
                 default = false;
