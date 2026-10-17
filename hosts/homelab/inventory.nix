@@ -173,6 +173,7 @@
         # Run by hand on the PC; LAN/tailnet only (a public Jupyter is remote code execution)
         host = "pc";
         port = 8888;
+        monitor = false; # not always running, so homelab-status shouldn't alert on it
       };
     };
   };

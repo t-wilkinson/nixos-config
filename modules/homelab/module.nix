@@ -289,6 +289,18 @@ in
                 };
                 default = { };
               };
+
+              units = mkOption {
+                type = types.listOf types.str;
+                default = [ ];
+                example = [ "vaultwarden.service" ];
+                description = "systemd units that make up the service; homelab-status checks them on its host.";
+              };
+              monitor = mkOption {
+                type = types.bool;
+                default = true;
+                description = "Include the service in homelab-status checks (false for things run by hand).";
+              };
             };
           }
         )

@@ -18,5 +18,7 @@
     # ./nextcloud.nix
     # ./immich.nix
     ./pastebin.nix
+
+    ./status.nix # homelab-status command (+ ntfy-notifying timer on the ntfy node)
   ];
 }
