@@ -132,8 +132,9 @@ in
           };
         };
 
-        widgets = [
-          {
+        widgets =
+          # Glances is off (Beszel replaced it); the built-in resources widget shows this host
+          lib.optional services.glances.enable {
             glances = {
               # Use internal localhost/container IP to avoid hairpin routing through Caddy
               url = "http://127.0.0.1:${toString services.glances.port}";
@@ -149,30 +150,35 @@ in
               ];
             };
           }
-          # {
-          #   resources = {
-          #     cpu = true;
-          #     memory = true;
-          #     disk = "/";
-          #     cputemp = true;
-          #   };
-          # }
-          {
-            search = {
-              provider = "duckduckgo";
-              target = "_blank";
-              showSearch = true;
+          ++ lib.optional (!services.glances.enable) {
+            resources = {
+              cpu = true;
+              memory = true;
+              disk = [
+                "/"
+                "/srv/backup"
+              ];
+              cputemp = true;
+              uptime = true;
             };
           }
-          {
-            datetime = {
-              format = {
-                timeStyle = "short";
-                dateStyle = "full";
+          ++ [
+            {
+              search = {
+                provider = "duckduckgo";
+                target = "_blank";
+                showSearch = true;
               };
-            };
-          }
-        ];
+            }
+            {
+              datetime = {
+                format = {
+                  timeStyle = "short";
+                  dateStyle = "full";
+                };
+              };
+            }
+          ];
 
         # Tiles come from the inventory (homelab.services.<n>.dashboard), plus extraTiles above
         services = homepageGroups;

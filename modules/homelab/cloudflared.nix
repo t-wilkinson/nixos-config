@@ -52,5 +52,9 @@ in
         };
       };
     };
+    # Pin the metrics/readiness endpoint (otherwise the first free port in 20241-20245);
+    # Gatus and homelab-status read /ready here
+    systemd.services."cloudflared-tunnel-${net.cloudflareTunnelId}".environment.TUNNEL_METRICS =
+      "127.0.0.1:20241";
   };
 }

@@ -57,7 +57,7 @@ in
           ${homelab.username}:
             displayname: "${homelab.username}"
             password: "${config.sops.placeholder.authelia_password_hash}"
-            email: "${homelab.username}@${net.domain}"
+            email: "${homelab.adminEmail}"
             groups:
               - admins
       '';

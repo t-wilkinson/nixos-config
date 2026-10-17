@@ -27,7 +27,9 @@
     ./actual-budget.nix
     ./wakeonlan.nix
     ./mc-server.nix
-    ./monitoring.nix
+    ./monitoring.nix # Glances (off: replaced by Beszel), old Prometheus/Grafana sketch
+    ./gatus.nix
+    ./beszel.nix
     ./borg.nix
     ./nextcloud.nix
     ./immich.nix

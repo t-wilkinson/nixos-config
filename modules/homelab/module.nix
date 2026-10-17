@@ -32,6 +32,10 @@ in
     username = mkOption {
       type = types.str;
     };
+    adminEmail = mkOption {
+      type = types.str;
+      description = "The admin's email: the Authelia user's email, which Beszel matches to log in.";
+    };
     adminKeys = mkOption {
       type = types.listOf types.str;
       default = [ ];

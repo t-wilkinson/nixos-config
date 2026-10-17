@@ -145,6 +145,8 @@ in
         actual-budget = [ "container@actual-budget.service" ];
         wakeonlan = [ "webhook.service" ];
         auth = [ "authelia-main.service" ];
+        gatus = [ "gatus.service" ];
+        beszel = [ "beszel-hub.service" ];
         borg = [ "borgbackup-job-homelab.timer" ];
         nextcloud = [
           "phpfpm-nextcloud.service"

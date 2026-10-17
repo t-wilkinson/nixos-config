@@ -11,6 +11,7 @@
     containerStateVersion = "24.11";
     gateway = "pi"; # runs Caddy, Blocky, the Cloudflare tunnel, the subnet router, NFS exports
 
+    adminEmail = "winston.trey.wilkinson@gmail.com";
     # Admin SSH keys: the user on every node, root on the Pi (deploys), the bootstrap images
     adminKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
@@ -72,7 +73,9 @@
       "dashboard"
       "syncthing"
       "zortex"
-      "glances"
+      # "glances" # replaced by Beszel (history, alerts, every node, GPU)
+      "gatus"
+      "beszel"
       "borg"
       "mealie"
       "actual-budget"
@@ -198,6 +201,39 @@
         port = 61208;
         description = "Monitoring";
         dashboard.category = "Compute Nodes";
+      };
+      gatus = {
+        # Uptime checks + status page, generated from this file; alerts to ntfy
+        host = "pi";
+        port = 8084;
+        subdomain = "status";
+        name = "Gatus";
+        description = "Uptime & status";
+        auth = true;
+        dashboard = {
+          category = "Infrastructure";
+          icon = "gatus";
+        };
+      };
+      beszel = {
+        # Metrics hub; an agent runs on every node once data.hubKey is set
+        host = "pi";
+        port = 8091;
+        name = "Beszel";
+        description = "System metrics";
+        auth = true;
+        dashboard = {
+          category = "Compute Nodes";
+          icon = "beszel";
+        };
+        data = {
+          # The hub's public key: Beszel UI -> Add system -> copy the key (ssh-ed25519 ...)
+          hubKey = null;
+          extraFilesystems = {
+            pi = "/srv/backup"; # the backup drive
+            pc = "/mnt/storage";
+          };
+        };
       };
 
       # Cloud
