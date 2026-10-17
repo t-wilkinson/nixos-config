@@ -12,25 +12,32 @@ let
 in
 {
   imports = [
-    ./inventory.nix
+    ../inventory.nix
     ./networking.nix
+    ./wifi.nix
     ./secrets.nix
-    ./services.nix
     ../../modules/homelab
     ../../modules/sops-check.nix
   ];
 
-  # Services and their hosts are listed in ./inventory.nix
+  # Services and their hosts are listed in ../inventory.nix
   homelab.thisNode = "pi";
 
   services.automatic-timezoned.enable = true;
 
-  nix.settings = {
-    trusted-users = [
-      "root"
-      "@wheel"
-    ];
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "prohibit-password"; # key only: deploy-rs connects as root
+    };
   };
+  users.users.root.openssh.authorizedKeys.keys = homelab.adminKeys;
+
+  # Only root may hand the daemon unsigned store paths. Deploys (deploy-rs) log in as root with
+  # an SSH key, so the admin user needs neither trusted-users nor passwordless sudo.
+  nix.settings.trusted-users = [ "root" ];
 
   systemd.tmpfiles.rules =
     let
@@ -101,7 +108,8 @@ in
 
   documentation.man.cache.enable = false; # Fish enables this by default but it takes a lot of time.
   boot.zfs.forceImportRoot = false; # no ZFS here; silences the 26.05 warning about the old default
-  security.sudo.wheelNeedsPassword = false; # So remote building doesn't keep asking for passwords
+  # sudo asks for the user's password (homelab_password_hash); deploys use root over SSH instead
+  security.sudo.wheelNeedsPassword = true;
 
   # Use generic extlinux compatible bootloader (standard for Pi images)
   boot.loader.grub.enable = false;
@@ -139,9 +147,7 @@ in
       "libvirtd"
       "syncthing"
     ];
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
-    ];
+    openssh.authorizedKeys.keys = homelab.adminKeys; # inventory.nix
   };
 
   environment.systemPackages = with pkgs; [
@@ -158,7 +164,8 @@ in
       name = "wol-pc";
       runtimeInputs = [ pkgs.wakeonlan ];
       text = ''
-        wakeonlan -i ${nodes.pc.ipv4} ${nodes.pc.mac}
+        # Broadcast on the direct link: a sleeping PC has no ARP entry, so its IP is unreachable
+        wakeonlan -i ${homelab.network.broadcast} -p 9 ${nodes.pc.mac}
       '';
     })
     (pkgs.writeShellScriptBin "hl-help" ''

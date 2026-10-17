@@ -14,7 +14,7 @@ in
     nat = {
       enable = true;
       internalInterfaces = [ "ve-+" ]; # for containers
-      externalInterface = "wlp1s0u1u4";
+      externalInterface = pi.wanInterface; # the USB Wi-Fi dongle (inventory.nix)
     };
 
     nameservers = [
@@ -23,7 +23,7 @@ in
     ];
 
     networkmanager = {
-      wifi.powersave = false;
+      # wifi.powersave / scanRandMacAddress: ./wifi.nix
       enable = true;
       dns = "none";
 
@@ -44,7 +44,7 @@ in
         #   wifi-security = {
         #     key-mgmt = "wpa-psk";
         #     # psk-file = config.sops.secrets.wifi_psk.path;
-        #     psk = "November13th"; # Note: This exposes the password in the Nix store
+        #     psk = "password"; # Note: This exposes the password in the Nix store
         #   };
         #   ipv4 = {
         #     method = "auto";

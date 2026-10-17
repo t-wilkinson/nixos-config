@@ -51,7 +51,7 @@ in
     #   }
     # ];
 
-    interfaces.enp4s0.wakeOnLan.enable = true;
+    # interfaces.enp4s0.wakeOnLan.enable: set by modules/homelab/wakeonlan.nix (wakeOnLan in the inventory)
     firewall =
       let
         kdePortRanges = {
@@ -99,7 +99,9 @@ in
       connection.id = "wired-homelab";
       connection.interface-name = homelabIface;
       connection.autoconnect = true;
-      # "802-3-ethernet".wake-on-lan = "magic"; # sudo ethtool -s enp4s0 wol gp (magic physical)
+      # Wake-on-LAN by magic packet. NetworkManager applies this on every activation (64 = magic);
+      # without it NM may leave or reset whatever udev set. Check: `sudo ethtool enp4s0` -> "Wake-on: g"
+      ethernet.wake-on-lan = "64";
 
       ipv4.method = "manual";
       ipv4.addresses = "${homelab.nodes.pc.cidr}";

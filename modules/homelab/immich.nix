@@ -1,63 +1,107 @@
+# modules/homelab/immich.nix
 {
   config,
-  username,
   lib,
-  pkgs,
+  unstable,
   ...
 }:
 let
-  homelab = config.homelab;
   cfg = config.homelab.services.immich;
 in
-{
-  # IMMICH Photos viewer
-  containers.immich = lib.mkIf cfg.enable {
-    autoStart = true;
-    # Bind mount the persistent data from the host into the container
-    bindMounts = {
-      "/mnt/media/pubdrive" = {
-        hostPath = homelab.drives.pubdrive;
-        isReadOnly = false;
-      };
+# Runs natively on its host (the PC; host = "pc" in hosts/inventory.nix), with machine
+# learning in a CUDA container. The old Pi container version is ./immich-container.nix.
+lib.mkIf cfg.runsHere {
+  services.immich = {
+    package = unstable.immich;
+    enable = true;
+    port = cfg.port;
+    host = "0.0.0.0";
+    mediaLocation = "/mnt/storage/immich";
+    # accelerationDevices = [
+    #   "/dev/dri/renderD129"
+    #   "/dev/nvidia0"
+    #   "/dev/nvidiactl"
+    #   "/dev/nvidia-uvm"
+    # ];
+    machine-learning = {
+      enable = false;
+
+      # environment = {
+      #   IMMICH_ACCELERATION_PROVIDER = "cuda";
+      #   CUDA_VISIBLE_DEVICES = "0";
+
+      #   LD_LIBRARY_PATH = lib.makeLibraryPath [
+      #     pkgs.cudaPackages.cudatoolkit
+      #     pkgs.cudaPackages.cudnn
+      #     pkgs.linuxPackages.nvidia_x11
+      #     "/run/opengl-driver/lib"
+      #   ];
+      #   # # prime offload environment variables
+      #   # __NV_PRIME_RENDER_OFFLOAD = "1";
+      #   # __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+      #   # __VK_LAYER_NV_optimus = "NVIDIA_only";
+      # };
     };
-    config =
-      { ... }:
-      {
-        systemd.tmpfiles.rules =
-          let
-            groups = lib.mapAttrs (k: v: toString v) homelab.groups;
-          in
-          [
-            "d /mnt/media/pubdrive 0770 immich ${groups.serverdata} - -"
-            "Z /mnt/media/pubdrive 0770 immich ${groups.serverdata} - -"
-          ];
-
-        users.users.immich = {
-          uid = 1000;
-          isSystemUser = true;
-          group = "immich";
-          extraGroups = [
-            "serverdata"
-          ];
-        };
-        users.groups.immich.gid = 1000;
-        users.groups.personaldata.gid = homelab.groups.personaldata;
-
-        networking.firewall.allowedTCPPorts = [ cfg.port ];
-
-        services.immich = {
-          enable = true;
-          user = "immich";
-          port = cfg.port;
-          host = "127.0.0.1";
-
-          # Point the main internal database/upload storage here.
-          # Note: This is NOT where your existing photos live; this is for Immich metadata.
-          mediaLocation = "/var/lib/immich";
-
-          # DISABLE ML to save the Pi 4 from melting
-          machine-learning.enable = false;
-        };
-      };
   };
+
+  virtualisation.oci-containers.containers.immich-machine-learning = {
+    image = "ghcr.io/immich-app/immich-machine-learning:release-cuda";
+    # Docker-published ports bypass the NixOS firewall, so bind to loopback only.
+    # Immich's machine-learning URL must then be http://127.0.0.1:3003 (not "localhost", which may resolve to ::1).
+    ports = [ "127.0.0.1:3003:3003" ];
+    volumes = [
+      "immich-model-cache:/cache"
+    ];
+    environment = {
+      CUDA_VISIBLE_DEVICES = "0";
+      IMMICH_HOST = "0.0.0.0";
+      IMMICH_PORT = "3003";
+    };
+    extraOptions = [
+      "--device=/dev/nvidiactl"
+      "--device=/dev/nvidia-uvm"
+      "--device=/dev/nvidia0"
+      "--ipc=host"
+    ];
+  };
+
+  systemd.services.immich-server.serviceConfig = {
+    ReadWritePaths = [ config.homelab.drives.pubdrive ];
+  };
+
+  systemd.services.immich-microservices.serviceConfig = {
+    ReadWritePaths = [ config.homelab.drives.pubdrive ];
+  };
+
+  users.users.immich.extraGroups = [
+    "serverdata"
+    "video"
+    "render"
+  ];
+
+  systemd.services."docker-immich-machine-learning" = {
+    wantedBy = [ "immich-server.service" ];
+  };
+
+  # systemd.services.immich-machine-learning.serviceConfig = {
+  #   # PrivateDevice = lib.mkForce false;
+  #   # DevicePolicy = "closed";
+  #   DeviceAllow = [
+  #     "/dev/dri/renderD129 rw"
+  #     "/dev/nvidia0 rw"
+  #     "/dev/nvidiactl rw"
+  #     "/dev/nvidia-uvm rw"
+  #     "/dev/nvidia-uvm-tools rw"
+  #     "/dev/nvidia-modeset rw"
+  #   ];
+  # };
+
+  # systemd.services.immich-server.serviceConfig = {
+  #   DeviceAllow = [
+  #     "/dev/nvidiactl rw"
+  #     "/dev/nvidia0 rw"
+  #     "/dev/nvidia-modeset rw"
+  #     "/dev/nvidia-uvm rw"
+  #   ];
+  # };
 }

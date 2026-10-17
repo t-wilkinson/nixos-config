@@ -5,16 +5,12 @@
     {
       self,
 
-      agenix,
       ags,
       anyrun,
       darwin-docker,
       deploy-rs,
       disko,
       firefox-gnome-theme,
-      flake-parts,
-      flake-utils,
-      gross,
       home-manager,
       homebrew-bundle,
       homebrew-cask,
@@ -22,7 +18,6 @@
       hyprland,
       hyprland-plugins,
       impurity-nix,
-      matugen,
       more-waita,
       nix-darwin,
       nix-homebrew,
@@ -158,7 +153,6 @@
           modules = [
             "${nixpkgs-nixos}/nixos/modules/installer/sd-card/sd-image-aarch64.nix"
             nixos-hardware.nixosModules.raspberry-pi-4
-            zortex.nixosModules.default
             sops-nix.nixosModules.sops
             (
               { lib, pkgs, ... }:
@@ -172,6 +166,19 @@
             ./hosts/homelab
           ];
         };
+
+      # Bootstrap images for new machines (hosts/void, docs/new-machine.md)
+      mkVoid =
+        system:
+        nixpkgs-nixos.lib.nixosSystem {
+          specialArgs = { inherit username; };
+          modules = [
+            { nixpkgs.hostPlatform = system; }
+            ./hosts/void
+          ];
+        };
+      void-x86_64 = mkVoid "x86_64-linux";
+      void-aarch64 = mkVoid "aarch64-linux";
 
     in
     {
@@ -188,17 +195,36 @@
 
       nixosConfigurations = mkImpureConfigurations mkNixosConfiguration linuxSystems // {
         homelab = homelab;
+        inherit void-x86_64 void-aarch64;
       };
 
-      images.homelab = homelab.config.system.build.sdImage;
-      deploy.nodes.homelab = {
-        hostname = "home.lab";
-        profiles.system = {
-          user = "root";
-          sshUser = "trey";
-          path = deploy-rs.lib.aarch64-linux.activate.nixos self.nixosConfigurations.homelab;
-        };
+      # nix build .#images.<name>
+      images = {
+        homelab = homelab.config.system.build.sdImage;
+        void-iso = void-x86_64.config.system.build.images.iso-installer; # USB installer
+        void-disk = void-x86_64.config.system.build.images.raw-efi; # write to the target drive
+        void-sd = void-aarch64.config.system.build.images.sd-card; # Pi SD card / USB SSD
       };
+
+      # deploy-rs: `nix run .#deploy` (all nodes) or `nix run .#deploy -- .#homelab`.
+      # Builds on this machine (the Mac's linux-builder, or the PC's aarch64 emulation) and
+      # copies the closure as root; add `--remote-build` to build on the Pi instead.
+      # Magic rollback: if the new system can't confirm the SSH connection within the timeout
+      # (e.g. a broken network or sshd config), the Pi reverts to the previous generation.
+      deploy.nodes.homelab =
+        let
+          pi = homelab.config.homelab.nodes.${homelab.config.homelab.thisNode};
+        in
+        {
+          hostname = pi.sshHost; # hosts/inventory.nix
+          sshUser = "root"; # key only (PermitRootLogin prohibit-password); trey's sudo needs a password
+          user = "root";
+          magicRollback = true;
+          autoRollback = true;
+          remoteBuild = false;
+          confirmTimeout = 60; # the Pi restarts Wi-Fi/Caddy/etc. on some changes
+          profiles.system.path = deploy-rs.lib.${pi.system}.activate.nixos homelab;
+        };
 
       checks = builtins.mapAttrs (_: deployLib: deployLib.deployChecks self.deploy) deploy-rs.lib;
 
@@ -235,14 +261,13 @@
     };
 
     # Utilities
-    flake-utils.url = "github:numtide/flake-utils";
     sops-nix.url = "github:Mic92/sops-nix";
     # use "impurity-nix" to avoid overwritting (merging @inputs in specialArgs) module that impurity injects named "impurity"
     impurity-nix.url = "github:outfoxxed/impurity.nix";
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs-nixos";
-    };
+    # agenix = {
+    #   url = "github:ryantm/agenix";
+    #   inputs.nixpkgs.follows = "nixpkgs-nixos";
+    # };
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs-nixos";
@@ -289,19 +314,19 @@
       # (pkgs.ags_1 in nixpkgs is the alternative)
       # inputs.nixpkgs.follows = "nixpkgs-nixos";
     };
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs-nixos";
-    };
-    gross = {
-      url = "github:fufexan/gross";
-      inputs.nixpkgs.follows = "nixpkgs-nixos";
-      inputs.flake-parts.follows = "flake-parts";
-    };
-    matugen = {
-      url = "github:/InioX/Matugen";
-      # ref = "refs/tags/matugen-v0.10.0"
-    };
+    # flake-parts = {
+    #   url = "github:hercules-ci/flake-parts";
+    #   inputs.nixpkgs-lib.follows = "nixpkgs-nixos";
+    # };
+    # gross = {
+    #   url = "github:fufexan/gross";
+    #   inputs.nixpkgs.follows = "nixpkgs-nixos";
+    #   inputs.flake-parts.follows = "flake-parts";
+    # };
+    # matugen = {
+    #   url = "github:/InioX/Matugen";
+    #   # ref = "refs/tags/matugen-v0.10.0"
+    # };
     more-waita = {
       url = "github:somepaulo/MoreWaita";
       flake = false;

@@ -1,8 +1,12 @@
 {
   pkgs,
+  lib,
   username,
   ...
 }:
+let
+  customBuilder = false; # see nix.linux-builder below
+in
 {
   imports = [
     ./home-manager.nix
@@ -38,13 +42,22 @@
     gnupg.sshKeyPaths = [ ];
   };
 
+  # Was in modules/nix.nix (shared); kept for macOS only, see the note there
+  nixpkgs.config.allowUnsupportedSystem = true;
+
   nix = {
     package = pkgs.nix;
+    # Builds aarch64-linux (the Pi) in a small NixOS VM; Nix sends Linux builds to it as a
+    # remote builder. Bootstrapping: the VM image is itself a Linux build, so a customised
+    # image can't be built until a builder exists. Switch once with customBuilder = false
+    # (prebuilt image from cache.nixos.org), then set it to true and switch again.
+    # Check: `nix build --impure --expr '(with import <nixpkgs> { system = "aarch64-linux"; }; hello)'`
+    # or `sudo ssh linux-builder uname -a`.
     linux-builder = {
       enable = true;
       ephemeral = true;
       maxJobs = 4;
-      config = {
+      config = lib.mkIf customBuilder {
         virtualisation = {
           darwin-builder = {
             diskSize = 40 * 1024;
@@ -58,10 +71,12 @@
     optimise.automatic = true;
 
     settings = {
-      extra-platforms = [
-        "aarch64-linux"
-        "x86_64-linux"
-      ];
+      # No Linux entries in extra-platforms: they tell Nix this Mac can build Linux itself, so it
+      # tried locally (and failed) instead of using the linux-builder.
+      # extra-platforms = [
+      #   "aarch64-linux"
+      #   "x86_64-linux"
+      # ];
       # experimental-features = "nix-command flakes";
       trusted-users = [
         "@admin"
