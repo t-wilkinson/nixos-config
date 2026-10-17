@@ -172,6 +172,19 @@
           ];
         };
 
+      # Bootstrap images for new machines (hosts/void, docs/new-machine.md)
+      mkVoid =
+        system:
+        nixpkgs-nixos.lib.nixosSystem {
+          specialArgs = { inherit username; };
+          modules = [
+            { nixpkgs.hostPlatform = system; }
+            ./hosts/void
+          ];
+        };
+      void-x86_64 = mkVoid "x86_64-linux";
+      void-aarch64 = mkVoid "aarch64-linux";
+
     in
     {
       apps =
@@ -187,9 +200,16 @@
 
       nixosConfigurations = mkImpureConfigurations mkNixosConfiguration linuxSystems // {
         homelab = homelab;
+        inherit void-x86_64 void-aarch64;
       };
 
-      images.homelab = homelab.config.system.build.sdImage;
+      # nix build .#images.<name>
+      images = {
+        homelab = homelab.config.system.build.sdImage;
+        void-iso = void-x86_64.config.system.build.images.iso-installer; # USB installer
+        void-disk = void-x86_64.config.system.build.images.raw-efi; # write to the target drive
+        void-sd = void-aarch64.config.system.build.images.sd-card; # Pi SD card / USB SSD
+      };
 
       # deploy-rs: `nix run .#deploy` (all nodes) or `nix run .#deploy -- .#homelab`.
       # Builds on this machine (the Mac's linux-builder, or the PC's aarch64 emulation) and
