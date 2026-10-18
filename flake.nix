@@ -229,6 +229,7 @@
             inherit (nixpkgs-unstable) lib;
             pkgs = import nixpkgs-unstable {
               inherit system;
+              config.allowUnfree = true;
               overlays = [
                 # (final: prev: { lndir = prev.xorg.lndir; })
               ];

@@ -19,7 +19,7 @@ colorstrings=''
 colorlist=()
 colorvalues=()
 
-# wallpath=$(swww query | head -1 | awk -F 'image: ' '{print $2}')
+# wallpath=$(awww query | head -1 | awk -F 'image: ' '{print $2}')
 # wallpath_png="$CACHE_DIR/user/generated/hypr/lockscreen.png"
 # convert "$wallpath" "$wallpath_png"
 # wallpath_png=$(echo "$wallpath_png" | sed 's/\//\\\//g')
@@ -184,8 +184,8 @@ apply_gtk() { # Using gradience-cli
 }
 
 apply_ags() {
-  agsv1 run-js "handleStyles(false);"
-  agsv1 run-js 'openColorScheme.value = true; Utils.timeout(2000, () => openColorScheme.value = false);'
+  ags run-js "handleStyles(false);"
+  ags run-js 'openColorScheme.value = true; Utils.timeout(2000, () => openColorScheme.value = false);'
 }
 
 apply_qt() {
