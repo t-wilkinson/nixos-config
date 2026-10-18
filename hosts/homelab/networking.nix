@@ -2,8 +2,15 @@
 { config, hostname, ... }:
 let
   pi = config.homelab.nodes.pi; # address on the direct ethernet link to the PC (inventory.nix)
+  wifiSsid = "KOI_POND_5G"; # the network name isn't secret; the password is (sops: wifi_psk)
 in
 {
+  sops.templates."nm-wifi-env" = {
+    # single quotes: systemd reads the value literally (no $ or \ handling); the password
+    # itself must not contain a single quote
+    content = "WIFI_PSK='${config.sops.placeholder.wifi_psk}'";
+    restartUnits = [ "NetworkManager-ensure-profiles.service" ];
+  };
 
   networking = {
     hostName = hostname;
@@ -28,6 +35,7 @@ in
       dns = "none";
 
       # Declaratively configure connections so they persist on reboot/rebuild
+      ensureProfiles.environmentFiles = [ config.sops.templates."nm-wifi-env".path ];
       ensureProfiles.profiles = {
         # 1. WI-FI PROFILE (Internet Access)
         # "wifi-connection" = {
@@ -50,6 +58,28 @@ in
         #     method = "auto";
         #   };
         # };
+
+        # Wi-Fi uplink. The password comes from sops (wifi_psk) through the environment file
+        # below: NetworkManager-ensure-profiles substitutes $WIFI_PSK when it writes the profile
+        # to /run/NetworkManager/system-connections (root-only), so it never enters the Nix store.
+        "wifi-uplink" = {
+          connection = {
+            id = "wifi-uplink";
+            type = "wifi";
+            interface-name = pi.wanInterface; # the USB dongle (inventory.nix)
+            autoconnect = "true";
+          };
+          wifi = {
+            ssid = wifiSsid;
+            mode = "infrastructure";
+          };
+          wifi-security = {
+            key-mgmt = "wpa-psk";
+            psk = "$WIFI_PSK";
+          };
+          ipv4.method = "auto";
+          ipv6.method = "auto";
+        };
 
         # 2. ETHERNET PROFILE (Direct Link to PC)
         "direct-ethernet" = {
