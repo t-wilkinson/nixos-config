@@ -49,6 +49,11 @@ let
         type = "app";
         meta.description = "Deploy the Pi with deploy-rs";
         program = "${pkgs.writeShellScript "h-deploy" ''
+          # Under sudo, ssh uses root's keys and drops your SSH agent, so the Pi refuses the login
+          if [ "$(id -u)" = 0 ]; then
+            echo "h-deploy: run it without sudo; it logs in to the Pi as root with your own SSH key" >&2
+            exit 1
+          fi
           exec ${deploy-rs.packages.${system}.default}/bin/deploy "''${FLAKE:-.}#homelab" "$@"
         ''}";
       };
