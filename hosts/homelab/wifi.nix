@@ -1,20 +1,27 @@
 # hosts/homelab/wifi.nix
-# Keeping the Pi's uplink (a USB Wi-Fi dongle, homelab.nodes.pi.wanInterface) alive.
+# Keeping the Pi's Wi-Fi uplink (homelab.nodes.pi.wanInterface) alive: the built-in Wi-Fi
+# (wlan0, brcmfmac) or a USB adapter.
 #
-# Symptom: Wi-Fi drops and stays down until a reboot, even with Wi-Fi power saving off.
-# "Until a reboot" points below NetworkManager: the dongle or its driver wedges (USB
-# autosuspend, a firmware hang, or a brown-out when the USB backup disk spins up on the same
-# bus), so reconnecting from NM alone doesn't help. Mitigations here:
-#   - no USB autosuspend (the dongle is never put to sleep)
+# History (2026-10): the USB dongle dropped and stayed down until a reboot; the built-in Wi-Fi
+# then failed every connection attempt at 802.11 authentication. That turned out to be a weak
+# link: the gateway reached the Pi at only -73 dBm on 5 GHz, and the Pi's own weaker
+# transmissions mostly didn't make it back. WPA3, the password and the driver were ruled out.
+# The real fix is signal (an extender or a better antenna); the settings here make the Pi
+# keep trying, recover by itself, and log the signal so a weak link is obvious next time.
+#
+# Mitigations here:
+#   - no USB autosuspend (a USB adapter is never put to sleep)
 #   - no MAC randomisation during scans (some drivers/routers handle it badly)
 #   - wifi-watchdog: checks the uplink every minute and escalates
 #       3 failed checks  -> reconnect the interface through NetworkManager
-#       5                -> reset the dongle on the USB bus (deauthorize / reauthorize)
+#       5                -> reset the radio: a USB adapter is reset on the bus, the built-in
+#                           Wi-Fi has its driver reloaded
 #       8                -> restart NetworkManager
 #       every 20 (~20 min) -> reboot, unless the Pi booted less than an hour ago
-#       (and another USB reset at 10, 30, 50, ...)
-#     Each failure logs link state, recent kernel messages and the Pi's throttling flags, so
-#     `journalctl -u wifi-watchdog -b -1` after a reboot shows what the dongle was doing.
+#       (and another radio reset at 10, 30, 50, ...)
+#     Each failure logs link state, the signal of the network it should be on, recent kernel
+#     messages and the Pi's throttling flags, so `journalctl -u wifi-watchdog -b -1` after a
+#     reboot shows what the radio was doing.
 {
   config,
   lib,
@@ -38,6 +45,8 @@ let
       networkmanager
       systemd
       util-linux
+      kmod # modprobe: reload the built-in Wi-Fi's driver
+      gnugrep
       curl
       libraspberrypi # vcgencmd
     ];
@@ -47,12 +56,20 @@ let
       mkdir -p "$STATE"
       fails=$(cat "$STATE/fails" 2> /dev/null || echo 0)
 
-      # Remember the dongle's USB device (e.g. 1-1.4) while it's visible: after a wedge the
-      # network interface can disappear, and the reset needs to know what to reset.
+      # Remember the radio while it's visible: after a wedge the network interface can
+      # disappear, and the reset needs to know what to reset. A USB adapter is remembered by
+      # its USB device (e.g. 1-1.4); any adapter by its driver's kernel module (e.g. brcmfmac).
       if [ -e "/sys/class/net/$IF/device" ]; then
         dev=$(readlink -f "/sys/class/net/$IF/device")   # .../1-1.4/1-1.4:1.0 (USB interface)
         usb=$(basename "$(dirname "$dev")")              # 1-1.4 (USB device)
-        [ -e "/sys/bus/usb/devices/$usb/authorized" ] && echo "$usb" > "$STATE/usb"
+        if [ -e "/sys/bus/usb/devices/$usb/authorized" ]; then
+          echo "$usb" > "$STATE/usb"
+        else
+          rm -f "$STATE/usb"
+        fi
+        if [ -e "$dev/driver/module" ]; then
+          basename "$(readlink -f "$dev/driver/module")" > "$STATE/module"
+        fi
       fi
 
       uplink_ok() {
@@ -88,6 +105,15 @@ let
       ip -br link show "$IF" 2>&1 || echo "$IF: interface missing"
       ip -4 -br addr show "$IF" 2>&1 || true
       iw dev "$IF" link 2>&1 || true
+      # Signal of the network the uplink should be on (from the last scan). Around -70 dBm or
+      # weaker, the Pi's replies often don't reach the router: a weak link, not a software fault.
+      ssid=$(nmcli -g 802-11-wireless.ssid connection show wifi-uplink 2> /dev/null || true)
+      if [ -n "$ssid" ]; then
+        iw dev "$IF" scan dump 2> /dev/null \
+          | awk -v ssid="$ssid" '/^BSS /{ bss=substr($2, 1, 17) } /signal:/{ sig=$2" "$3 } /freq:/{ f=$2 }
+              $1 == "SSID:" && substr($0, index($0, $2)) == ssid { print "seen " ssid " " bss " " f " MHz " sig }' \
+          || true
+      fi
       nmcli -t -f DEVICE,STATE,CONNECTION device 2>&1 || true
       vcgencmd get_throttled 2>&1 || true   # 0x0 = fine; bit 0/16 = under-voltage now/since boot
       journalctl -k -n 15 --no-pager -o short-monotonic 2>&1 | grep -iE "usb|wl|80211|firmware|voltage" || true
@@ -96,16 +122,27 @@ let
         echo "$1" > "$STATE/action"
         echo "action: $1"
       }
-      usb_reset() {
-        local usb
+      radio_reset() {
+        local usb mod holder
         usb=$(cat "$STATE/usb" 2> /dev/null || true)
+        mod=$(cat "$STATE/module" 2> /dev/null || true)
         if [ -n "$usb" ] && [ -e "/sys/bus/usb/devices/$usb/authorized" ]; then
           act "USB reset of $usb"
           echo 0 > "/sys/bus/usb/devices/$usb/authorized"
           sleep 3
           echo 1 > "/sys/bus/usb/devices/$usb/authorized"
+        elif [ -n "$mod" ]; then
+          # Built-in Wi-Fi: unload and reload its driver. Modules that use it (brcmfmac's
+          # vendor modules, e.g. brcmfmac_cyw) have to go first.
+          act "reload driver $mod"
+          for holder in /sys/module/"$mod"/holders/*; do
+            [ -e "$holder" ] && modprobe -r "$(basename "$holder")"
+          done
+          modprobe -r "$mod" || true
+          sleep 3
+          modprobe "$mod" || true
         else
-          act "USB reset skipped (device unknown)"
+          act "radio reset skipped (device unknown)"
         fi
       }
       case "$fails" in
@@ -113,7 +150,7 @@ let
           act "reconnect $IF"
           nmcli device reconnect "$IF" || nmcli device connect "$IF" || true
           ;;
-        5) usb_reset ;;
+        5) radio_reset ;;
         8)
           act "restart NetworkManager"
           systemctl restart NetworkManager
@@ -133,7 +170,7 @@ let
               act "reboot skipped (booted ''${up}s ago)"
             fi
           elif [ $((fails % 10)) -eq 0 ]; then
-            usb_reset
+            radio_reset
           fi
           ;;
       esac
@@ -141,7 +178,7 @@ let
   };
 in
 {
-  # The dongle (and the backup disk) are never autosuspended
+  # A USB Wi-Fi adapter (and the backup disk) are never autosuspended
   boot.kernelParams = [ "usbcore.autosuspend=-1" ];
 
   # Regulatory domain: without it the kernel uses the restrictive "world" domain, which can
@@ -160,13 +197,16 @@ in
   networking.networkmanager.wifi = {
     powersave = false;
     scanRandMacAddress = false;
-    # iwd instead of wpa_supplicant: with wpa_supplicant 2.12 the built-in Wi-Fi never got past
-    # 802.11 authentication on either band, even with brcmfmac's offloads disabled. iwd is the
-    # usual working combination for brcmfmac. NetworkManager still manages the connection
-    # (same wifi-uplink profile and sops password); the NixOS module enables iwd itself.
-    # Back out by deleting this line.
-    # backend = "iwd";
+    # Backend: wpa_supplicant (the default). iwd was tried; it always picks WPA3 when the network
+    # offers it, and WPA3 never completed on this chip (only tried on the weak link, so not a
+    # verdict). wpa_supplicant with pmf = 1 in the wifi-uplink profile (networking.nix) stays on
+    # WPA2, which is verified working.
   };
+
+  # nm-online waits for the Wi-Fi to connect. When it can't (no signal, wrong network), the unit
+  # fails, switch-to-configuration reports the failure, and deploy-rs rolls the whole deploy
+  # back - including whatever was meant to fix the Wi-Fi. Nothing here needs to wait for it.
+  systemd.services.NetworkManager-wait-online.enable = false;
 
   systemd.services.wifi-watchdog = {
     description = "Check the Wi-Fi uplink and recover it";

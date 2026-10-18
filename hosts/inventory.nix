@@ -41,7 +41,7 @@
         ipv4 = "10.1.0.2";
         lanInterface = "end0";
         # wanInterface = "wlp1s0u1u4"; # USB Wi-Fi dongle (hosts/homelab/wifi.nix keeps it alive)
-        wanInterface = "wlan0"; # USB Wi-Fi dongle (hosts/homelab/wifi.nix keeps it alive)
+        wanInterface = "wlan0"; # built-in Wi-Fi (hosts/homelab/wifi.nix keeps it alive)
         sshHost = "home.lab"; # deploy-rs target (Blocky on the LAN; tailnet via the subnet route)
         syncthingId = "HIAD4WE-UUAOBRY-KXKOWTA-P5HAXBL-FH3NQKF-BZLSGSO-YKNVFFI-4VUZQQE";
       };

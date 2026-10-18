@@ -21,7 +21,7 @@ in
     nat = {
       enable = true;
       internalInterfaces = [ "ve-+" ]; # for containers
-      externalInterface = pi.wanInterface; # the USB Wi-Fi dongle (inventory.nix)
+      externalInterface = pi.wanInterface; # the Wi-Fi uplink (inventory.nix)
     };
 
     nameservers = [
@@ -66,8 +66,11 @@ in
           connection = {
             id = "wifi-uplink";
             type = "wifi";
-            interface-name = pi.wanInterface; # the USB dongle (inventory.nix)
+            interface-name = pi.wanInterface; # the Wi-Fi uplink (inventory.nix)
             autoconnect = "true";
+            # Keep retrying forever. The default (4 tries, then a 5-minute pause) leaves the Pi
+            # offline after a few failures on a weak link.
+            autoconnect-retries = "0";
           };
           wifi = {
             ssid = wifiSsid;
@@ -76,7 +79,7 @@ in
           wifi-security = {
             key-mgmt = "wpa-psk";
             psk = "$WIFI_PSK";
-            pmf = 1;
+            pmf = 1; # disable: keeps NetworkManager on WPA2, the path verified working on this chip
           };
           ipv4.method = "auto";
           ipv6.method = "auto";
