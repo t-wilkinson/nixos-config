@@ -165,7 +165,7 @@ in
     # usual working combination for brcmfmac. NetworkManager still manages the connection
     # (same wifi-uplink profile and sops password); the NixOS module enables iwd itself.
     # Back out by deleting this line.
-    backend = "iwd";
+    # backend = "iwd";
   };
 
   systemd.services.wifi-watchdog = {

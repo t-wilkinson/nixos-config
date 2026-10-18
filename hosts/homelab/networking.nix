@@ -76,6 +76,7 @@ in
           wifi-security = {
             key-mgmt = "wpa-psk";
             psk = "$WIFI_PSK";
+            pmf = 1;
           };
           ipv4.method = "auto";
           ipv6.method = "auto";
