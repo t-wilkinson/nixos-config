@@ -149,6 +149,12 @@ in
   hardware.wirelessRegulatoryDatabase = true;
   boot.extraModprobeConfig = ''
     options cfg80211 ieee80211_regdom="US"
+
+    # The Pi's built-in Wi-Fi (brcmfmac, wlan0): with wpa_supplicant 2.11+ (26.05 has 2.12) the chip's offloaded
+    # authentication never completes ("Authentication with <bssid> timed out", assoc reject
+    # status 16) on both bands. Turning off the firmware SAE (0x80000) and auth/4-way-handshake
+    # offload (0x2000) features hands authentication back to wpa_supplicant.
+    options brcmfmac feature_disable=0x82000
   '';
 
   networking.networkmanager.wifi = {
