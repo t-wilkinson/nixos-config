@@ -32,7 +32,7 @@ let
       name = node.name;
       host = if n == cfg.host then "127.0.0.1" else node.ipv4;
       port = agentPort;
-      users = [ homelab.adminEmail ];
+      users = [ homelab.username ];
     }) agentNodes;
   };
 in
@@ -63,16 +63,17 @@ in
         environment = {
           KEY = hubKey; # the hub's public key (not a secret)
           # The hub's own node is reached over loopback; the others on their homelab address
-          LISTEN = if cfg.host == homelab.thisNode then "127.0.0.1:${toString agentPort}" else toString agentPort;
+          LISTEN =
+            if cfg.host == homelab.thisNode then "127.0.0.1:${toString agentPort}" else toString agentPort;
         }
         // lib.optionalAttrs (cfg.data ? extraFilesystems.${homelab.thisNode}) {
           EXTRA_FILESYSTEMS = cfg.data.extraFilesystems.${homelab.thisNode};
         };
       };
       # Only the hub (over the direct link) reaches other nodes' agents
-      networking.firewall.interfaces.${iface}.allowedTCPPorts = lib.mkIf (
-        cfg.host != homelab.thisNode
-      ) [ agentPort ];
+      networking.firewall.interfaces.${iface}.allowedTCPPorts = lib.mkIf (cfg.host != homelab.thisNode) [
+        agentPort
+      ];
     })
   ];
 }
