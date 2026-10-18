@@ -10,6 +10,7 @@ let
     let
       mkHomelabApp = scriptName: deps: {
         type = "app";
+        meta.description = "homelab: apps/homelab/${scriptName}";
         program = "${(pkgs.writeScriptBin scriptName ''
           #!${pkgs.bash}/bin/bash
           export PATH="${pkgs.lib.makeBinPath deps}:$PATH"
@@ -41,10 +42,12 @@ let
       # deploy-rs (flake.nix deploy.nodes): `nix run .#deploy -- .#homelab [--remote-build]`
       "deploy" = {
         type = "app";
+        meta.description = "deploy-rs";
         program = "${deploy-rs.packages.${system}.default}/bin/deploy";
       };
       "h-deploy" = {
         type = "app";
+        meta.description = "Deploy the Pi with deploy-rs";
         program = "${pkgs.writeShellScript "h-deploy" ''
           exec ${deploy-rs.packages.${system}.default}/bin/deploy "''${FLAKE:-.}#homelab" "$@"
         ''}";
@@ -58,6 +61,7 @@ let
 
   mkApp = pkgs: scriptName: system: {
     type = "app";
+    meta.description = "apps/${system}/${scriptName}";
     program = "${(pkgs.writeScriptBin scriptName ''
       #!/usr/bin/env bash
       PATH=${pkgs.git}/bin:$PATH

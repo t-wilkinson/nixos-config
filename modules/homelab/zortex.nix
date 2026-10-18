@@ -2,6 +2,7 @@
 {
   config,
   lib,
+  pkgs,
   inputs,
   ...
 }:
@@ -36,6 +37,20 @@ in
     }
 
     (lib.mkIf cfg.runsHere {
+      # Go 1.26 (nixpkgs 26.05) answers "/raw/../x" with a 307 redirect to the cleaned path
+      # where Go <= 1.25 sent 301; zortex's TestFiles only accepts 301/404, so the package
+      # failed its checks. The redirect is harmless (the cleaned path is outside /raw and the
+      # test still asserts no file content leaks). Patch only while the old assertion is there;
+      # fix it upstream in zortex.nvim (app/web/web_test.go) and this does nothing.
+      services.zortex.package = (pkgs.callPackage "${inputs.zortex}/nix/zortex.nix" { }).overrideAttrs (old: {
+        postPatch = (old.postPatch or "") + ''
+          if grep -q 'code != 404 && code != 301 ||' app/web/web_test.go 2>/dev/null; then
+            substituteInPlace app/web/web_test.go \
+              --replace-fail 'code != 404 && code != 301 ||' 'code != 404 && code != 301 && code != 307 ||'
+          fi
+        '';
+      });
+
       # ZORTEX: notes, calendar, etc.
       services.zortex = {
         enable = true;
