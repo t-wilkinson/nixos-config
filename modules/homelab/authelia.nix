@@ -73,6 +73,14 @@ in
       settings = {
         theme = "auto";
         server.address = "tcp://${cfg.localEndpoint}/";
+        # Forward auth checks the session cookie only. The default also checks any Authorization
+        # header, and apps behind the login send their own (Beszel/PocketBase sends its API token
+        # there): Authelia can't parse it and answers 401, so the app breaks right after its own
+        # login even though the Authelia session is fine.
+        server.endpoints.authz.forward-auth = {
+          implementation = "ForwardAuth";
+          authn_strategies = [ { name = "CookieSession"; } ];
+        };
         log.level = "info";
 
         authentication_backend = {
