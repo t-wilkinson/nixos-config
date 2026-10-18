@@ -3,6 +3,7 @@
   config,
   lib,
   pkgs,
+  unstable,
   ...
 }:
 let
@@ -19,8 +20,11 @@ in
     # token as the password.
     services.ntfy-sh = {
       enable = true;
-      # Declarative users/tokens (auth-users / auth-tokens) need ntfy >= 2.14; 26.05 ships 2.26.
-      # package = unstable.ntfy-sh;
+      # unstable (2.27+): the Pi ran unstable's ntfy before 26.05, which migrated its database
+      # to schema 9; 26.05's 2.26 only knows schema 8 and refuses to start ("version 9 is higher
+      # than current version 8"). ntfy can't downgrade a database, so stay on unstable (or on
+      # >= the version that wrote it) from here on.
+      package = unstable.ntfy-sh;
       settings = {
         base-url = "https://${services.ntfy.domain}";
         listen-http = "127.0.0.1:${toString services.ntfy.port}"; # only Caddy and local clients

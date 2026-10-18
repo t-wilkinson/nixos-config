@@ -32,7 +32,9 @@ let
       name = node.name;
       host = if n == cfg.host then "127.0.0.1" else node.ipv4;
       port = agentPort;
-      users = [ homelab.username ];
+      # No users: the hub assigns each system to its first account. (A listed email that
+      # doesn't match an account leaves the system with no users, which the hub refuses -
+      # and a refused config.yml stops it from starting.)
     }) agentNodes;
   };
 in
@@ -51,9 +53,19 @@ in
           TRUSTED_AUTH_HEADER = "Remote-Email";
         };
       };
-      # Declarative systems: the hub syncs beszel_data/config.yml on start
+      # Declarative systems: the hub syncs beszel_data/config.yml on start. Only once an
+      # account exists: before that every system would have no users, the sync fails, and the
+      # hub won't start. After creating the account: `sudo systemctl restart beszel-hub`.
       systemd.services.beszel-hub.serviceConfig.ExecStartPre = lib.mkAfter [
-        "${pkgs.coreutils}/bin/install -D -m 0644 ${systemsYml} beszel_data/config.yml"
+        "${pkgs.writeShellScript "beszel-systems" ''
+          db=beszel_data/data.db
+          n=$(${pkgs.sqlite}/bin/sqlite3 -readonly "$db" 'select count(*) from users' 2>/dev/null || echo 0)
+          if [ "''${n:-0}" -gt 0 ]; then
+            ${pkgs.coreutils}/bin/install -D -m 0644 ${systemsYml} beszel_data/config.yml
+          else
+            ${pkgs.coreutils}/bin/rm -f beszel_data/config.yml
+          fi
+        ''}"
       ];
     })
 

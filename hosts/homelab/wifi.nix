@@ -71,6 +71,7 @@ let
       }
 
       if uplink_ok; then
+        touch "$STATE/ever-up"
         if [ "$fails" -ge 3 ]; then
           msg="Wi-Fi recovered after $fails failed checks (last action: $(cat "$STATE/action" 2> /dev/null || echo none))"
           echo "$msg"
@@ -120,7 +121,11 @@ let
         *)
           if [ $((fails % 20)) -eq 0 ]; then
             up=$(awk '{ print int($1) }' /proc/uptime)
-            if [ "$up" -gt 3600 ]; then
+            if [ ! -e "$STATE/ever-up" ]; then
+              # Never connected since boot: a missing dongle or a wrong password, not a wedge.
+              # Rebooting wouldn't help, and would loop.
+              act "reboot skipped (uplink never came up this boot)"
+            elif [ "$up" -gt 3600 ]; then
               act "reboot"
               notify "Wi-Fi down for $fails minutes; rebooting"
               systemctl reboot
@@ -138,6 +143,13 @@ in
 {
   # The dongle (and the backup disk) are never autosuspended
   boot.kernelParams = [ "usbcore.autosuspend=-1" ];
+
+  # Regulatory domain: without it the kernel uses the restrictive "world" domain, which can
+  # leave 5 GHz channels unusable (the network shows in scans but association fails)
+  hardware.wirelessRegulatoryDatabase = true;
+  boot.extraModprobeConfig = ''
+    options cfg80211 ieee80211_regdom="US"
+  '';
 
   networking.networkmanager.wifi = {
     powersave = false;
