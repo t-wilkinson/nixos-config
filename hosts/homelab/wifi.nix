@@ -160,6 +160,12 @@ in
   networking.networkmanager.wifi = {
     powersave = false;
     scanRandMacAddress = false;
+    # iwd instead of wpa_supplicant: with wpa_supplicant 2.12 the built-in Wi-Fi never got past
+    # 802.11 authentication on either band, even with brcmfmac's offloads disabled. iwd is the
+    # usual working combination for brcmfmac. NetworkManager still manages the connection
+    # (same wifi-uplink profile and sops password); the NixOS module enables iwd itself.
+    # Back out by deleting this line.
+    backend = "iwd";
   };
 
   systemd.services.wifi-watchdog = {

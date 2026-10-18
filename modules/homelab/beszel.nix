@@ -56,7 +56,10 @@ in
       # Declarative systems: the hub syncs beszel_data/config.yml on start. Only once an
       # account exists: before that every system would have no users, the sync fails, and the
       # hub won't start. After creating the account: `sudo systemctl restart beszel-hub`.
-      systemd.services.beszel-hub.serviceConfig.ExecStartPre = lib.mkAfter [
+      # (mkForce: the nixpkgs module also runs `beszel-hub history-sync`, which this Beszel
+      # version doesn't have - "unknown command" on every start)
+      systemd.services.beszel-hub.serviceConfig.ExecStartPre = lib.mkForce [
+        "${config.services.beszel.hub.package}/bin/beszel-hub migrate up"
         "${pkgs.writeShellScript "beszel-systems" ''
           db=beszel_data/data.db
           n=$(${pkgs.sqlite}/bin/sqlite3 -readonly "$db" 'select count(*) from users' 2>/dev/null || echo 0)
