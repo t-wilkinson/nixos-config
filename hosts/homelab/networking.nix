@@ -2,7 +2,7 @@
 { config, hostname, ... }:
 let
   pi = config.homelab.nodes.pi; # address on the direct ethernet link to the PC (inventory.nix)
-  wifiSsid = "KOI_POND_5G"; # the network name isn't secret; the password is (sops: wifi_psk)
+  wifiSsid = "HOMELAB_5G"; # the network name isn't secret; the password is (sops: wifi_psk)
 in
 {
   sops.templates."nm-wifi-env" = {

@@ -128,7 +128,7 @@
         };
         data = {
           # The hub's public key: Beszel UI -> Add system -> copy the key (ssh-ed25519 ...)
-          hubKey = null;
+          hubKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF7egVuJEq7mJZcR71Ylch1uaIHbQeG5UBq7eYJwJhEG";
           extraFilesystems = {
             pi = "/srv/backup"; # the backup drive
             pc = "/mnt/storage";
