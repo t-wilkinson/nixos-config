@@ -33,6 +33,7 @@
         nextcloud_admin_pass = root;
         nextcloud_database_pass = root;
         vaultwarden_admin_hash = root;
+        zortex_cozi_url = root;
 
         borg_pass = root; # borg repokey passphrase
         minecraft_rcon_pass = root; # borg talks to the Minecraft server over RCON

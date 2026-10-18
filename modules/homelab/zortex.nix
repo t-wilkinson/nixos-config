@@ -54,13 +54,21 @@ in
       # ZORTEX: notes, calendar, etc.
       services.zortex = {
         enable = true;
-        web.port = services.zortex.port;
-        web.writable = true;
-        web.htmlScripts = true;
-        timezone = "America/New_York";
-        ntfy.url = "https://${services.ntfy.domain}";
-        ntfy.topic = "zortex-notify";
-        ntfy.authTokenFile = config.sops.secrets.ntfy_auth.path;
+        feeds.cozi = {
+          title = "Rodericks";
+          urlFile = config.sops.secrets.zortex_cozi_url.path;
+          notify = true;
+        };
+        web = {
+          port = services.zortex.port;
+          writable = true;
+          htmlScripts = true;
+        };
+        ntfy = {
+          url = "https://${services.ntfy.domain}";
+          topic = "zortex-notify";
+          authTokenFile = config.sops.secrets.ntfy_auth.path;
+        };
         notesDir = "/srv/sync/personal/notes";
         notesGroup = toString homelab.groups.zortexdata; # "zortexdata"; # lib.toString homelab.groups.personaldata;
         # dataDir = "/var/lib/zortex";

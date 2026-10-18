@@ -37,6 +37,12 @@ return {
           },
         },
 
+        features = {
+          calendar_feeds = {
+            cozi = true,
+          },
+        },
+
         server = {
           enabled = true,
           api_endpoint = "https://zortex.home.lab",
