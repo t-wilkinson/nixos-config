@@ -15,7 +15,6 @@
       homebrew-bundle,
       homebrew-cask,
       homebrew-core,
-      impurity-nix,
       more-waita,
       nix-darwin,
       nix-homebrew,
@@ -40,33 +39,28 @@
       ];
       mkApps = import ./lib/mk-apps.nix { inherit self inputs; };
 
-      impurity-module = {
-        impurity.enable = true;
-        imports = [ impurity-nix.nixosModules.impurity ];
-        impurity.configRoot = self;
-      };
-
-      mkImpureConfigurations =
+      # One configuration per system. The "-impure" names stay as aliases so existing scripts and
+      # muscle memory keep working; --impure is no longer needed (config links are out-of-store
+      # symlinks, see lib/default.nix).
+      mkConfigurations =
         mkConfiguration: systems:
         builtins.listToAttrs (
-          builtins.concatMap (system: [
-            {
-              name = system;
-              value = mkConfiguration system [
-                {
-                  # Is this necessary?
-                  # imports = [ impurity-nix.nixosModules.impurity ];
-                  # impurity.configRoot = self;
-                }
-              ];
-            }
-            {
-              name = "${system}-impure";
-              value = mkConfiguration system [
-                impurity-module
-              ];
-            }
-          ]) systems
+          builtins.concatMap (
+            system:
+            let
+              cfg = mkConfiguration system [ ];
+            in
+            [
+              {
+                name = system;
+                value = cfg;
+              }
+              {
+                name = "${system}-impure";
+                value = cfg;
+              }
+            ]
+          ) systems
         );
 
       mkDarwinConfiguration =
@@ -77,6 +71,7 @@
             inherit inputs username;
             hostname = "macos";
             homedir = "/Users/${username}";
+            configDir = "/Users/${username}/dev/t-wilkinson/nixos-config"; # this repo's working copy
             # nixpkgs-unstable branch is not built for aarch64-darwin
             unstable = import nixpkgs-nixos {
               inherit system;
@@ -117,6 +112,7 @@
             inherit self inputs username;
             hostname = "nixos";
             homedir = "/home/${username}";
+            configDir = "/home/${username}/dev/t-wilkinson/nixos-config"; # this repo's working copy
             unstable = import nixpkgs-unstable {
               inherit system;
               config.allowUnfree = true;
@@ -184,14 +180,13 @@
         nixpkgs-nixos.lib.genAttrs linuxSystems mkApps.linux
         // nixpkgs-darwin.lib.genAttrs darwinSystems mkApps.darwin;
 
-      darwinConfigurations = mkImpureConfigurations mkDarwinConfiguration darwinSystems // {
+      darwinConfigurations = mkConfigurations mkDarwinConfiguration darwinSystems // {
         "aarch64-darwin-wgu" = mkDarwinConfiguration "aarch64-darwin" [
-          impurity-module
           { imports = [ ./hosts/macos/wgu.nix ]; }
         ];
       };
 
-      nixosConfigurations = mkImpureConfigurations mkNixosConfiguration linuxSystems // {
+      nixosConfigurations = mkConfigurations mkNixosConfiguration linuxSystems // {
         homelab = homelab;
         inherit void-x86_64 void-aarch64;
       };
@@ -260,8 +255,8 @@
 
     # Utilities
     sops-nix.url = "github:Mic92/sops-nix";
-    # use "impurity-nix" to avoid overwritting (merging @inputs in specialArgs) module that impurity injects named "impurity"
-    impurity-nix.url = "github:outfoxxed/impurity.nix";
+    # impurity.nix is gone: ~/.config links are out-of-store symlinks (lib/default.nix)
+    # impurity-nix.url = "github:outfoxxed/impurity.nix";
     # agenix = {
     #   url = "github:ryantm/agenix";
     #   inputs.nixpkgs.follows = "nixpkgs-nixos";

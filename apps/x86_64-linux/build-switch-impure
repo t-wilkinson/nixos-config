@@ -8,9 +8,8 @@ NC='\033[0m'
 FLAKE_TARGET="x86_64-linux-impure"
 
 export NIXPKGS_ALLOW_UNFREE=1
-export IMPURITY_PATH="$(git rev-parse --show-toplevel)"
 
 echo "${YELLOW}Building and switching to new generation...${NC}"
-/run/current-system/sw/bin/nixos-rebuild switch --impure --flake .#$FLAKE_TARGET "$@"
+/run/current-system/sw/bin/nixos-rebuild switch --flake .#$FLAKE_TARGET "$@"
 
 echo "${GREEN}Switch to new generation complete!${NC}"

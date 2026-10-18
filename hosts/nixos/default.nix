@@ -94,10 +94,13 @@
         (lib.mkIf config.virtualisation.docker.enable "docker")
         (lib.mkIf config.networking.networkmanager.enable "networkmanager")
       ];
-      openssh.authorizedKeys.keyFiles = [
-        "/home/${username}/.ssh/authorized_keys"
-        # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
-      ];
+      # Admin keys from hosts/inventory.nix (reading ~/.ssh/authorized_keys at evaluation time
+      # needed --impure)
+      openssh.authorizedKeys.keys = config.homelab.adminKeys;
+      # openssh.authorizedKeys.keyFiles = [
+      #   "/home/${username}/.ssh/authorized_keys"
+      #   # (lib.mkIf (keys ? ${config.networking.hostName}) keys.${config.networking.hostName})
+      # ];
     };
   };
 

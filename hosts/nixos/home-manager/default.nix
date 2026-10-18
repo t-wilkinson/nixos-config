@@ -3,7 +3,7 @@
   inputs,
   pkgs,
   myLib,
-  impurity,
+  configDir,
   homedir,
   username,
   unstable,
@@ -30,7 +30,6 @@ in
         self
         username
         inputs
-        impurity
         unstable
         ;
     };
@@ -56,7 +55,7 @@ in
         ];
         packages = [ git-credential-pass ];
         file =
-          myLib.mkConfigLinks impurity [
+          myLib.mkConfigLinks pkgs configDir [
             "Kvantum"
             "ags"
             "chrome-flags.conf"

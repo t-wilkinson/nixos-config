@@ -5,11 +5,10 @@ SYSTEM_TYPE="aarch64-darwin-wgu"
 FLAKE_SYSTEM="darwinConfigurations.${SYSTEM_TYPE}.system"
 
 export NIXPKGS_ALLOW_UNFREE=1
-export IMPURITY_PATH="$SCRIPT_DIR"
 
 # Build and Switch
-nix --extra-experimental-features 'nix-command flakes' build --impure .#$FLAKE_SYSTEM --show-trace
-sudo --preserve-env=NIXPKGS_ALLOW_UNFREE,IMPURITY_PATH ./result/sw/bin/darwin-rebuild switch --impure --flake .#${SYSTEM_TYPE}
+nix --extra-experimental-features 'nix-command flakes' build .#$FLAKE_SYSTEM --show-trace
+sudo --preserve-env=NIXPKGS_ALLOW_UNFREE ./result/sw/bin/darwin-rebuild switch --flake .#${SYSTEM_TYPE}
 unlink ./result
 
 # Clear the environment for wgu

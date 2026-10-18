@@ -260,21 +260,6 @@
         "type": "github"
       }
     },
-    "impurity-nix": {
-      "locked": {
-        "lastModified": 1689836741,
-        "narHash": "sha256-82KeRg2sAqDXCdzVs8P8GoqVaPsZjkWgrfsj6kgOLTY=",
-        "owner": "outfoxxed",
-        "repo": "impurity.nix",
-        "rev": "bbc41b69ab5485cd55aa315d08cff865781d3913",
-        "type": "github"
-      },
-      "original": {
-        "owner": "outfoxxed",
-        "repo": "impurity.nix",
-        "type": "github"
-      }
-    },
     "more-waita": {
       "flake": false,
       "locked": {
@@ -486,7 +471,6 @@
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
         "homebrew-core": "homebrew-core",
-        "impurity-nix": "impurity-nix",
         "more-waita": "more-waita",
         "nix-darwin": "nix-darwin",
         "nix-homebrew": "nix-homebrew",

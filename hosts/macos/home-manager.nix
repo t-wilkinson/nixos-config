@@ -1,7 +1,6 @@
 {
   self,
   inputs,
-  impurity,
   pkgs,
   unstable,
   homedir,
@@ -62,7 +61,6 @@
         inputs
         username
         unstable
-        impurity
         ;
     };
     users.${username} =
@@ -84,7 +82,10 @@
             prismlauncher
           ];
           file = {
-            ".gnupg/gpg-agent.conf".source = "${homedir}/.gnupg/gpg-agent.conf.mac";
+            # A file outside the repo: link to it (a plain path would be copied into the store,
+            # which pure evaluation refuses)
+            ".gnupg/gpg-agent.conf".source =
+              config.lib.file.mkOutOfStoreSymlink "${homedir}/.gnupg/gpg-agent.conf.mac";
           };
 
           stateVersion = "23.11";

@@ -1,5 +1,5 @@
 {
-  impurity,
+  configDir,
   pkgs,
   unstable,
   lib,
@@ -15,7 +15,7 @@
         [ ]
         ++ (import ./packages.nix { inherit pkgs unstable; })
         ++ (import ./development.nix { inherit pkgs unstable hostname; });
-      file = myLib.mkConfigLinks impurity [
+      file = myLib.mkConfigLinks pkgs configDir [
         "alacritty"
         "bat"
         "fish"
