@@ -2,6 +2,7 @@
 let
   homelab = config.homelab;
   nodes = config.homelab.nodes;
+  disks = homelab.storage.disks;
 in
 {
   users.groups.storage-media = { };
@@ -10,13 +11,19 @@ in
   users.users.${username}.extraGroups = [ "storage-media" ];
 
   # FILE SETTINGS
-  systemd.tmpfiles.rules = [
-    # Type Path Mode User Group Age Argument
-    "d ${homelab.drives.pubdrive} 2770 ${username} storage-media"
-    "Z ${homelab.drives.pubdrive} 2770 ${username} storage-media"
-    # "a+   /mnt/storage/pubdrive     -    -    -             -   u:nextcloud:rX,u:immich:rX,g:storage-media:rwX"
-    # "a+   /mnt/storage/pubdrive     -    -    -             -   d:u:nextcloud:rwX,d:u:immich:rwX,d:g:storage-media:rwX"
-  ];
+  systemd.tmpfiles.rules =
+    let
+      shares = disks.pc-storage.shares;
+    in
+    [
+      # Type Path Mode User Group Age Argument
+      "d ${shares.pubdrive.path} 2770 ${username} storage-media"
+      "Z ${shares.pubdrive.path} 2770 ${username} storage-media"
+      # "a+   /mnt/storage/pubdrive     -    -    -             -   u:nextcloud:rX,u:immich:rX,g:storage-media:rwX"
+      # "a+   /mnt/storage/pubdrive     -    -    -             -   d:u:nextcloud:rwX,d:u:immich:rwX,d:g:storage-media:rwX"
+      "d ${shares.immich.path} 2770 immich storage-media"
+      "Z ${shares.immich.path} 2770 immich storage-media"
+    ];
 
   # SWAP
   swapDevices = [
@@ -44,7 +51,7 @@ in
   services.nfs.server = {
     enable = true;
     exports = ''
-      /mnt/storage ${nodes.pi.ipv4}(rw,sync,no_subtree_check,crossmnt,fsid=0,no_root_squash)
+      ${disks.pc-storage.mountPoint} ${nodes.pi.ipv4}(rw,sync,no_subtree_check,crossmnt,fsid=0,no_root_squash)
     '';
   };
 

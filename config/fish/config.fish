@@ -126,7 +126,8 @@ alias nc="sudo nixos-container"
 alias netcat="/run/current-system/sw/bin/nc"
 alias fix_audio="systemctl --user restart wireplumber.service && systemctl --user restart pipewire.service"
 
-alias ls="eza --icons=always --grid"
+alias ls="eza --icons=always --grid -g"
+alias lss="command ls"
 # alias ls='eza'
 # alias l='eza -lbF --git'
 # alias ll='eza -lbGF --git'

@@ -15,6 +15,8 @@
     # Admin SSH keys: the user on every node, root on the Pi (deploys), the bootstrap images
     adminKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ winston.trey.wilkinson@gmail.com"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ pc.home.lab"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ 10.1.0.1"
     ];
 
     drives = {
@@ -23,6 +25,33 @@
       personal = "/srv/sync/personal";
       minecraft = "/var/lib/minecraft";
       actual-budget = "/var/lib/actual-budget";
+    };
+
+    storage = {
+      disks = {
+        # homelab = {
+        #   uuid = "";
+        #   shares = {
+        #     pubdrive = "/mnt/storage/pubdrive";
+        #     pi-pubdrive = "/srv/pubdrive";
+        #     personal = "/srv/sync/personal";
+        #   };
+        # };
+        pc-storage = {
+          uuid = "a92044b3-8a07-43d8-a676-abbac9f6e667";
+          mountPoint = "/mnt/storage";
+          shares = {
+            immich = { };
+            pubdrive = { };
+            phones = { };
+          };
+        };
+      };
+
+      # dataDirs = {
+      #   minecraft = "/var/lib/minecraft";
+      #   actual-budget = "/var/lib/actual-budget";
+      # };
     };
 
     nodes = {

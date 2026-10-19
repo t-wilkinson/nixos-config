@@ -20,16 +20,18 @@ let
   homelab = config.homelab;
   username = homelab.username;
   pi = homelab.nodes.pi;
+  pc-storage = homelab.storage.disks.pc-storage;
 
-  immichLibrary = "/mnt/storage/immich/library";
-  phonesDir = "/mnt/storage/phones"; # raw phone dumps on the PC's HDD
+  immichLibrary = "${pc-storage.shares.immich.path}/library";
+  phonesDir = "${pc-storage.mountPoint}/phones"; # raw phone dumps on the PC's HDD
   piDir = "/srv/backup/phone-archive"; # on the Pi's backup SSD
   stateDir = "/var/lib/phone-archive"; # PC: SSH key, known_hosts, last file list
-  limitBytes = 200 * 1000 * 1000 * 1000; # 200 GB
+  limitBytes = 100 * 1000 * 1000 * 1000; # 200 GB
 
   # Public half of /var/lib/phone-archive/id_ed25519 on the PC (see the setup steps).
   # null = not set up yet: the Pi accepts no key for it.
-  senderKey = null;
+  senderKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO/U50yCVsRpRDIFJCyRxDX2NJYZkDLleyiFf7AsCKaP phone-archive@pc";
+  privateKeyFile = "/home/${username}/dev/t-wilkinson/personal/secrets/keys/phone-archive/id_ed25519";
 in
 lib.mkMerge [
   # PC: phone dumps, adb, and the weekly push of the oldest 200 GB
@@ -77,7 +79,7 @@ lib.mkMerge [
         echo "Selected $(wc -l < "$list") files, oldest $(head -1 "$list"), newest $(tail -1 "$list")"
 
         rsync -rlt --ignore-existing --chmod=D0750,F0640 --files-from="$list" \
-          -e "ssh -i ${stateDir}/id_ed25519 -o UserKnownHostsFile=${stateDir}/known_hosts -o StrictHostKeyChecking=accept-new" \
+          -e "ssh -i ${privateKeyFile} -o UserKnownHostsFile=${stateDir}/known_hosts -o StrictHostKeyChecking=accept-new" \
           ${immichLibrary}/ phone-archive@${pi.ipv4}:./
       '';
     };
@@ -104,7 +106,9 @@ lib.mkMerge [
       group = "phone-archive";
       home = piDir;
       shell = pkgs.bashInteractive; # sshd runs the forced command through the login shell
-      openssh.authorizedKeys.keys = lib.optional (senderKey != null) ''restrict,command="${pkgs.rrsync}/bin/rrsync -wo -no-del -no-overwrite ${piDir}" ${senderKey}'';
+      openssh.authorizedKeys.keys = lib.optional (
+        senderKey != null
+      ) ''restrict,command="${pkgs.rrsync}/bin/rrsync -wo -no-del -no-overwrite ${piDir}" ${senderKey}'';
     };
   })
 ]
