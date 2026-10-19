@@ -10,6 +10,7 @@ let
   secrets = config.sops.secrets;
   mc = homelab.services.mc-server;
   pc_ip_address = homelab.nodes.${mc.host}.ipv4;
+  backupDisk = null; # UUID of the backup SSD (lsblk -f), e.g. "1b2c3d4e-5f60-..."
   # Password comes from the environment (MCRCON_PASS) so it never shows up in `ps`.
   # -P is the port; -p would be the password.
   mcrconCmd = "MCRCON_PASS=\"$(cat ${secrets.minecraft_rcon_pass.path})\" ${pkgs.mcrcon}/bin/mcrcon -H ${pc_ip_address} -P ${toString mc.data.rconPort}";
@@ -21,6 +22,19 @@ in
     environment.systemPackages = with pkgs; [
       borgbackup
     ];
+
+    # The backup SSD (borg repo + phone archive). Nothing mounted it before, so the job below
+    # skipped every run unless it was mounted by hand. Set backupDisk to its UUID and fsType to
+    # its type (both from `lsblk -f` on the Pi).
+    fileSystems."/srv/backup" = lib.mkIf (backupDisk != null) {
+      device = "/dev/disk/by-uuid/${backupDisk}";
+      fsType = "ext4";
+      options = [
+        "nofail" # boot without it
+        "noatime"
+        "x-systemd.device-timeout=10s"
+      ];
+    };
     systemd.tmpfiles.rules = [
       "d /srv/backup 0770 ${homelab.username} ${toString homelab.groups.personaldata}"
       "Z /srv/backup 0770 ${homelab.username} ${toString homelab.groups.personaldata}"

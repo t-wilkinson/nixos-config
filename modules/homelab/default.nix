@@ -31,6 +31,7 @@
     ./gatus.nix
     ./beszel.nix
     ./borg.nix
+    ./phone-archive.nix # phone dumps on the PC; the oldest 200 GB copied to the Pi's SSD
     ./nextcloud.nix
     ./immich.nix
 
