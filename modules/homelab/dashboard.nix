@@ -79,13 +79,6 @@ let
       lib.mapAttrsToList (n: s: mkTile s) (lib.filterAttrs (n: s: s.dashboard.category == group) tiled)
       ++ (extraTiles.${group} or [ ]);
   }) (groupOrder ++ lib.subtractLists groupOrder categories);
-
-  mkHomepageEntry = name: service: {
-    ${name} = {
-      description = service.description;
-      href = "https://${service.domain}";
-    };
-  };
 in
 {
   config = lib.mkMerge [
@@ -117,7 +110,7 @@ in
         allowedHosts = "${services.dashboard.domain},${services.dashboard.publicDomain},${net.domain},localhost,127.0.0.1";
         settings = {
           title = "Homelab";
-          favicon = "https://nixos.org/favicon.png";
+          favicon = "https://nixos.org/favicon.ico";
           theme = "dark";
           color = "slate"; # palette is overridden in customCSS; any color works
           headerStyle = "boxed";
