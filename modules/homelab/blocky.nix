@@ -34,7 +34,12 @@ in
           }
           # Private services also answer on their public name, but only on the LAN/tailnet.
           # Public services keep resolving to Cloudflare (real certificate, e.g. Bitwarden mobile).
-          // lib.mapAttrs' (n: v: lib.nameValuePair v.publicDomain gatewayIp) privateServices;
+          // lib.mapAttrs' (n: v: lib.nameValuePair v.publicDomain gatewayIp) privateServices
+
+          # Resolve node ips (need to establish a subnet via tailscale)
+          // lib.mapAttrs' (n: v: lib.nameValuePair "${v.hostname}.${net.domain}" (toString v.ipv4)) (
+            lib.filterAttrs (n: v: v.ipv4 != null) homelab.nodes
+          );
         };
 
         # Ad Blocking

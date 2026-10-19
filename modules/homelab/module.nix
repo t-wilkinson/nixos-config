@@ -99,6 +99,11 @@ in
                 default = capitalizeFirst name;
                 description = "Pretty name (dashboard buttons).";
               };
+              hostname = mkOption {
+                type = types.str;
+                default = name;
+                description = "Hostname for system";
+              };
               system = mkOption {
                 type = types.nullOr types.str;
                 default = null;
