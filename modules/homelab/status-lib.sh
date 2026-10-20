@@ -180,10 +180,11 @@ check_nfs() {
   fi
 }
 
-# check_backup REPO MOUNT PASSFILE  (newest borg archive younger than 26 h)
+# check_backup REPO MOUNT PASSFILE  (newest borg archive younger than 26 h; MOUNT "-" when the
+# repo is a plain directory rather than on its own drive)
 check_backup() {
   local json last ts age
-  if ! mountpoint -q "$2"; then
+  if [ "$2" != - ] && ! mountpoint -q "$2"; then
     fail "Backups" "$2 is not mounted"
     return
   fi

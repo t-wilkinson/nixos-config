@@ -33,7 +33,7 @@ in
         privateNetwork = false;
         bindMounts = {
           "/var/lib/minecraft" = {
-            hostPath = homelab.drives.minecraft;
+            hostPath = homelab.storage.shares.minecraft.localPath; # the Pi's share, over NFS
             isReadOnly = false;
           };
         }

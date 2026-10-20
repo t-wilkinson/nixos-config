@@ -1,29 +1,14 @@
+# The storage HDD, its shares (pubdrive, immich, phones, backups) and the NFS exports/mounts
+# between the PC and the Pi come from homelab.storage in ../inventory.nix.
 { config, username, ... }:
 let
-  homelab = config.homelab;
-  nodes = config.homelab.nodes;
-  disks = homelab.storage.disks;
+  storage = config.homelab.storage.volumes.pc-storage;
 in
 {
   users.groups.storage-media = { };
   users.users.immich.extraGroups = [ "storage-media" ];
   users.users.nextcloud.extraGroups = [ "storage-media" ];
   users.users.${username}.extraGroups = [ "storage-media" ];
-
-  # FILE SETTINGS
-  systemd.tmpfiles.rules =
-    let
-      shares = disks.pc-storage.shares;
-    in
-    [
-      # Type Path Mode User Group Age Argument
-      "d ${shares.pubdrive.path} 2770 ${username} storage-media"
-      "Z ${shares.pubdrive.path} 2770 ${username} storage-media"
-      # "a+   /mnt/storage/pubdrive     -    -    -             -   u:nextcloud:rX,u:immich:rX,g:storage-media:rwX"
-      # "a+   /mnt/storage/pubdrive     -    -    -             -   d:u:nextcloud:rwX,d:u:immich:rwX,d:g:storage-media:rwX"
-      "d ${shares.immich.path} 2770 immich storage-media"
-      "Z ${shares.immich.path} 2770 immich storage-media"
-    ];
 
   # SWAP
   swapDevices = [
@@ -48,25 +33,7 @@ in
   };
   boot.supportedFilesystems = [ "zfs" ];
 
-  services.nfs.server = {
-    enable = true;
-    exports = ''
-      ${disks.pc-storage.mountPoint} ${nodes.pi.ipv4}(rw,sync,no_subtree_check,crossmnt,fsid=0,no_root_squash)
-    '';
-  };
-
-  fileSystems =
-    let
-      homelabOptions = [
-        "x-systemd.automount"
-        "x-systemd.idle-timeout=10"
-        "x-systemd.mount-timeout=10s"
-        "x-systemd.after=network-online.target"
-        "noauto"
-        "_netdev"
-      ];
-    in
-    {
+  fileSystems = {
       "/" = {
         device = "rpool/root";
         fsType = "zfs";
@@ -92,33 +59,8 @@ in
         ];
       };
 
-      "/mnt/homelab/personal" = {
-        device = "${nodes.pi.ipv4}:/srv/sync/personal";
-        fsType = "nfs";
-        options = homelabOptions;
-      };
-      "/var/lib/minecraft" = {
-        device = "${nodes.pi.ipv4}:/var/lib/minecraft";
-        fsType = "nfs";
-        options = homelabOptions ++ [
-          "rw"
-          "soft"
-        ];
-      };
-
-      "/mnt/storage" = {
-        device = "/dev/disk/by-uuid/a92044b3-8a07-43d8-a676-abbac9f6e667";
-        fsType = "btrfs";
-        options = [
-          "subvol=@data"
-          "compress=no"
-          "noatime"
-          "noatime"
-          "x-systemd.device-timeout=10s"
-        ];
-      };
-      "/mnt/storage/.snapshots" = {
-        device = "/dev/disk/by-uuid/a92044b3-8a07-43d8-a676-abbac9f6e667";
+      "${storage.mountPoint}/.snapshots" = {
+        inherit (storage) device;
         fsType = "btrfs";
         options = [
           "subvol=@snapshots"

@@ -34,7 +34,7 @@ lib.mkIf cfg.runsHere {
 
   systemd.services.phpfpm-nextcloud.serviceConfig = {
     ReadWritePaths = [
-      homelab.drives.pubdrive
+      homelab.storage.shares.pubdrive.path
     ];
   };
 

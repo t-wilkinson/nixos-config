@@ -54,8 +54,12 @@ let
     ) config.fileSystems
   );
   borgRepo = config.services.borgbackup.jobs.homelab.repo;
-  borgMount = dirOf borgRepo;
-  disks = lib.unique ([ "/" ] ++ dataMounts ++ lib.optional hasBorg borgMount);
+  # The filesystem holding the repo: its own mount if it has one, else "-" (a plain directory
+  # on /, which check_backup then doesn't require to be a mount point)
+  borgMount = lib.findFirst (mp: lib.hasPrefix "${mp}/" "${borgRepo}/") "-" (
+    lib.filter (mp: mp != "/") (lib.attrNames config.fileSystems)
+  );
+  disks = lib.unique ([ "/" ] ++ dataMounts ++ lib.optional (hasBorg && borgMount != "-") borgMount);
 
   otherNodes = lib.filterAttrs (n: node: n != hl.thisNode && node.ipv4 != null) hl.nodes;
   namesOf = s: [ s.domain ] ++ lib.optional (s.publicDomain != null) s.publicDomain;
@@ -148,6 +152,8 @@ in
         gatus = [ "gatus.service" ];
         beszel = [ "beszel-hub.service" ];
         borg = [ "borgbackup-job-homelab.timer" ];
+        archive = [ "homelab-archive.timer" ];
+        borg-mirror = [ "borg-mirror.timer" ];
         nextcloud = [
           "phpfpm-nextcloud.service"
           "nginx.service"

@@ -10,7 +10,8 @@ let
   secrets = config.sops.secrets;
   mc = homelab.services.mc-server;
   pc_ip_address = homelab.nodes.${mc.host}.ipv4;
-  # backupDisk = homelab.storage.disks.pc-storage.uuid;
+  shares = homelab.storage.shares;
+  repo = "${shares.backup.path}/homelab"; # /srv/backup/homelab
   # Password comes from the environment (MCRCON_PASS) so it never shows up in `ps`.
   # -P is the port; -p would be the password.
   mcrconCmd = "MCRCON_PASS=\"$(cat ${secrets.minecraft_rcon_pass.path})\" ${pkgs.mcrcon}/bin/mcrcon -H ${pc_ip_address} -P ${toString mc.data.rconPort}";
@@ -21,11 +22,6 @@ in
   config = lib.mkIf cfg.runsHere {
     environment.systemPackages = with pkgs; [
       borgbackup
-    ];
-
-    systemd.tmpfiles.rules = [
-      "d /srv/backup 0770 ${homelab.username} ${toString homelab.groups.personaldata}"
-      "Z /srv/backup 0770 ${homelab.username} ${toString homelab.groups.personaldata}"
     ];
 
     systemd.services."borgbackup-job-homelab" = {
@@ -57,18 +53,22 @@ in
     };
 
     services.borgbackup.jobs."homelab" = {
-      # /srv/backup is the backup drive's mount point. The encrypted repo lives in a
-      # subdirectory; borg won't create a repo inside the old unencrypted one, so move that
-      # aside first (see the PR notes). doInit creates it on the first run, after preHook
-      # has confirmed the drive is mounted.
-      repo = "/srv/backup/homelab";
+      # A directory on the Pi's drive (the backup share, /srv/backup). The PC keeps a copy of
+      # this repo (borg-mirror.nix); the PC's archive next to it (pc-archive) is not in here.
+      inherit repo;
+
+      # Wait for the lock instead of failing while the PC is copying the repo
+      extraArgs = [
+        "--lock-wait"
+        "3600"
+      ];
 
       paths = [
         "/srv/sync"
-        # "/srv/pubdrive"
         "/var/lib/nextcloud"
         "/var/lib/vaultwarden"
-        "/var/lib/minecraft"
+        shares.minecraft.path
+        shares.actual-budget.path
       ];
 
       exclude = [
@@ -87,6 +87,7 @@ in
 
       # repokey: the key sits in the repo, protected by borg_pass. Keep an offline copy of
       # `borg key export /srv/backup/homelab` too; without key + passphrase the backups are gone.
+      # (The PC's copy of the repo has the key inside it, but still needs the passphrase.)
       encryption = {
         mode = "repokey-blake2";
         passCommand = "cat ${secrets.borg_pass.path}";
@@ -105,13 +106,9 @@ in
       };
 
       preHook = ''
-        ${ntfyCurl} -d "Borg backing up homelab" http://${homelab.services.ntfy.localEndpoint}/homelab || true
-
-        if [ ! -d /srv/backup/homelab ]; then
-          echo "Backup drive not mounted. Skipping backup."
-          exit 0
-        fi
-
+        ${lib.optionalString homelab.services.ntfy.enable ''
+          ${ntfyCurl} -d "Borg backing up homelab" http://${homelab.services.ntfy.localEndpoint}/homelab || true
+        ''}
         # NEXTCLOUD
         # echo "Backing up nextcloud..."
         # ${pkgs.nixos-container}/bin/nixos-container run nextcloud -- \
@@ -134,32 +131,36 @@ in
         # chown ${homelab.username}:${toString homelab.groups.personaldata} /var/lib/immich/immich-sql-dump.sql
         # chmod 660 /var/lib/immich/immich-sql-dump.sql
 
-        # MINECRAFT
-        echo "Backing up Minecraft..."
-        if ${pkgs.iputils}/bin/ping -c 1 -W 2 ${pc_ip_address} > /dev/null; then
-          ${mcrconCmd} "save-all"
-          ${mcrconCmd} "save-off"
-        else
-          echo "Minecraft server at ${pc_ip_address} is unreachable. Skipping Minecraft backup."
-        fi
+        # MINECRAFT: flush and pause saving while the world is copied. Only when the server is
+        # enabled, and never fatal: the script runs under set -e, and a PC that's awake without
+        # the server running would otherwise fail the whole backup.
+        ${lib.optionalString mc.enable ''
+          echo "Backing up Minecraft..."
+          if ${pkgs.iputils}/bin/ping -c 1 -W 2 ${pc_ip_address} > /dev/null; then
+            ${mcrconCmd} "save-all" && ${mcrconCmd} "save-off" || echo "Minecraft RCON unavailable; copying the world as is."
+          else
+            echo "Minecraft server at ${pc_ip_address} is unreachable. Skipping Minecraft flush."
+          fi
+        ''}
       '';
 
-      postHook = lib.mkIf homelab.services.ntfy.enable ''
-        if ${pkgs.iputils}/bin/ping -c 1 -W 2 ${pc_ip_address} > /dev/null; then
-          ${mcrconCmd} "save-on"
-        fi
-
-        # BORG_EXIT_CODE: 0 = success, 1 = warning, 2 = error
-        EXIT_CODE="''${BORG_EXIT_CODE:-2}"
-        echo $BORG_EXIT_CODE
-        if [ "$EXIT_CODE" -eq 0 ]; then
+      # Runs on exit, success or not; the job's exit status is $exitStatus (0 = success,
+      # 1 = warning, 2 = error). Failures notify through OnFailure above.
+      postHook =
+        lib.optionalString mc.enable ''
+          if ${pkgs.iputils}/bin/ping -c 1 -W 2 ${pc_ip_address} > /dev/null; then
+            ${mcrconCmd} "save-on" || true
+          fi
+        ''
+      + lib.optionalString homelab.services.ntfy.enable ''
+        if [ "$exitStatus" -eq 0 ]; then
           ${ntfyCurl} \
             -H "Title: Backup Successful" \
             -H "Priority: low" \
             -H "Tags: white_check_mark,backup" \
-            -d "Borg finished backing up to /srv/backup/homelab successfully." \
+            -d "Borg finished backing up to ${repo} successfully." \
             http://${homelab.services.ntfy.localEndpoint}/homelab
-        elif [ "$EXIT_CODE" -eq 1 ]; then
+        elif [ "$exitStatus" -eq 1 ]; then
           ${ntfyCurl} \
             -H "Title: Backup Finished with Warnings" \
             -H "Priority: default" \

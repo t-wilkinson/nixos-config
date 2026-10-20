@@ -42,7 +42,7 @@ in
   systemd.tmpfiles.rules =
     let
       groups = lib.mapAttrs (n: v: toString v) config.homelab.groups;
-      drives = config.homelab.drives;
+      personal = config.homelab.storage.shares.personal.path;
     in
     # d(D) := create (empty) directory
     # z(Z) := (recursively) modifies path
@@ -54,40 +54,23 @@ in
       "d      /srv/sync             0701  ${username}    -     -   -"
       "z      /srv/sync             0701  ${username}    -     -   -"
 
-      # /srv/sync/personal: owned by personaldata, traversal-only for zortexdata
-      "d ${drives.personal} 2770 ${username} ${groups.personaldata} - -"
-      "z ${drives.personal} 2770 ${username} ${groups.personaldata} - -"
-      "a ${drives.personal} -    -          -                    - group:${groups.zortexdata}:--x"
+      # Share directories (personal, backup, minecraft, ...) and the NFS mount of the PC's
+      # pubdrive come from homelab.storage in ../inventory.nix.
+
+      # /srv/sync/personal: traversal-only for zortexdata
+      "a ${personal} -    -          -                    - group:${groups.zortexdata}:--x"
 
       # /srv/sync/personal/notes: read-only for zortexdata
-      "d ${drives.personal}/notes 2770 ${username} ${groups.personaldata} - -"
+      "d ${personal}/notes 2770 ${username} ${groups.personaldata} - -"
       # Apply access ACL recursively to existing contents, and default ACL to notes directory
-      "A ${drives.personal}/notes - - - - group:${groups.zortexdata}:rwx"
-      "a ${drives.personal}/notes - - - - default:group:${groups.zortexdata}:rwx"
-
-      "d ${drives.pi-pubdrive} 2770 ${username} ${groups.storage-media} - -"
-      "Z ${drives.pi-pubdrive} 2770 ${username} ${groups.storage-media} - -"
-      "d ${drives.minecraft} 2775 ${username} ${groups.serverdata} - -"
-      "Z ${drives.minecraft} 2775 ${username} ${groups.serverdata} - -"
-      "d ${drives.actual-budget} 2775 ${username} ${groups.serverdata} - -"
-      "Z ${drives.actual-budget} 2775 ${username} ${groups.serverdata} - -"
+      "A ${personal}/notes - - - - group:${groups.zortexdata}:rwx"
+      "a ${personal}/notes - - - - default:group:${groups.zortexdata}:rwx"
     ];
 
   fileSystems."/" = {
     device = "/dev/disk/by-label/NIXOS_SD";
     fsType = "ext4";
     options = [ "noatime" ];
-  };
-  fileSystems."${homelab.drives.pi-pubdrive}" = {
-    device = "${homelab.nodes.pc.ipv4}:/pubdrive";
-    fsType = "nfs4";
-    options = [
-      "x-systemd.automount"
-      "noauto"
-      "x-systemd.device-timeout=10s" # Fail fast if machine is off
-      "x-systemd.after=network-online.target"
-      "_netdev" # Wait for network before mounting
-    ];
   };
 
   # fileSystems."/mnt/backup" = {

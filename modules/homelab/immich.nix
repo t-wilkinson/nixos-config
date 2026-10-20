@@ -7,6 +7,7 @@
 }:
 let
   cfg = config.homelab.services.immich;
+  shares = config.homelab.storage.shares;
 in
 # Runs natively on its host (the PC; host = "pc" in hosts/inventory.nix), with machine
 # learning in a CUDA container. The old Pi container version is ./immich-container.nix.
@@ -16,7 +17,7 @@ lib.mkIf cfg.runsHere {
     enable = true;
     port = cfg.port;
     host = "0.0.0.0";
-    mediaLocation = "/mnt/storage/immich";
+    mediaLocation = shares.immich.path; # thumbnails, encoded video, backups/ (database dumps)
     # accelerationDevices = [
     #   "/dev/dri/renderD129"
     #   "/dev/nvidia0"
@@ -65,12 +66,10 @@ lib.mkIf cfg.runsHere {
     ];
   };
 
+  # pubdrive is an external library (the photos stay where they are). The microservices
+  # worker runs inside immich-server now; there is no immich-microservices unit.
   systemd.services.immich-server.serviceConfig = {
-    ReadWritePaths = [ config.homelab.drives.pubdrive ];
-  };
-
-  systemd.services.immich-microservices.serviceConfig = {
-    ReadWritePaths = [ config.homelab.drives.pubdrive ];
+    ReadWritePaths = [ shares.pubdrive.path ];
   };
 
   users.users.immich.extraGroups = [

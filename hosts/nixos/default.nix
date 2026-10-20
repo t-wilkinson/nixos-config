@@ -121,6 +121,7 @@
 
   environment.systemPackages = with pkgs; [
     libimobiledevice
+    android-tools # adb: dump the Samsung to /mnt/storage/phones
     ifuse # for mounting the filesystem
     droidcam
 

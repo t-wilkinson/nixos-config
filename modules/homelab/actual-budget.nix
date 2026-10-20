@@ -14,7 +14,7 @@ lib.mkIf service.runsHere {
     autoStart = true;
     bindMounts = {
       "/var/lib/private/actual" = {
-        hostPath = homelab.drives.actual-budget;
+        hostPath = homelab.storage.shares.actual-budget.path;
         isReadOnly = false;
       };
     };

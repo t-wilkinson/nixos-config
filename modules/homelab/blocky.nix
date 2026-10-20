@@ -11,46 +11,54 @@ let
   ) homelab.services;
 in
 {
-  config = lib.mkIf homelab.isGateway {
-    services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
-    # services.resolved.extraConfig = "DNSStubListener=no"; # removed in 26.05; resolved is off anyway
-    services.blocky = {
-      enable = true;
-      settings = {
-        ports.dns = 53;
-        # ports.http = 4000;
-        upstreams.groups.default = [
-          "https://1.1.1.1/dns-query" # Cloudflare
-          "https://8.8.8.8/dns-query" # Google
-        ];
+  config = lib.mkMerge [
+    {
+      # Blocky has no web UI; send the bare name to the blocking status (JSON)
+      homelab.services.blocky.extraConfig = "redir / /api/blocking/status";
+    }
+    (lib.mkIf homelab.isGateway {
+      services.resolved.enable = false; # Disable systemd-resolved to free port 53 for Blocky
+      # services.resolved.extraConfig = "DNSStubListener=no"; # removed in 26.05; resolved is off anyway
+      services.blocky = {
+        enable = true;
+        settings = {
+          ports.dns = 53;
+          # API and /metrics, on loopback only: Caddy serves it as dns.home.lab behind the login
+          # (homelab.services.blocky in hosts/inventory.nix)
+          ports.http = lib.mkIf homelab.services.blocky.enable "127.0.0.1:${toString homelab.services.blocky.port}";
+          upstreams.groups.default = [
+            "https://1.1.1.1/dns-query" # Cloudflare
+            "https://8.8.8.8/dns-query" # Google
+          ];
 
-        # Access your services via these domains
-        customDNS = {
-          customTTL = "1h";
-          mapping = {
-            # Map main domain and all subdomains to the gateway's direct IP
-            "${net.domain}" = gatewayIp;
-            "*.${net.domain}" = gatewayIp;
-          }
-          # Private services also answer on their public name, but only on the LAN/tailnet.
-          # Public services keep resolving to Cloudflare (real certificate, e.g. Bitwarden mobile).
-          // lib.mapAttrs' (n: v: lib.nameValuePair v.publicDomain gatewayIp) privateServices
+          # Access your services via these domains
+          customDNS = {
+            customTTL = "1h";
+            mapping = {
+              # Map main domain and all subdomains to the gateway's direct IP
+              "${net.domain}" = gatewayIp;
+              "*.${net.domain}" = gatewayIp;
+            }
+            # Private services also answer on their public name, but only on the LAN/tailnet.
+            # Public services keep resolving to Cloudflare (real certificate, e.g. Bitwarden mobile).
+            // lib.mapAttrs' (n: v: lib.nameValuePair v.publicDomain gatewayIp) privateServices
 
-          # Resolve node ips (need to establish a subnet via tailscale)
-          // lib.mapAttrs' (n: v: lib.nameValuePair "${v.hostname}.${net.domain}" (toString v.ipv4)) (
-            lib.filterAttrs (n: v: v.ipv4 != null) homelab.nodes
-          );
-        };
-
-        # Ad Blocking
-        blocking = {
-          # enable = true;
-          blackLists = {
-            ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
+            # Resolve node ips (need to establish a subnet via tailscale)
+            // lib.mapAttrs' (n: v: lib.nameValuePair "${v.hostname}.${net.domain}" (toString v.ipv4)) (
+              lib.filterAttrs (n: v: v.ipv4 != null) homelab.nodes
+            );
           };
-          clientGroupsBlock.default = [ "ads" ];
+
+          # Ad Blocking
+          blocking = {
+            # enable = true;
+            blackLists = {
+              ads = [ "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts" ];
+            };
+            clientGroupsBlock.default = [ "ads" ];
+          };
         };
       };
-    };
-  };
+    })
+  ];
 }

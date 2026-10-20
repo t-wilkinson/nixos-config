@@ -19,39 +19,105 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIID64Ajd0fkDjs12IacKz28QzlyedzzaAL8V6YmjTPd/ 10.1.0.1"
     ];
 
-    drives = {
-      pubdrive = "/mnt/storage/pubdrive";
-      pi-pubdrive = "/srv/pubdrive";
-      personal = "/srv/sync/personal";
-      minecraft = "/var/lib/minecraft";
-      actual-budget = "/var/lib/actual-budget";
-    };
-
-    storage = {
-      disks = {
-        # homelab = {
-        #   uuid = "";
-        #   shares = {
-        #     pubdrive = "/mnt/storage/pubdrive";
-        #     pi-pubdrive = "/srv/pubdrive";
-        #     personal = "/srv/sync/personal";
-        #   };
-        # };
-        pc-storage = {
-          uuid = "a92044b3-8a07-43d8-a676-abbac9f6e667";
-          mountPoint = "/mnt/storage";
-          shares = {
-            immich = { };
-            pubdrive = { };
-            phones = { };
+    # Where data lives. Each volume is on one node; its shares get their directories
+    # (owner/group/mode) there, and NFS exports + automounts for the nodes listed under nfs.
+    # Modules refer to shares by name: homelab.storage.shares.<name>.path / .localPath
+    # (modules/homelab/storage.nix).
+    storage.volumes = {
+      # PC: the storage HDD (btrfs; the .snapshots subvolume is mounted in hosts/nixos/filesystem.nix)
+      pc-storage = {
+        node = "pc";
+        uuid = "a92044b3-8a07-43d8-a676-abbac9f6e667";
+        mountPoint = "/mnt/storage";
+        fsType = "btrfs";
+        options = [
+          "subvol=@data"
+          "compress=no"
+          "noatime"
+          "x-systemd.device-timeout=10s"
+        ];
+        shares = {
+          # Photos (Immich external library) and documents (Nextcloud)
+          pubdrive = {
+            group = "storage-media";
+            mode = "2770";
+            recursive = true;
+            nfs.pi.mountPoint = "/srv/pubdrive";
+          };
+          # Immich's own data: thumbnails, encoded video, database backups
+          immich = {
+            owner = "immich";
+            group = "storage-media";
+            mode = "2770";
+            recursive = true;
+          };
+          # Raw phone dumps (adb pull, idevicebackup2)
+          phones = {
+            group = "storage-media";
+            mode = "2770";
+          };
+          # Copies of other nodes' backups (borg-mirror)
+          backups = {
+            owner = "root";
+            group = "root";
+            mode = "0700";
           };
         };
       };
 
-      # dataDirs = {
-      #   minecraft = "/var/lib/minecraft";
-      #   actual-budget = "/var/lib/actual-budget";
-      # };
+      # Pi: directories on its only drive (no separate mount)
+      pi-srv = {
+        node = "pi";
+        mountPoint = "/srv";
+        shares = {
+          personal = {
+            subpath = "sync/personal";
+            group = "personaldata";
+            mode = "2770";
+            nfs.pc = {
+              mountPoint = "/mnt/homelab/personal";
+              extraOptions = [ "x-systemd.idle-timeout=10" ];
+            };
+          };
+          # Borg repo (backup/homelab) and the PC's archive. Not recursive: borg and the
+          # archive user keep their own ownership inside. Others may traverse (o+x) so the
+          # archive user can reach its own directory.
+          backup = {
+            group = "personaldata";
+            mode = "0771";
+          };
+          archive = {
+            subpath = "backup/pc-archive";
+            owner = "archive";
+            group = "archive";
+            mode = "0750";
+          };
+        };
+      };
+      pi-state = {
+        node = "pi";
+        mountPoint = "/var/lib";
+        shares = {
+          minecraft = {
+            group = "serverdata";
+            mode = "2775";
+            recursive = true;
+            nfs.pc = {
+              mountPoint = "/var/lib/minecraft";
+              extraOptions = [
+                "x-systemd.idle-timeout=10"
+                "rw"
+                "soft"
+              ];
+            };
+          };
+          actual-budget = {
+            group = "serverdata";
+            mode = "2775";
+            recursive = true;
+          };
+        };
+      };
     };
 
     nodes = {
@@ -63,6 +129,9 @@
         mac = "04:7c:16:e6:d1:10"; # enp4s0
         wakeOnLan = true;
         syncthingId = "KKNEQ5H-UN3RKTW-BKSIL55-R43FWNR-4OHY5FA-DDYL6N2-R27WQ7B-IJSXPQ3";
+        # Root's key for the backup copies (archive.nix, borg-mirror.nix)
+        backupKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO/U50yCVsRpRDIFJCyRxDX2NJYZkDLleyiFf7AsCKaP phone-archive@pc";
+        backupKeyFile = "/home/${username}/dev/t-wilkinson/personal/secrets/keys/phone-archive/id_ed25519";
         # syncthingId = "X6Q657S-5M3JA3P-MMWO5VX-EPHF7BB-XQI3MPS-NV2NFSA-BCPHPOV-VFCRZAG";
       };
       pi = {
@@ -108,6 +177,7 @@
       "gatus"
       "beszel"
       "borg"
+      "blocky"
       "mealie"
       "actual-budget"
       "wakeonlan"
@@ -119,6 +189,8 @@
       "nextcloud"
       "immich"
       "jupyter"
+      "archive" # oldest PC files -> Pi
+      "borg-mirror" # Pi's borg repo -> PC
       # "mc-server"
     ];
 
@@ -134,6 +206,71 @@
         dashboard = {
           icon = "mdi-finance";
           extra.ping = "https://budget.home.lab";
+        };
+      };
+      archive = {
+        # PC -> Pi: the oldest files of each set, add-only (modules/homelab/archive.nix)
+        host = "pc";
+        expose = false;
+        data = {
+          target = "pi";
+          share = "archive";
+          sets =
+            let
+              media = [
+                "jpg"
+                "jpeg"
+                "png"
+                "heic"
+                "heif"
+                "gif"
+                "webp"
+                "tif"
+                "tiff"
+                "dng"
+                "raw"
+                "cr2"
+                "nef"
+                "arw"
+                "mp4"
+                "mov"
+                "m4v"
+                "avi"
+                "mkv"
+                "3gp"
+                "webm"
+                "mts"
+              ];
+            in
+            {
+              # Photos and videos (the Immich library), oldest by the yyyy-mm-dd- name prefix
+              immich = {
+                sources = [ "pubdrive" ];
+                extensions = media;
+                limit = "100G";
+              };
+              # Documents (Nextcloud): everything in pubdrive that isn't media, plus users' files
+              nextcloud = {
+                sources = [
+                  "pubdrive"
+                  "/var/lib/nextcloud/data"
+                ];
+                excludeExtensions = media;
+                include = [
+                  "pubdrive/*"
+                  "data/*/files/*"
+                ];
+                limit = "20G";
+              };
+              # Immich's daily database dumps: albums, faces, OCR, smart search, metadata.
+              # Newest first; the Pi deletes copies older than keepDays.
+              immich-db = {
+                sources = [ "/mnt/storage/immich/backups" ];
+                order = "newest";
+                limit = "5G";
+                keepDays = 30;
+              };
+            };
         };
       };
       auth = {
@@ -158,8 +295,8 @@
         data = {
           # The hub's public key: Beszel UI -> Add system -> copy the key (ssh-ed25519 ...)
           hubKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF7egVuJEq7mJZcR71Ylch1uaIHbQeG5UBq7eYJwJhEG";
+          # Drives besides / (the Pi's /srv/backup is a folder on its root drive, so / covers it)
           extraFilesystems = {
-            pi = "/srv/backup"; # the backup drive
             pc = "/mnt/storage";
           };
         };
@@ -167,6 +304,30 @@
       borg = {
         host = "pi";
         expose = false;
+      };
+      borg-mirror = {
+        # Pi -> PC: the PC copies the Pi's borg repo when it's awake (modules/homelab/borg-mirror.nix)
+        host = "pc";
+        expose = false;
+        data = {
+          source = "pi";
+          share = "backups";
+          keepDeletedDays = 30;
+        };
+      };
+      blocky = {
+        # LAN DNS on the gateway (modules/homelab/blocky.nix). No web UI: this exposes its
+        # API (/api/blocking/status, /api/lists/refresh, ...) and /metrics behind the login.
+        host = "pi";
+        port = 4100; # Blocky's default 4000 is NFS statd's port here (modules/homelab/nfs.nix)
+        subdomain = "dns";
+        name = "Blocky DNS";
+        description = "Ad-blocking & Local DNS";
+        auth = true;
+        dashboard = {
+          category = "Infrastructure";
+          icon = "mdi-dns";
+        };
       };
       dashboard = {
         host = "pi";

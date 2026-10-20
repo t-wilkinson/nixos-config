@@ -19,7 +19,7 @@ in
     # Bind mount the persistent data from the host into the container
     bindMounts = {
       "/mnt/media/pubdrive" = {
-        hostPath = homelab.drives.pubdrive;
+        hostPath = homelab.storage.shares.pubdrive.localPath;
         isReadOnly = false;
       };
     };

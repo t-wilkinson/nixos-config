@@ -24,11 +24,11 @@ in
       autoStart = true;
       bindMounts = {
         "/mnt/media/personal" = {
-          hostPath = homelab.drives.personal;
+          hostPath = homelab.storage.shares.personal.path;
           isReadOnly = false;
         };
         "/mnt/media/pubdrive" = {
-          hostPath = homelab.drives.pi-pubdrive;
+          hostPath = homelab.storage.shares.pubdrive.localPath;
           isReadOnly = false;
         };
       }

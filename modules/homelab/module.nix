@@ -54,83 +54,7 @@ in
         personaldata = 987;
       };
     };
-    drives = mkOption {
-      type = types.attrsOf types.str;
-      default = { };
-      example = {
-        backup = "/mnt/backup";
-      };
-      description = "drive name -> path.";
-    };
-    storage = {
-      disks = lib.mkOption {
-        description = "Managed physical or vijkrtual block storage devices.";
-        default = { };
-        type = lib.types.attrsOf (
-          lib.types.submodule (
-            { name, config, ... }: {
-              options = {
-                uuid = lib.mkOption {
-                  type = lib.types.str;
-                  description = "Filesystem UUID of the partition (/dev/disk/by-uuid/<uuid>).";
-                };
-
-                mountPoint = lib.mkOption {
-                  type = lib.types.path;
-                  description = "Target directory where this disk is mounted.";
-                };
-
-                fsType = lib.mkOption {
-                  type = lib.types.str;
-                  default = "ext4";
-                  description = "Filesystem type (e.g., ext4, btrfs, xfs).";
-                };
-
-                options = lib.mkOption {
-                  type = lib.types.listOf lib.types.str;
-                  default = [
-                    "defaults"
-                    "nofail"
-                  ];
-                  description = "Mount options passed to systemd/fstab.";
-                };
-
-                shares =
-                  let
-                    storageConfig = config;
-                  in
-                  lib.mkOption {
-                    description = "Named shared directories hosted inside this disk.";
-                    default = { };
-                    type = lib.types.attrsOf (
-                      lib.types.submodule (
-                        { name, config, ... }: {
-                          options = {
-                            # Defaults to the share name inside mountPoint: /mnt/storage/<name>
-                            subpath = lib.mkOption {
-                              type = lib.types.str;
-                              default = name;
-                              description = "Relative subfolder on the disk.";
-                            };
-
-                            # Fully qualified absolute path (read-only derived value)
-                            path = lib.mkOption {
-                              type = lib.types.path;
-                              readOnly = true;
-                              default = "${storageConfig.mountPoint}/${config.subpath}";
-                              description = "Full canonical path to the share directory.";
-                            };
-                          };
-                        }
-                      )
-                    );
-                  };
-              };
-            }
-          )
-        );
-      };
-    };
+    # Disks, data directories and NFS shares: homelab.storage (./storage.nix)
     enableServices = mkOption {
       type = types.listOf types.str;
       default = [ ];
@@ -221,6 +145,21 @@ in
                 type = types.nullOr types.str;
                 default = null;
                 description = "Syncthing device ID.";
+              };
+              backupKey = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                example = "ssh-ed25519 AAAA... backup@pc";
+                description = ''
+                  Public half of the SSH key this node's root uses for backup copies to and from
+                  other nodes (./archive.nix, ./borg-mirror.nix). Other nodes only accept it for
+                  those copies (forced commands), never for a shell.
+                '';
+              };
+              backupKeyFile = mkOption {
+                type = types.nullOr types.str;
+                default = null;
+                description = "Private half of backupKey on this node (readable by root).";
               };
             };
           }

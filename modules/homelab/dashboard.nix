@@ -32,13 +32,6 @@ let
   extraTiles = {
     "Infrastructure" = [
       {
-        "Blocky DNS" = {
-          icon = "mdi-dns";
-          href = "http://${nodes.${homelab.gateway}.ipv4}:4000"; # If you enable Blocky's HTTP port
-          description = "Ad-blocking & Local DNS";
-        };
-      }
-      {
         "Root Certificate" = {
           icon = "mdi-file-certificate";
           href = "https://${cfg.domain}/root.crt";
@@ -148,7 +141,7 @@ in
               uptime = true;
               disk = [
                 "/"
-                homelab.drives.pi-pubdrive
+                homelab.storage.shares.pubdrive.localPath
               ];
             };
           }
@@ -156,10 +149,8 @@ in
             resources = {
               cpu = true;
               memory = true;
-              disk = [
-                "/"
-                "/srv/backup"
-              ];
+              # / holds everything on the Pi, /srv/backup included
+              disk = [ "/" ];
               cputemp = true;
               uptime = true;
             };

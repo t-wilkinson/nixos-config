@@ -6,6 +6,7 @@
 {
   imports = [
     ./module.nix
+    ./storage.nix # volumes, shares, NFS exports/mounts (homelab.storage)
 
     # Gateway (Pi): proxy, DNS, tunnel, subnet router, NFS exports, fail2ban
     ./caddy.nix
@@ -31,7 +32,8 @@
     ./gatus.nix
     ./beszel.nix
     ./borg.nix
-    # ./phone-archive.nix # phone dumps on the PC; the oldest 200 GB copied to the Pi's SSD
+    ./borg-mirror.nix # the Pi's borg repo, copied to the PC
+    ./archive.nix # the PC's oldest photos/documents + Immich DB dumps, copied to the Pi
     ./nextcloud.nix
     ./immich.nix
 
