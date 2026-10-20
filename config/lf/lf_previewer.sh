@@ -10,6 +10,14 @@ y=$5
 #     exit 1
 # fi
 
+case "$(file -b --mime-type "$file")" in
+image/*)
+  kitty +kitten icat --silent --stdin no --transfer-mode file \
+    --place "${width}x${height}@${x}x${y}" "$file" </dev/tty >/dev/tty
+  exit 1
+  ;;
+esac
+
 case "$file" in
 *.tar*) tar tf "$file" ;;
 *.zip) unzip -l "$file" ;;

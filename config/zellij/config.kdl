@@ -40,9 +40,9 @@ keybinds clear-defaults=true {
     bind "p" { SwitchFocus; SwitchToMode "Normal"; }
     bind "n" { NewPane "Right"; SwitchToMode "Normal"; }
     bind "Alt h" { NewPane "Left"; SwitchToMode "Normal"; }
-    bind "Alt j" { NewPane "Right"; SwitchToMode "Normal"; }
-    bind "Alt k" { NewPane "Down"; SwitchToMode "Normal"; }
-    bind "Alt l" { NewPane "Up"; SwitchToMode "Normal"; }
+    bind "Alt j" { NewPane "Down"; SwitchToMode "Normal"; }
+    bind "Alt k" { NewPane "Up"; SwitchToMode "Normal"; }
+    bind "Alt l" { NewPane "Right"; SwitchToMode "Normal"; }
     bind "x" { CloseFocus; SwitchToMode "Normal"; }
     bind "f" { ToggleFocusFullscreen; SwitchToMode "Normal"; }
     bind "z" { TogglePaneFrames; SwitchToMode "Normal"; }
