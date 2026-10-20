@@ -86,10 +86,10 @@
             group = "personaldata";
             mode = "0771";
           };
+          # PC files copied by hand (apps/homelab/copy-to-pi). If the archive service is turned
+          # back on, set owner and group to "archive".
           archive = {
             subpath = "backup/pc-archive";
-            owner = "archive";
-            group = "archive";
             mode = "0750";
           };
         };
@@ -189,7 +189,7 @@
       "nextcloud"
       "immich"
       "jupyter"
-      "archive" # oldest PC files -> Pi
+      # "archive" # daily: oldest PC files -> Pi (off for now; copy by hand with apps/homelab/copy-to-pi)
       "borg-mirror" # Pi's borg repo -> PC
       # "mc-server"
     ];

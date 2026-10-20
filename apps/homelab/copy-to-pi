@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Copy the files and folders named in a list from this PC to the Pi's backup folder.
+#
+#   copy-to-pi LIST [rsync options...]      e.g.  copy-to-pi ~/pi-backup.txt --dry-run
+#
+# LIST: one absolute path per line (files or folders). Blank lines and lines starting with #
+# are ignored. Each path keeps its full location under the destination, so
+# /mnt/storage/pubdrive/2019 lands in /srv/backup/pc-archive/mnt/storage/pubdrive/2019.
+#
+# Safe to re-run at any time:
+#   - nothing on the Pi is ever deleted (no --delete);
+#   - a file that changed on the PC replaces the Pi's copy only after the old copy is renamed
+#     to <name>.<date> (--backup), so nothing is ever silently overwritten;
+#   - each file is written to a temporary name and renamed only once it is complete and its
+#     checksum matched, so an interrupted run never leaves a half-written file; re-running
+#     picks up where it stopped (unchanged files are skipped).
+#
+# Override the destination with PI_DEST=user@host:/path.
+set -euo pipefail
+
+if [ $# -lt 1 ] || [ ! -f "$1" ]; then
+  echo "usage: copy-to-pi LIST [rsync options, e.g. --dry-run]" >&2
+  exit 2
+fi
+list=$1
+shift
+dest=${PI_DEST:-trey@10.1.0.2:/srv/backup/pc-archive/}
+
+paths=$(mktemp)
+trap 'rm -f "$paths"' EXIT
+
+# Check every line before copying anything: a typo stops the run instead of being skipped
+bad=0
+while IFS= read -r line || [ -n "$line" ]; do
+  line="${line#"${line%%[![:space:]]*}"}" # trim leading whitespace
+  line="${line%"${line##*[![:space:]]}"}" # trim trailing whitespace
+  [ -z "$line" ] || [[ $line == \#* ]] && continue
+  if [[ $line != /* ]]; then
+    echo "not an absolute path: $line" >&2
+    bad=1
+  elif [ ! -e "$line" ]; then
+    echo "does not exist: $line" >&2
+    bad=1
+  else
+    printf '%s\0' "${line#/}" >> "$paths" # relative to /, NUL-separated (spaces are fine)
+  fi
+done < "$list"
+[ "$bad" = 0 ] || exit 1
+[ -s "$paths" ] || { echo "nothing to copy in $list" >&2; exit 1; }
+
+# -r must be explicit: --files-from turns off the recursion -a would imply.
+# -l keeps symlinks as symlinks; -t keeps modification times (so unchanged files are skipped).
+rsync -rlt --from0 --files-from="$paths" \
+  --backup --suffix=".$(date +%F)" \
+  --partial-dir=.rsync-partial \
+  --mkpath --info=progress2,stats1 \
+  "$@" / "$dest"
