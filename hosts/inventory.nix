@@ -80,11 +80,19 @@
               extraOptions = [ "x-systemd.idle-timeout=10" ];
             };
           };
-          # Borg repo (backup/homelab) and the PC files copied by hand (pc-archive).
-          # Not recursive: borg keeps its own ownership inside.
+          # Borg repos (backup/homelab, backup/pc) and the PC files copied by hand
+          # (pc-archive). Not recursive: each keeps its own ownership inside. Others may
+          # traverse (o+x) so borg-pc can reach its own repo.
           backup = {
             group = "personaldata";
-            mode = "0770";
+            mode = "0771";
+          };
+          # The PC's database backups (borg-pc.nix); only borg-pc can read it
+          pc-borg = {
+            subpath = "backup/pc";
+            owner = "borg-pc";
+            group = "borg-pc";
+            mode = "0700";
           };
           # PC files copied by hand (apps/homelab/copy-to-pi)
           archive = {
@@ -128,7 +136,7 @@
         mac = "04:7c:16:e6:d1:10"; # enp4s0
         wakeOnLan = true;
         syncthingId = "KKNEQ5H-UN3RKTW-BKSIL55-R43FWNR-4OHY5FA-DDYL6N2-R27WQ7B-IJSXPQ3";
-        # Root's key for pulling the Pi's borg repo (borg-mirror.nix)
+        # Root's key for the backups between the PC and the Pi (borg-mirror.nix, borg-pc.nix)
         backupKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO/U50yCVsRpRDIFJCyRxDX2NJYZkDLleyiFf7AsCKaP phone-archive@pc";
         backupKeyFile = "/home/${username}/dev/t-wilkinson/personal/secrets/keys/phone-archive/id_ed25519";
         # syncthingId = "X6Q657S-5M3JA3P-MMWO5VX-EPHF7BB-XQI3MPS-NV2NFSA-BCPHPOV-VFCRZAG";
@@ -189,6 +197,7 @@
       "immich"
       "jupyter"
       "borg-mirror" # Pi's borg repo -> PC
+      "borg-pc" # PC's databases -> Pi
       # "mc-server"
     ];
 
@@ -237,6 +246,25 @@
       borg = {
         host = "pi";
         expose = false;
+      };
+      borg-pc = {
+        # PC -> Pi: Nextcloud and Immich databases + Nextcloud's data, append-only
+        # (modules/homelab/borg-pc.nix)
+        host = "pc";
+        expose = false;
+        data = {
+          target = "pi";
+          share = "pc-borg";
+          databases = [
+            "nextcloud"
+            "immich"
+          ];
+          keep = {
+            daily = 7;
+            weekly = 4;
+            monthly = 6;
+          };
+        };
       };
       borg-mirror = {
         # Pi -> PC: the PC copies the Pi's borg repo when it's awake (modules/homelab/borg-mirror.nix)

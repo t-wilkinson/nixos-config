@@ -153,6 +153,7 @@ in
         beszel = [ "beszel-hub.service" ];
         borg = [ "borgbackup-job-homelab.timer" ];
         borg-mirror = [ "borg-mirror.timer" ];
+        borg-pc = [ "borgbackup-job-pc.timer" ];
         nextcloud = [
           "phpfpm-nextcloud.service"
           "nginx.service"
