@@ -7,7 +7,11 @@
 # from there and is told to reload by the template's post_hook:
 #   quickshell  colors.json         watched by the shell (config/quickshell/Theme.qml)
 #   kitty       kitty.conf          include'd by config/kitty/kitty.conf; SIGUSR1 reloads
-#   zellij      zellij/matugen.kdl  theme_dir in config/zellij/config.kdl; applies to new sessions
+#   terminals   sequences.txt       escape codes: printed by new fish/zsh shells (outside Zellij) and
+#                                   pushed to every open terminal by `theme-terminals`; Zellij panes
+#                                   follow the outer terminal (see theme-terminals in shell.nix)
+#   zellij      zellij/matugen.kdl  Zellij's own UI (frames, tab bar); theme_dir in
+#                                   config/zellij/config.kdl, reloaded when the config is touched
 #   neovim      nvim.lua            watched by config/nvim/lua/plugins/colors.lua
 #   hyprland    hyprland.conf       sourced by config/hypr/hyprland/colors.conf; hyprctl reload
 #   gtk         gtk.css             @import'ed by ~/.config/gtk-{3,4}.0/gtk.css (theme.nix)
@@ -42,11 +46,20 @@ output_path = "~/.local/state/theme/colors.json"
 [templates.kitty]
 input_path = "./templates/kitty.conf"
 output_path = "~/.local/state/theme/kitty.conf"
-post_hook = "pkill -USR1 -x kitty || true"
+# SIGUSR1 makes kitty reread its config. On NixOS the process is the wrapped binary.
+post_hook = "pkill -USR1 -x .kitty-wrapped; pkill -USR1 -x kitty; true"
+
+[templates.sequences]
+input_path = "./templates/sequences.txt"
+output_path = "~/.local/state/theme/sequences.txt"
+# Recolor every open terminal and Zellij pane (hosts/nixos/home-manager/shell.nix)
+post_hook = "theme-terminals || true"
 
 [templates.zellij]
 input_path = "./templates/zellij.kdl"
 output_path = "~/.local/state/theme/zellij/matugen.kdl"
+# Zellij rereads its config when the file changes; touching it picks up the new theme file
+post_hook = "touch \"$HOME/.config/zellij/config.kdl\" 2>/dev/null; true"
 
 [templates.neovim]
 input_path = "./templates/nvim.lua"

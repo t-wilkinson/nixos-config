@@ -95,12 +95,12 @@ Scope {
                                 text: button.modelData.icon
                                 size: 34
                                 fill: button.selected ? 1 : 0
-                                color: button.selected ? Theme.colors.onPrimaryContainer : Theme.colors.onSurface
+                                color: button.selected ? Theme.colors.primaryContainerText : Theme.colors.surfaceText
                             }
                             StyledText {
                                 Layout.alignment: Qt.AlignHCenter
                                 text: button.modelData.label
-                                color: button.selected ? Theme.colors.onPrimaryContainer : Theme.colors.onSurfaceVariant
+                                color: button.selected ? Theme.colors.primaryContainerText : Theme.colors.surfaceVariantText
                             }
                         }
                     }

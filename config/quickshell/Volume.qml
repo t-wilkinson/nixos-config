@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.Pipewire
 
-// Output volume. Click to mute, scroll to change.
+// Output volume. Click to mute; scrolling here goes to the bar (Bar.qml), which sets the volume.
 MouseArea {
     id: root
 
@@ -15,10 +15,6 @@ MouseArea {
     implicitHeight: 28
     cursorShape: Qt.PointingHandCursor
     onClicked: if (ready) sink.audio.muted = !sink.audio.muted
-    onWheel: wheel => {
-        if (ready)
-            sink.audio.volume = Math.max(0, Math.min(1.5, sink.audio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05)));
-    }
 
     // Binds the sink so its volume and mute state are live
     PwObjectTracker {
@@ -32,11 +28,11 @@ MouseArea {
 
         Icon {
             text: root.muted ? "volume_off" : root.volume > 0.5 ? "volume_up" : root.volume > 0 ? "volume_down" : "volume_mute"
-            color: root.muted ? Theme.colors.outline : Theme.colors.onSurfaceVariant
+            color: root.muted ? Theme.colors.outline : Theme.colors.surfaceVariantText
         }
         StyledText {
             text: Math.round(root.volume * 100) + "%"
-            color: Theme.colors.onSurfaceVariant
+            color: Theme.colors.surfaceVariantText
         }
     }
 }

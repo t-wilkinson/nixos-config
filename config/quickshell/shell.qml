@@ -4,8 +4,10 @@
 // Quickshell desktop shell. Started by Hyprland (config/hypr/hyprland/execs.conf) as
 // `qs -n -d`; edits here reload live. Colors follow the wallpaper (Theme.qml).
 //
-//   Bar.qml            top bar: workspaces, window title, clock, tray, volume
-//   Notifications.qml  notification daemon, popups, history panel
+//   Bar.qml            top bar: workspaces, window title, clock, media, tray, volume
+//   Overview.qml       workspaces with live window previews; type to search apps
+//   Sidebar.qml        quick settings, sliders, media, Bluetooth, notification history
+//   Notifications.qml  notification daemon and popups
 //   Osd.qml            volume indicator
 //   Launcher.qml       app launcher
 //   PowerMenu.qml      lock / suspend / log out / reboot / power off
@@ -21,6 +23,8 @@ ShellRoot {
     }
 
     Notifications {}
+    Overview {}
+    Sidebar {}
     Osd {}
     Launcher {}
     PowerMenu {}

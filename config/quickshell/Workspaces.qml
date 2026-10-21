@@ -5,7 +5,7 @@ import Quickshell.Hyprland
 // Ten workspaces as pills: the focused one is wide and colored, occupied ones are solid,
 // empty ones are faint. Click to switch. Shows the group of ten holding the focused
 // workspace (1-10, 11-20, ...), matching Super+N in keybinds.conf.
-RowLayout {
+Item {
     id: root
 
     property int count: 10
@@ -20,37 +20,60 @@ RowLayout {
         return null;
     }
 
-    spacing: 5
+    implicitWidth: row.implicitWidth
+    implicitHeight: row.implicitHeight
 
-    Repeater {
-        model: root.count
+    // Scroll over the workspaces to move between them (elsewhere on the bar: brightness on
+    // the left half, volume on the right)
+    MouseArea {
+        anchors.fill: parent
+        anchors.margins: -4
+        acceptedButtons: Qt.NoButton
+        property real pending: 0 // touchpads send fractions of a notch
+        onWheel: wheel => {
+            pending += wheel.angleDelta.y;
+            if (Math.abs(pending) < 120)
+                return;
+            Hyprland.dispatch(pending > 0 ? "workspace m-1" : "workspace m+1");
+            pending = 0;
+        }
+    }
 
-        delegate: MouseArea {
-            id: pill
+    RowLayout {
+        id: row
+        anchors.centerIn: parent
+        spacing: 5
 
-            required property int index
-            readonly property int wsId: root.base + index + 1
-            readonly property var ws: root.workspace(wsId)
-            readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === wsId
-            readonly property bool occupied: ws !== null && ws.toplevels.values.length > 0
+        Repeater {
+            model: root.count
 
-            implicitWidth: focused ? 28 : 12
-            implicitHeight: 12
-            cursorShape: Qt.PointingHandCursor
-            onClicked: Hyprland.dispatch("workspace " + wsId)
+            delegate: MouseArea {
+                id: pill
 
-            Behavior on implicitWidth {
-                NumberAnimation {
-                    duration: Theme.animMs
-                    easing.type: Easing.OutCubic
+                required property int index
+                readonly property int wsId: root.base + index + 1
+                readonly property var ws: root.workspace(wsId)
+                readonly property bool focused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === wsId
+                readonly property bool occupied: ws !== null && ws.toplevels.values.length > 0
+
+                implicitWidth: focused ? 28 : 12
+                implicitHeight: 12
+                cursorShape: Qt.PointingHandCursor
+                onClicked: Hyprland.dispatch("workspace " + wsId)
+
+                Behavior on implicitWidth {
+                    NumberAnimation {
+                        duration: Theme.animMs
+                        easing.type: Easing.OutCubic
+                    }
                 }
-            }
 
-            Rectangle {
-                anchors.fill: parent
-                radius: height / 2
-                color: pill.focused ? Theme.colors.primary : pill.occupied ? Theme.colors.onSurfaceVariant : Theme.colors.outlineVariant
-                Behavior on color { ColorAnimation { duration: Theme.animMs } }
+                Rectangle {
+                    anchors.fill: parent
+                    radius: height / 2
+                    color: pill.focused ? Theme.colors.primary : pill.occupied ? Theme.colors.surfaceVariantText : Theme.colors.outlineVariant
+                    Behavior on color { ColorAnimation { duration: Theme.animMs } }
+                }
             }
         }
     }

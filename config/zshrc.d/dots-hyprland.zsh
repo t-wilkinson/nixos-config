@@ -1,5 +1,5 @@
-# Use the generated color scheme
-
-if test -f ~/.cache/ags/user/generated/terminal/sequences.txt; then
-    cat ~/.cache/ags/user/generated/terminal/sequences.txt
+# Use the generated color scheme (matugen). Not inside Zellij: there the panes show the outer
+# terminal's palette, which follows the wallpaper by itself (theme-terminals).
+if [ -f ~/.local/state/theme/sequences.txt ] && [ -z "$ZELLIJ" ]; then
+    cat ~/.local/state/theme/sequences.txt
 fi

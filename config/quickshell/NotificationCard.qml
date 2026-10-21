@@ -85,7 +85,7 @@ Rectangle {
                     Layout.fillWidth: true
                     text: card.notification.appName
                     font.pixelSize: Theme.fontSize - 2
-                    color: Theme.colors.onSurfaceVariant
+                    color: Theme.colors.surfaceVariantText
                 }
                 IconButton {
                     implicitWidth: 22
@@ -99,7 +99,7 @@ Rectangle {
                 Layout.fillWidth: true
                 text: card.notification.summary
                 font.weight: Font.DemiBold
-                color: card.critical ? Theme.colors.onErrorContainer : Theme.colors.onSurface
+                color: card.critical ? Theme.colors.errorContainerText : Theme.colors.surfaceText
                 wrapMode: Text.Wrap
                 maximumLineCount: 2
             }
@@ -108,7 +108,7 @@ Rectangle {
                 visible: text !== ""
                 text: card.notification.body
                 textFormat: Text.StyledText
-                color: card.critical ? Theme.colors.onErrorContainer : Theme.colors.onSurfaceVariant
+                color: card.critical ? Theme.colors.errorContainerText : Theme.colors.surfaceVariantText
                 wrapMode: Text.Wrap
                 maximumLineCount: 5
                 onLinkActivated: link => Qt.openUrlExternally(link)
@@ -139,7 +139,7 @@ Rectangle {
                         StyledText {
                             anchors.centerIn: parent
                             text: action.modelData.text
-                            color: action.containsMouse ? Theme.colors.onPrimary : Theme.colors.onSecondaryContainer
+                            color: action.containsMouse ? Theme.colors.primaryText : Theme.colors.secondaryContainerText
                         }
                     }
                 }

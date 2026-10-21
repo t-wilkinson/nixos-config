@@ -13,8 +13,10 @@ if status is-interactive
     set fish_greeting
 
     starship init fish | source
-    if test -f ~/.cache/ags/user/generated/terminal/sequences.txt
-        cat ~/.cache/ags/user/generated/terminal/sequences.txt
+    # Wallpaper colors (matugen). Not inside Zellij: there the panes show the outer
+    # terminal's palette, which follows the wallpaper by itself (theme-terminals).
+    if test -f ~/.local/state/theme/sequences.txt; and not set -q ZELLIJ
+        cat ~/.local/state/theme/sequences.txt
     end
 
     function starship_transient_prompt_func

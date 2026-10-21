@@ -10,28 +10,6 @@ import Quickshell.Widgets
 Scope {
     id: root
 
-    function matches(query) {
-        const q = query.toLowerCase().trim();
-        const apps = Array.from(DesktopEntries.applications.values).filter(e => !e.noDisplay);
-        if (q === "")
-            return apps.sort((a, b) => a.name.localeCompare(b.name));
-        const scored = [];
-        for (const app of apps) {
-            const name = app.name.toLowerCase();
-            let score = -1;
-            if (name.startsWith(q))
-                score = 0;
-            else if (name.includes(q))
-                score = 1;
-            else if ((app.genericName || "").toLowerCase().includes(q) || app.keywords.some(k => k.toLowerCase().includes(q)))
-                score = 2;
-            if (score >= 0)
-                scored.push({ app, score });
-        }
-        scored.sort((a, b) => a.score - b.score || a.app.name.localeCompare(b.app.name));
-        return scored.map(s => s.app);
-    }
-
     LazyLoader {
         active: ShellState.launcherOpen
 
@@ -79,15 +57,15 @@ Scope {
 
                             Icon {
                                 text: "search"
-                                color: Theme.colors.onSurfaceVariant
+                                color: Theme.colors.surfaceVariantText
                             }
                             TextField {
                                 id: search
                                 Layout.fillWidth: true
                                 focus: true
                                 placeholderText: "Search apps"
-                                placeholderTextColor: Theme.colors.onSurfaceVariant
-                                color: Theme.colors.onSurface
+                                placeholderTextColor: Theme.colors.surfaceVariantText
+                                color: Theme.colors.surfaceText
                                 font.family: Theme.font
                                 font.pixelSize: Theme.fontSize + 2
                                 background: null
@@ -106,7 +84,7 @@ Scope {
                         Layout.fillHeight: true
                         clip: true
                         spacing: 2
-                        model: root.matches(search.text)
+                        model: Apps.search(search.text)
                         highlightMoveDuration: Theme.animMs
                         highlight: Rectangle {
                             radius: Theme.smallRadius + 4
@@ -142,14 +120,14 @@ Scope {
                                     StyledText {
                                         Layout.fillWidth: true
                                         text: entry.modelData.name
-                                        color: entry.ListView.isCurrentItem ? Theme.colors.onPrimaryContainer : Theme.colors.onSurface
+                                        color: entry.ListView.isCurrentItem ? Theme.colors.primaryContainerText : Theme.colors.surfaceText
                                     }
                                     StyledText {
                                         Layout.fillWidth: true
                                         visible: text !== ""
                                         text: entry.modelData.comment || entry.modelData.genericName
                                         font.pixelSize: Theme.fontSize - 2
-                                        color: entry.ListView.isCurrentItem ? Theme.colors.onPrimaryContainer : Theme.colors.onSurfaceVariant
+                                        color: entry.ListView.isCurrentItem ? Theme.colors.primaryContainerText : Theme.colors.surfaceVariantText
                                     }
                                 }
                             }

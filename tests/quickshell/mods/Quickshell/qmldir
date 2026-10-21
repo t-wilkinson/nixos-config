@@ -1,0 +1,16 @@
+module Quickshell
+ShellRoot 1.0 ShellRoot.qml
+Scope 1.0 Scope.qml
+Singleton 1.0 Singleton.qml
+PanelWindow 1.0 PanelWindow.qml
+Variants 1.0 Variants.qml
+LazyLoader 1.0 LazyLoader.qml
+SystemClock 1.0 SystemClock.qml
+ShellScreen 1.0 ShellScreen.qml
+Region 1.0 Region.qml
+ExclusionMode 1.0 ExclusionMode.qml
+DesktopEntry 1.0 DesktopEntry.qml
+singleton Quickshell 1.0 QuickshellGlobal.qml
+singleton DesktopEntries 1.0 DesktopEntries.qml
+PanelAnchors 1.0 PanelAnchors.qml
+PanelMargins 1.0 PanelMargins.qml

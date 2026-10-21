@@ -5,7 +5,7 @@ Text {
     property real fill: 0
     property int size: 18
 
-    color: Theme.colors.onSurface
+    color: Theme.colors.surfaceText
     font.family: Theme.iconFont
     font.pixelSize: size
     font.variableAxes: ({ "FILL": fill, "opsz": size })
