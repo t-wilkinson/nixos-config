@@ -35,6 +35,7 @@ in
         ./hyprland.nix
         ./mimelist.nix
         ./packages.nix
+        ./shell.nix # Quickshell + matugen (wallpaper colors)
         ./sway.nix
         ./theme.nix
       ];
@@ -59,9 +60,11 @@ in
             # "fontconfig"
             "fuzzel"
             "hypr"
+            "matugen"
             "mpv"
             "ntfy"
             "qt5ct"
+            "quickshell"
             "rofi"
             "thorium-flags.conf"
             "zshrc.d"

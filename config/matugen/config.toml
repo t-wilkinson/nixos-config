@@ -1,0 +1,68 @@
+# config/matugen/config.toml  (~/.config/matugen)
+#
+# One wallpaper -> one palette -> every app. Run `theme-wallpaper <image>` (or Ctrl+Super+T),
+# which sets the wallpaper and runs `matugen image <image>`.
+#
+# Generated files go to ~/.local/state/theme/, never into this repo. Each app loads its file
+# from there and is told to reload by the template's post_hook:
+#   quickshell  colors.json         watched by the shell (config/quickshell/Theme.qml)
+#   kitty       kitty.conf          include'd by config/kitty/kitty.conf; SIGUSR1 reloads
+#   zellij      zellij/matugen.kdl  theme_dir in config/zellij/config.kdl; applies to new sessions
+#   neovim      nvim.lua            watched by config/nvim/lua/plugins/colors.lua
+#   hyprland    hyprland.conf       sourced by config/hypr/hyprland/colors.conf; hyprctl reload
+#   gtk         gtk.css             @import'ed by ~/.config/gtk-{3,4}.0/gtk.css (theme.nix)
+#   fuzzel      fuzzel.ini          include'd by config/fuzzel/fuzzel.ini
+#
+# Template syntax (matugen 4): {{ colors.<role>.default.hex }}. Roles are Material You's
+# (primary, surface, on_surface, ...) plus the custom colors below, which matugen shifts
+# toward the wallpaper's hue so terminal and syntax colors match it but stay recognisable.
+
+[config]
+version_check = false
+caching = true
+fallback_color = "#7db7e0"
+
+[config.custom_colors]
+red = "#e5534b"
+orange = "#f0883e"
+yellow = "#e3b341"
+green = "#57ab5a"
+cyan = "#39c5cf"
+blue = "#539bf5"
+magenta = "#c27bd6"
+
+[config.wallpaper]
+set = true
+command = "awww img --transition-type grow --transition-fps 120 --transition-duration 1 {{ image }}"
+
+[templates.quickshell]
+input_path = "./templates/colors.json"
+output_path = "~/.local/state/theme/colors.json"
+
+[templates.kitty]
+input_path = "./templates/kitty.conf"
+output_path = "~/.local/state/theme/kitty.conf"
+post_hook = "pkill -USR1 -x kitty || true"
+
+[templates.zellij]
+input_path = "./templates/zellij.kdl"
+output_path = "~/.local/state/theme/zellij/matugen.kdl"
+
+[templates.neovim]
+input_path = "./templates/nvim.lua"
+output_path = "~/.local/state/theme/nvim.lua"
+
+[templates.hyprland]
+input_path = "./templates/hyprland.conf"
+output_path = "~/.local/state/theme/hyprland.conf"
+post_hook = "hyprctl reload > /dev/null 2>&1 || true"
+
+[templates.gtk]
+input_path = "./templates/gtk.css"
+output_path = "~/.local/state/theme/gtk.css"
+# GTK only rereads CSS when the theme changes: switch away and back
+post_hook = "t=$(gsettings get org.gnome.desktop.interface gtk-theme) && gsettings set org.gnome.desktop.interface gtk-theme Adwaita && gsettings set org.gnome.desktop.interface gtk-theme \"$t\" || true"
+
+[templates.fuzzel]
+input_path = "./templates/fuzzel.ini"
+output_path = "~/.local/state/theme/fuzzel.ini"

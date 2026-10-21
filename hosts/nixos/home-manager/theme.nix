@@ -103,12 +103,18 @@ in
     font.name = "Rubik";
     theme.name = gtk-theme;
     gtk4.theme = config.gtk.theme; # 26.05 stopped inheriting this by default
+    gtk4.extraCss = ''
+      @import url("file://${config.home.homeDirectory}/.local/state/theme/gtk.css");
+    '';
     cursorTheme = {
       name = cursor-theme;
       package = cursor-package;
     };
     iconTheme.name = moreWaita.name;
+    # Wallpaper colors from matugen (config/matugen/templates/gtk.css); @import must come first
     gtk3.extraCss = ''
+      @import url("file://${config.home.homeDirectory}/.local/state/theme/gtk.css");
+
       headerbar, .titlebar,
       .csd:not(.popup):not(tooltip):not(messagedialog) decoration{
         border-radius: 0;

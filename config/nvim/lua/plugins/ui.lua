@@ -5,23 +5,15 @@ return {
   { "catppuccin/nvim", enabled = false },
   { "folke/tokyonight.nvim", enabled = false },
   { "dracula/vim", enabled = false },
+  -- Fallback colorscheme; the wallpaper-driven one is in colors.lua
   {
     "rose-pine/neovim",
     name = "rose-pine",
-    variant = "auto",
-    dark_variant = "moon",
-
-    config = function()
-      vim.cmd("colorscheme rose-pine-moon")
-    end,
+    lazy = true,
+    opts = { variant = "auto", dark_variant = "moon" },
   },
 
   { "nvim-mini/mini.animate", enabled = false },
-
-  {
-    "LazyVim/LazyVim",
-    opts = { colorscheme = "rose-pine-moon" },
-  },
 
   {
     "akinsho/bufferline.nvim",
