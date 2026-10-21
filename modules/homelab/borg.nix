@@ -56,6 +56,7 @@ in
 
     systemd.services."borgbackup-job-homelab".unitConfig.OnFailure = "borg-job-failure-notify.service";
     systemd.services."borg-job-failure-notify" = notifyFailure "borgbackup-job-homelab" "Backup";
+    systemd.services."borgbackup-job-homelab".serviceConfig.StateDirectory = "borg-db-dumps";
 
     # Monthly: check the repo and every archive's metadata (not the file contents themselves;
     # that is `borg check --verify-data`, worth running by hand once in a while).
@@ -89,7 +90,7 @@ in
         "/home/${homelab.username}" # Syncthing's config and keys
         "/etc/ssh" # host keys and the sops age key
       ];
-      readWritePaths = [ dumpDir ];
+      # readWritePaths = [ dumpDir ];
 
       exclude = [
         "*.pyc"
@@ -178,6 +179,8 @@ in
         '';
     };
 
-    systemd.tmpfiles.rules = [ "d ${dumpDir} 0700 root root - -" ];
+    # systemd.tmpfiles.rules = [
+    #   "d ${dumpDir} 0700 root root - -"
+    # ];
   };
 }
