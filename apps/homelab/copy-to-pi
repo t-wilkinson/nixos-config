@@ -16,6 +16,10 @@
 #     picks up where it stopped (unchanged files are skipped).
 #
 # Override the destination with PI_DEST=user@host:/path.
+
+# EXAMPLE USAGE:
+# sudo PI_DEST=trey@10.1.0.2:/srv/backup/pc-archive/ ./copy-to-pi list.txt -e "ssh -i /home/trey/.ssh/id_ed25519"
+
 set -euo pipefail
 
 if [ $# -lt 1 ] || [ ! -f "$1" ]; then
@@ -24,7 +28,7 @@ if [ $# -lt 1 ] || [ ! -f "$1" ]; then
 fi
 list=$1
 shift
-dest=${PI_DEST:-trey@10.1.0.2:/srv/backup/pc-archive/}
+dest=${PI_DEST:-trey@home.lab:/srv/backup/pc-archive/}
 
 paths=$(mktemp)
 trap 'rm -f "$paths"' EXIT
@@ -42,11 +46,14 @@ while IFS= read -r line || [ -n "$line" ]; do
     echo "does not exist: $line" >&2
     bad=1
   else
-    printf '%s\0' "${line#/}" >> "$paths" # relative to /, NUL-separated (spaces are fine)
+    printf '%s\0' "${line#/}" >>"$paths" # relative to /, NUL-separated (spaces are fine)
   fi
-done < "$list"
+done <"$list"
 [ "$bad" = 0 ] || exit 1
-[ -s "$paths" ] || { echo "nothing to copy in $list" >&2; exit 1; }
+[ -s "$paths" ] || {
+  echo "nothing to copy in $list" >&2
+  exit 1
+}
 
 # -r must be explicit: --files-from turns off the recursion -a would imply.
 # -l keeps symlinks as symlinks; -t keeps modification times (so unchanged files are skipped).
