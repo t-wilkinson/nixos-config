@@ -13,8 +13,8 @@ if status is-interactive
     set fish_greeting
 
     starship init fish | source
-    if test -f ~/.cache/ags/user/generated/terminal/sequences.txt
-        cat ~/.cache/ags/user/generated/terminal/sequences.txt
+    if test -f ~/.local/state/theme/sequences.txt
+        cat ~/.local/state/theme/sequences.txt
     end
 
     function starship_transient_prompt_func

@@ -2,14 +2,19 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
+import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 
 // The top bar, one per screen (shell.qml makes one per entry in Quickshell.screens).
-// Left: workspaces and the focused window. Center: clock. Right: tray, volume, buttons.
+// Left: overview button, workspaces (scroll to switch), window title.
+// Center: clock and the playing media (click to play/pause).
+// Right: tray, volume, notifications, settings sidebar, power.
+// Scrolling anywhere else on the bar changes the volume.
 PanelWindow {
     id: bar
 
     required property ShellScreen modelData
+    readonly property PwNode sink: Pipewire.defaultAudioSink
 
     screen: modelData
     anchors {
@@ -21,6 +26,10 @@ PanelWindow {
     exclusiveZone: implicitHeight
     color: "transparent"
     WlrLayershell.namespace: "quickshell:bar"
+
+    PwObjectTracker {
+        objects: bar.sink ? [bar.sink] : []
+    }
 
     Rectangle {
         id: background
@@ -35,34 +44,52 @@ PanelWindow {
         border.width: 1
         border.color: Theme.colors.outlineVariant
 
-        // Scroll anywhere on the bar to move between workspaces
-        WheelHandler {
-            acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
-            onWheel: event => Hyprland.dispatch(event.angleDelta.y > 0 ? "workspace m-1" : "workspace m+1")
+        // Volume on scroll. Widgets above it that handle scrolling themselves (workspaces,
+        // media, volume) take the event first.
+        MouseArea {
+            anchors.fill: parent
+            acceptedButtons: Qt.NoButton
+            onWheel: wheel => {
+                if (bar.sink === null || bar.sink.audio === null)
+                    return;
+                const step = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
+                bar.sink.audio.volume = Math.max(0, Math.min(1, bar.sink.audio.volume + step));
+            }
         }
 
         RowLayout {
             anchors {
                 left: parent.left
                 verticalCenter: parent.verticalCenter
-                leftMargin: Theme.gap * 2
+                leftMargin: Theme.gap
             }
             spacing: Theme.gap * 2
 
             IconButton {
-                icon: "apps"
-                onClicked: ShellState.launcherOpen = !ShellState.launcherOpen
+                icon: "grid_view"
+                active: ShellState.overviewOpen
+                onClicked: {
+                    const open = !ShellState.overviewOpen;
+                    ShellState.closeAll();
+                    ShellState.overviewOpen = open;
+                }
             }
             Workspaces {}
             StyledText {
-                Layout.maximumWidth: bar.width / 4
+                Layout.maximumWidth: bar.width / 5
                 text: Hyprland.activeToplevel ? Hyprland.activeToplevel.title : ""
                 color: Theme.colors.surfaceVariantText
             }
         }
 
-        Clock {
+        RowLayout {
             anchors.centerIn: parent
+            spacing: Theme.gap * 3
+
+            Clock {}
+            MediaWidget {
+                Layout.maximumWidth: bar.width / 4
+            }
         }
 
         RowLayout {
@@ -77,12 +104,20 @@ PanelWindow {
             Volume {}
             IconButton {
                 icon: ShellState.dnd ? "notifications_off" : "notifications"
-                active: ShellState.notificationsOpen
-                onClicked: ShellState.notificationsOpen = !ShellState.notificationsOpen
+                badge: ShellState.notifications !== null ? ShellState.notifications.values.length : 0
+                onClicked: ShellState.sidebarOpen = !ShellState.sidebarOpen
+            }
+            IconButton {
+                icon: "tune"
+                active: ShellState.sidebarOpen
+                onClicked: ShellState.sidebarOpen = !ShellState.sidebarOpen
             }
             IconButton {
                 icon: "power_settings_new"
-                onClicked: ShellState.powerMenuOpen = !ShellState.powerMenuOpen
+                onClicked: {
+                    ShellState.closeAll();
+                    ShellState.powerMenuOpen = true;
+                }
             }
         }
     }

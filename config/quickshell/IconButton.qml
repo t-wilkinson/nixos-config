@@ -7,6 +7,7 @@ MouseArea {
     property alias icon: glyph.text
     property alias iconSize: glyph.size
     property bool active: false
+    property int badge: 0 // a count in the corner when > 0
     property color activeColor: Theme.colors.primaryContainer
     property color activeIconColor: Theme.colors.primaryContainerText
 
@@ -28,5 +29,26 @@ MouseArea {
         anchors.centerIn: parent
         fill: root.active ? 1 : 0
         color: root.active ? root.activeIconColor : Theme.colors.surfaceVariantText
+    }
+
+    Rectangle {
+        visible: root.badge > 0
+        anchors {
+            top: parent.top
+            right: parent.right
+        }
+        implicitWidth: Math.max(16, count.implicitWidth + 8)
+        implicitHeight: 16
+        radius: 8
+        color: Theme.colors.primary
+
+        StyledText {
+            id: count
+            anchors.centerIn: parent
+            text: root.badge > 99 ? "99+" : root.badge
+            color: Theme.colors.primaryText
+            font.pixelSize: 10
+            font.weight: Font.Bold
+        }
     }
 }

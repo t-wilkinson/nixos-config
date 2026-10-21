@@ -87,6 +87,28 @@ class WlrKeyboardFocus(QObject):
         OnDemand = 2
 
 
+from PySide6.QtQuick import QQuickItem
+QML_IMPORT_NAME = "Quickshell.Wayland"
+
+
+@QmlElement
+class ScreencopyView(QQuickItem):
+    changed = Signal()
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._src = None
+        self._live = False
+
+    def _get_src(self): return self._src
+    def _set_src(self, v): self._src = v; self.changed.emit()
+    captureSource = Property(QObject, _get_src, _set_src, notify=changed)
+
+    def _get_live(self): return self._live
+    def _set_live(self, v): self._live = v; self.changed.emit()
+    live = Property(bool, _get_live, _set_live, notify=changed)
+
+
 # ---- Harness: a list model like Quickshell's ObjectModel (modelData role + values) ----
 QML_IMPORT_NAME = "Harness"
 
@@ -187,11 +209,15 @@ def main():
     theme = pobj.property("t")
 
     steps = [
+        ("open overview", lambda: state.setProperty("overviewOpen", True)),
+        ("close overview", lambda: state.setProperty("overviewOpen", False)),
+        ("open sidebar", lambda: state.setProperty("sidebarOpen", True)),
+        ("close sidebar", lambda: state.setProperty("sidebarOpen", False)),
         ("open launcher", lambda: state.setProperty("launcherOpen", True)),
         ("close launcher", lambda: state.setProperty("launcherOpen", False)),
         ("open power menu", lambda: state.setProperty("powerMenuOpen", True)),
         ("close power menu", lambda: state.setProperty("powerMenuOpen", False)),
-        ("open notifications", lambda: state.setProperty("notificationsOpen", True)),
+        ("open sidebar again", lambda: state.setProperty("sidebarOpen", True)),
         ("toggle dnd", lambda: state.setProperty("dnd", True)),
         ("theme values", lambda: QMetaObject.invokeMethod(pobj, "report")),
         ("clear notifications", lambda: QMetaObject.invokeMethod(pobj, "clear")),

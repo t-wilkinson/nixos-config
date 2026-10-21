@@ -5,8 +5,8 @@ import Quickshell.Io
 import Quickshell.Services.Notifications
 import Quickshell.Wayland
 
-// Notification daemon: popups in the top right, a history panel (Super+N or the bell in
-// the bar) and do-not-disturb. State and IPC: ShellState.qml.
+// Notification daemon and popups (top right). The history lives in the sidebar
+// (Sidebar.qml); do-not-disturb and IPC in ShellState.qml.
 Scope {
     id: root
 
@@ -16,7 +16,10 @@ Scope {
             all[i].dismiss();
     }
 
-    Component.onCompleted: ShellState.clearNotifications = root.clear
+    Component.onCompleted: {
+        ShellState.notifications = server.trackedNotifications;
+        ShellState.clearNotifications = root.clear;
+    }
 
     NotificationServer {
         id: server
@@ -48,7 +51,7 @@ Scope {
         exclusiveZone: 0
         implicitWidth: 380
         implicitHeight: popupColumn.implicitHeight
-        visible: !ShellState.dnd && !ShellState.notificationsOpen && popupColumn.implicitHeight > 0
+        visible: !ShellState.dnd && !ShellState.sidebarOpen && popupColumn.implicitHeight > 0
         color: "transparent"
         WlrLayershell.layer: WlrLayer.Overlay
         WlrLayershell.namespace: "quickshell:notifications"
@@ -75,90 +78,6 @@ Scope {
                         running: popup.showing && !popup.critical
                         interval: popup.modelData.expireTimeout > 0 ? popup.modelData.expireTimeout * 1000 : 5000
                         onTriggered: popup.showing = false
-                    }
-                }
-            }
-        }
-    }
-
-    // History panel on the right
-    PanelWindow {
-        anchors {
-            top: true
-            right: true
-            bottom: true
-        }
-        margins {
-            top: Theme.gap * 2
-            right: Theme.gap * 2
-            bottom: Theme.gap * 2
-        }
-        exclusiveZone: 0
-        implicitWidth: 400
-        visible: ShellState.notificationsOpen
-        color: "transparent"
-        WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.namespace: "quickshell:notification-history"
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
-
-        Rectangle {
-            anchors.fill: parent
-            radius: Theme.radius
-            color: Theme.colors.surfaceContainer
-            border.width: 1
-            border.color: Theme.colors.outlineVariant
-            focus: true
-            Keys.onEscapePressed: ShellState.notificationsOpen = false
-
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 12
-                spacing: Theme.gap * 2
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    StyledText {
-                        Layout.fillWidth: true
-                        text: "Notifications"
-                        font.pixelSize: Theme.fontSize + 4
-                        font.weight: Font.DemiBold
-                    }
-                    IconButton {
-                        icon: ShellState.dnd ? "notifications_off" : "notifications_active"
-                        active: ShellState.dnd
-                        onClicked: ShellState.dnd = !ShellState.dnd
-                    }
-                    IconButton {
-                        icon: "clear_all"
-                        onClicked: root.clear()
-                    }
-                    IconButton {
-                        icon: "close"
-                        onClicked: ShellState.notificationsOpen = false
-                    }
-                }
-
-                StyledText {
-                    Layout.fillWidth: true
-                    Layout.topMargin: 40
-                    visible: history.count === 0
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "Nothing new"
-                    color: Theme.colors.outline
-                }
-
-                ListView {
-                    id: history
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-                    spacing: Theme.gap
-                    model: Array.from(server.trackedNotifications.values).reverse() // newest first
-
-                    delegate: NotificationCard {
-                        required property Notification modelData
-                        notification: modelData
-                        width: ListView.view.width
                     }
                 }
             }
