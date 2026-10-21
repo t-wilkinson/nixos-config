@@ -30,6 +30,7 @@ let
   repo = "${hl.storage.shares.backup.path}/homelab";
   dest = "${hl.storage.shares.${cfg.data.share}.path}/pi-borg";
   stateDir = "/var/lib/borg-mirror";
+  canNotify = hl.services.ntfy.enable && config.sops.secrets ? ntfy_auth;
   ssh = "ssh -i ${host.backupKeyFile} -o UserKnownHostsFile=${stateDir}/known_hosts -o StrictHostKeyChecking=accept-new -o BatchMode=yes";
 in
 lib.mkIf cfg.enable (
@@ -51,8 +52,23 @@ lib.mkIf cfg.enable (
     (lib.mkIf cfg.runsHere {
       systemd.tmpfiles.rules = [ "d ${stateDir} 0700 root root - -" ];
 
+      # Failures reach ntfy through Caddy (the PC trusts the homelab CA); the token is the
+      # desktop subscriber's (hosts/nixos/default.nix)
+      systemd.services.borg-mirror-failure-notify = lib.mkIf canNotify {
+        description = "Notify that the borg mirror failed";
+        serviceConfig.Type = "oneshot";
+        script = ''
+          ${pkgs.curl}/bin/curl -sS -H "Authorization: Bearer $(cat ${config.sops.secrets.ntfy_auth.path})" \
+            -H "Title: Backup mirror failed on ${config.networking.hostName}" \
+            -H "Priority: high" -H "Tags: warning,backup" \
+            -d "Check 'journalctl -u borg-mirror' for details." \
+            https://${hl.services.ntfy.domain}/homelab
+        '';
+      };
+
       systemd.services.borg-mirror = {
         description = "Copy the ${source.name}'s borg repo to this machine";
+        unitConfig.OnFailure = lib.optional canNotify "borg-mirror-failure-notify.service";
         wants = [ "network-online.target" ];
         after = [ "network-online.target" ];
         unitConfig.RequiresMountsFor = [ dest ];
@@ -94,9 +110,9 @@ lib.mkIf cfg.enable (
       systemd.timers.borg-mirror = {
         wantedBy = [ "timers.target" ];
         timerConfig = {
-          OnCalendar = "daily";
+          OnCalendar = "*-*-* 06:00"; # after the Pi's 03:00 backup; on wake if the PC slept
           Persistent = true;
-          RandomizedDelaySec = "1h";
+          RandomizedDelaySec = "15m";
         };
       };
     })

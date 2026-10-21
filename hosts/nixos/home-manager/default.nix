@@ -11,13 +11,6 @@
 }:
 let
   homeDirectory = "/home/${username}";
-  git-credential-pass = pkgs.writeShellScriptBin "git-credential-pass" ''
-    #!/bin/bash
-    echo "protocol=https"
-    token=$(${pkgs.pass}/bin/pass git/token)
-    echo "username=t-wilkinson"
-    echo "password=$token"
-  '';
 in
 {
   home-manager = {
@@ -42,6 +35,7 @@ in
         ./hyprland.nix
         ./mimelist.nix
         ./packages.nix
+        ./shell.nix # Quickshell + matugen (wallpaper colors)
         ./sway.nix
         ./theme.nix
       ];
@@ -53,7 +47,9 @@ in
           "$HOME/.local/bin"
           "$HOME/.npm-packages/bin"
         ];
-        packages = [ git-credential-pass ];
+        # Git and SSH authenticate with keys stored in Vaultwarden, served by the Bitwarden
+        # desktop app's SSH agent (it asks before each use). Hyprland sets it too (env.conf).
+        sessionVariables.SSH_AUTH_SOCK = "${homeDirectory}/.bitwarden-ssh-agent.sock";
         file =
           myLib.mkConfigLinks pkgs configDir [
             "Kvantum"
@@ -64,9 +60,11 @@ in
             # "fontconfig"
             "fuzzel"
             "hypr"
+            "matugen"
             "mpv"
             "ntfy"
             "qt5ct"
+            "quickshell"
             "rofi"
             "thorium-flags.conf"
             "zshrc.d"
@@ -98,7 +96,9 @@ in
             init = {
               defaultBranch = "main";
             };
-            credential.helper = "${git-credential-pass}/bin/git-credential-pass";
+            # Your own repos go over SSH (key from the Bitwarden agent, no stored token);
+            # everyone else's stay anonymous HTTPS. Flake inputs (github:...) are unaffected.
+            url."git@github.com:t-wilkinson/".insteadOf = "https://github.com/t-wilkinson/";
             alias = {
               pu = "push";
               co = "checkout";

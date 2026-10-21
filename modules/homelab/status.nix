@@ -152,8 +152,8 @@ in
         gatus = [ "gatus.service" ];
         beszel = [ "beszel-hub.service" ];
         borg = [ "borgbackup-job-homelab.timer" ];
-        archive = [ "homelab-archive.timer" ];
         borg-mirror = [ "borg-mirror.timer" ];
+        borg-pc = [ "borgbackup-job-pc.timer" ];
         nextcloud = [
           "phpfpm-nextcloud.service"
           "nginx.service"

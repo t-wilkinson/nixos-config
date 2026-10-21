@@ -152,7 +152,7 @@ in
                 example = "ssh-ed25519 AAAA... backup@pc";
                 description = ''
                   Public half of the SSH key this node's root uses for backup copies to and from
-                  other nodes (./archive.nix, ./borg-mirror.nix). Other nodes only accept it for
+                  other nodes (./borg-mirror.nix, ./borg-pc.nix). Other nodes only accept it for
                   those copies (forced commands), never for a shell.
                 '';
               };
@@ -213,19 +213,18 @@ in
       };
       privateRanges = mkOption {
         type = types.listOf types.str;
-        # Loopback is deliberately NOT included (unlike Caddy's `private_ranges` shorthand):
+        # Only the tailnet. The homelab link (network.cidr, PC <-> Pi) is added in
+        # lib.caddyPrivateRanges. The household Wi-Fi (192.168.x) is deliberately NOT trusted:
+        # every phone, guest and IoT device there would otherwise count as "LAN". Use Tailscale
+        # on those devices instead.
+        # Loopback is deliberately NOT included either (unlike Caddy's `private_ranges`):
         # cloudflared connects from 127.0.0.1, so tunnel traffic can never count as LAN, even if
-        # a request somehow arrived without Cf-Connecting-Ip. LAN clients and the Pi itself
-        # reach Caddy via 10.x / 192.168.x / the tailnet.
+        # a request somehow arrived without Cf-Connecting-Ip.
         default = [
-          "10.0.0.0/8"
-          "172.16.0.0/12"
-          "192.168.0.0/16"
-          "fd00::/8"
           "100.64.0.0/10" # tailnet (IPv4)
           "fd7a:115c:a1e0::/48" # tailnet (IPv6)
         ];
-        description = "Caddy client_ip ranges treated as LAN/tailnet.";
+        description = "Caddy client_ip ranges treated as LAN/tailnet, besides network.cidr.";
       };
       containerNetwork = mkOption {
         type = types.str;

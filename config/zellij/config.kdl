@@ -294,7 +294,10 @@ themes {
 // Default: default
 //
 // theme "catppuccin-mocha"
-theme "dracula"
+// "matugen" follows the wallpaper (config/matugen, generated into theme_dir below); new
+// sessions pick up a change. Set "dracula" to go back to the fixed theme.
+theme "matugen"
+theme_dir "/home/trey/.local/state/theme/zellij"
 
 // The name of the default layout to load on startup
 // Default: "default"

@@ -80,15 +80,21 @@
               extraOptions = [ "x-systemd.idle-timeout=10" ];
             };
           };
-          # Borg repo (backup/homelab) and the PC's archive. Not recursive: borg and the
-          # archive user keep their own ownership inside. Others may traverse (o+x) so the
-          # archive user can reach its own directory.
+          # Borg repos (backup/homelab, backup/pc) and the PC files copied by hand
+          # (pc-archive). Not recursive: each keeps its own ownership inside. Others may
+          # traverse (o+x) so borg-pc can reach its own repo.
           backup = {
             group = "personaldata";
             mode = "0771";
           };
-          # PC files copied by hand (apps/homelab/copy-to-pi). If the archive service is turned
-          # back on, set owner and group to "archive".
+          # The PC's database backups (borg-pc.nix); only borg-pc can read it
+          pc-borg = {
+            subpath = "backup/pc";
+            owner = "borg-pc";
+            group = "borg-pc";
+            mode = "0700";
+          };
+          # PC files copied by hand (apps/homelab/copy-to-pi)
           archive = {
             subpath = "backup/pc-archive";
             mode = "0750";
@@ -130,7 +136,7 @@
         mac = "04:7c:16:e6:d1:10"; # enp4s0
         wakeOnLan = true;
         syncthingId = "KKNEQ5H-UN3RKTW-BKSIL55-R43FWNR-4OHY5FA-DDYL6N2-R27WQ7B-IJSXPQ3";
-        # Root's key for the backup copies (archive.nix, borg-mirror.nix)
+        # Root's key for the backups between the PC and the Pi (borg-mirror.nix, borg-pc.nix)
         backupKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO/U50yCVsRpRDIFJCyRxDX2NJYZkDLleyiFf7AsCKaP phone-archive@pc";
         backupKeyFile = "/home/${username}/dev/t-wilkinson/personal/secrets/keys/phone-archive/id_ed25519";
         # syncthingId = "X6Q657S-5M3JA3P-MMWO5VX-EPHF7BB-XQI3MPS-NV2NFSA-BCPHPOV-VFCRZAG";
@@ -190,8 +196,8 @@
       "nextcloud"
       "immich"
       "jupyter"
-      # "archive" # daily: oldest PC files -> Pi (off for now; copy by hand with apps/homelab/copy-to-pi)
       "borg-mirror" # Pi's borg repo -> PC
+      "borg-pc" # PC's databases -> Pi
       # "mc-server"
     ];
 
@@ -207,71 +213,6 @@
         dashboard = {
           icon = "mdi-finance";
           extra.ping = "https://budget.home.lab";
-        };
-      };
-      archive = {
-        # PC -> Pi: the oldest files of each set, add-only (modules/homelab/archive.nix)
-        host = "pc";
-        expose = false;
-        data = {
-          target = "pi";
-          share = "archive";
-          sets =
-            let
-              media = [
-                "jpg"
-                "jpeg"
-                "png"
-                "heic"
-                "heif"
-                "gif"
-                "webp"
-                "tif"
-                "tiff"
-                "dng"
-                "raw"
-                "cr2"
-                "nef"
-                "arw"
-                "mp4"
-                "mov"
-                "m4v"
-                "avi"
-                "mkv"
-                "3gp"
-                "webm"
-                "mts"
-              ];
-            in
-            {
-              # Photos and videos (the Immich library), oldest by the yyyy-mm-dd- name prefix
-              immich = {
-                sources = [ "pubdrive" ];
-                extensions = media;
-                limit = "100G";
-              };
-              # Documents (Nextcloud): everything in pubdrive that isn't media, plus users' files
-              nextcloud = {
-                sources = [
-                  "pubdrive"
-                  "/var/lib/nextcloud/data"
-                ];
-                excludeExtensions = media;
-                include = [
-                  "pubdrive/*"
-                  "data/*/files/*"
-                ];
-                limit = "20G";
-              };
-              # Immich's daily database dumps: albums, faces, OCR, smart search, metadata.
-              # Newest first; the Pi deletes copies older than keepDays.
-              immich-db = {
-                sources = [ "/mnt/storage/immich/backups" ];
-                order = "newest";
-                limit = "5G";
-                keepDays = 30;
-              };
-            };
         };
       };
       auth = {
@@ -305,6 +246,25 @@
       borg = {
         host = "pi";
         expose = false;
+      };
+      borg-pc = {
+        # PC -> Pi: Nextcloud and Immich databases + Nextcloud's data, append-only
+        # (modules/homelab/borg-pc.nix)
+        host = "pc";
+        expose = false;
+        data = {
+          target = "pi";
+          share = "pc-borg";
+          databases = [
+            "nextcloud"
+            "immich"
+          ];
+          keep = {
+            daily = 7;
+            weekly = 4;
+            monthly = 6;
+          };
+        };
       };
       borg-mirror = {
         # Pi -> PC: the PC copies the Pi's borg repo when it's awake (modules/homelab/borg-mirror.nix)
