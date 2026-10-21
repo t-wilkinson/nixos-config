@@ -152,7 +152,7 @@ in
                 example = "ssh-ed25519 AAAA... backup@pc";
                 description = ''
                   Public half of the SSH key this node's root uses for backup copies to and from
-                  other nodes (./archive.nix, ./borg-mirror.nix). Other nodes only accept it for
+                  other nodes (./borg-mirror.nix). Other nodes only accept it for
                   those copies (forced commands), never for a shell.
                 '';
               };
