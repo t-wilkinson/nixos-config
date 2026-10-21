@@ -229,6 +229,7 @@ def main():
         ("scroll down at the top edge, right half (volume)", lambda: wheel(0.85, 1, -120)),
         ("volume after scrolling", lambda: print_volume()),
         ("scroll over the workspaces", lambda: wheel(0.5, 25, -120)),
+        ("scroll down, then up, over the media", lambda: [wheel_on("MediaWidget", -120), wheel_on("MediaWidget", 120)]),
         ("brightness key (ipc up)", lambda: QMetaObject.invokeMethod(pobj, "ipcUp")),
         ("built-in screen (brightnessctl)", lambda: QMetaObject.invokeMethod(pobj, "builtin")),
         ("clear notifications", lambda: QMetaObject.invokeMethod(pobj, "clear")),
@@ -248,6 +249,24 @@ def main():
         ev = QWheelEvent(pos, pos, QPoint(0, 0), QPoint(0, delta), Qt.NoButton, Qt.NoModifier,
                          Qt.NoScrollPhase, False)
         QGuiApplication.sendEvent(w, ev)
+
+    def wheel_on(type_name, delta):
+        # A wheel event at the centre of the first item of a QML type (e.g. MediaWidget) in the bar
+        w = bar_window()
+        def find(item):
+            if item.metaObject().className().startswith(type_name + "_QMLTYPE"):
+                return item
+            for child in item.childItems():
+                found = find(child)
+                if found is not None:
+                    return found
+            return None
+        item = find(w.contentItem())
+        if item is None:
+            raise RuntimeError("no " + type_name + " in the bar")
+        centre = item.mapToScene(QPointF(item.width() / 2, item.height() / 2))
+        messages.append(("info", "HARNESS: %s at x=%d..%d" % (type_name, item.mapToScene(QPointF(0, 0)).x(), item.mapToScene(QPointF(item.width(), 0)).x())))
+        wheel(centre.x() / w.width(), centre.y(), delta)
 
     def screenshot():
         path = os.environ.get("HARNESS_SCREENSHOT")

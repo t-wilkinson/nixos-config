@@ -10,7 +10,8 @@ import Quickshell.Wayland
 //   center  clock | workspaces (in the exact middle) | playing media (click to play/pause)
 //   right   tray, volume, notifications, settings sidebar, power
 // Scrolling anywhere on the bar, right up to the screen edge: the left half sets this
-// monitor's brightness, the right half the volume. Over the workspaces it switches workspace.
+// monitor's brightness, the right half the volume. Over the workspaces it switches workspace,
+// over the playing media it skips tracks.
 PanelWindow {
     id: bar
 
@@ -39,7 +40,7 @@ PanelWindow {
 
     // Covers the whole window, including the transparent strip above and beside the bar, so
     // the pointer can be pushed against the top of the screen. Widgets that handle scrolling
-    // themselves (workspaces) take it first.
+    // themselves (workspaces, media) take it first.
     MouseArea {
         id: wheelArea
 
