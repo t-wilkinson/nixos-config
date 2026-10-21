@@ -7,9 +7,11 @@
 # from there and is told to reload by the template's post_hook:
 #   quickshell  colors.json         watched by the shell (config/quickshell/Theme.qml)
 #   kitty       kitty.conf          include'd by config/kitty/kitty.conf; SIGUSR1 reloads
-#   terminals   sequences.txt       escape codes: printed by new fish/zsh shells and pushed to every
-#                                   open terminal (kitty, foot, Zellij panes) on each change
-#   zellij      zellij/matugen.kdl  theme_dir in config/zellij/config.kdl; applies to new sessions
+#   terminals   sequences.txt       escape codes: printed by new fish/zsh shells (outside Zellij) and
+#                                   pushed to every open terminal by `theme-terminals`; Zellij panes
+#                                   follow the outer terminal (see theme-terminals in shell.nix)
+#   zellij      zellij/matugen.kdl  Zellij's own UI (frames, tab bar); theme_dir in
+#                                   config/zellij/config.kdl, reloaded when the config is touched
 #   neovim      nvim.lua            watched by config/nvim/lua/plugins/colors.lua
 #   hyprland    hyprland.conf       sourced by config/hypr/hyprland/colors.conf; hyprctl reload
 #   gtk         gtk.css             @import'ed by ~/.config/gtk-{3,4}.0/gtk.css (theme.nix)
@@ -50,9 +52,8 @@ post_hook = "pkill -USR1 -x .kitty-wrapped; pkill -USR1 -x kitty; true"
 [templates.sequences]
 input_path = "./templates/sequences.txt"
 output_path = "~/.local/state/theme/sequences.txt"
-# Recolor every open terminal this user owns (each kitty window and each Zellij pane is a pty).
-# The codes only change colors; they are output, so running programs never see them.
-post_hook = "for t in /dev/pts/[0-9]*; do [ -O \"$t\" ] && cat \"$HOME/.local/state/theme/sequences.txt\" > \"$t\"; done 2>/dev/null; true"
+# Recolor every open terminal and Zellij pane (hosts/nixos/home-manager/shell.nix)
+post_hook = "theme-terminals || true"
 
 [templates.zellij]
 input_path = "./templates/zellij.kdl"

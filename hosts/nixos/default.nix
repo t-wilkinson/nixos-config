@@ -91,6 +91,7 @@
         # "render"
         "libvirtd"
         "dialout"
+        "i2c" # ddcutil: monitor brightness from the bar (hardware.i2c.enable)
         (lib.mkIf config.virtualisation.docker.enable "docker")
         (lib.mkIf config.networking.networkmanager.enable "networkmanager")
       ];

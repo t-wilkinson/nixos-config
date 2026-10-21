@@ -6,15 +6,21 @@ import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 
 // The top bar, one per screen (shell.qml makes one per entry in Quickshell.screens).
-// Left: overview button, workspaces (scroll to switch), window title.
-// Center: clock and the playing media (click to play/pause).
-// Right: tray, volume, notifications, settings sidebar, power.
-// Scrolling anywhere else on the bar changes the volume.
+//   left    overview button, window title
+//   center  clock | workspaces (in the exact middle) | playing media (click to play/pause)
+//   right   tray, volume, notifications, settings sidebar, power
+// Scrolling anywhere on the bar, right up to the screen edge: the left half sets this
+// monitor's brightness, the right half the volume. Over the workspaces it switches workspace.
 PanelWindow {
     id: bar
 
     required property ShellScreen modelData
     readonly property PwNode sink: Pipewire.defaultAudioSink
+
+    function changeVolume(delta) {
+        if (sink !== null && sink.audio !== null)
+            sink.audio.volume = Math.max(0, Math.min(1, sink.audio.volume + delta));
+    }
 
     screen: modelData
     anchors {
@@ -31,6 +37,29 @@ PanelWindow {
         objects: bar.sink ? [bar.sink] : []
     }
 
+    // Covers the whole window, including the transparent strip above and beside the bar, so
+    // the pointer can be pushed against the top of the screen. Widgets that handle scrolling
+    // themselves (workspaces) take it first.
+    MouseArea {
+        id: wheelArea
+
+        property real pending: 0 // touchpads and smooth wheels send fractions of a notch
+
+        anchors.fill: parent
+        acceptedButtons: Qt.NoButton
+        onWheel: wheel => {
+            pending += wheel.angleDelta.y;
+            const notches = pending > 0 ? Math.floor(pending / 120) : Math.ceil(pending / 120);
+            if (notches === 0)
+                return;
+            pending -= notches * 120;
+            if (wheel.x < width / 2)
+                Brightness.adjust(bar.modelData.name, notches * Brightness.step);
+            else
+                bar.changeVolume(notches * 0.05);
+        }
+    }
+
     Rectangle {
         id: background
         anchors {
@@ -44,20 +73,8 @@ PanelWindow {
         border.width: 1
         border.color: Theme.colors.outlineVariant
 
-        // Volume on scroll. Widgets above it that handle scrolling themselves (workspaces,
-        // media, volume) take the event first.
-        MouseArea {
-            anchors.fill: parent
-            acceptedButtons: Qt.NoButton
-            onWheel: wheel => {
-                if (bar.sink === null || bar.sink.audio === null)
-                    return;
-                const step = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
-                bar.sink.audio.volume = Math.max(0, Math.min(1, bar.sink.audio.volume + step));
-            }
-        }
-
         RowLayout {
+            id: left
             anchors {
                 left: parent.left
                 verticalCenter: parent.verticalCenter
@@ -74,25 +91,41 @@ PanelWindow {
                     ShellState.overviewOpen = open;
                 }
             }
-            Workspaces {}
             StyledText {
-                Layout.maximumWidth: bar.width / 5
+                id: title
+                // Up to the clock
+                Layout.maximumWidth: Math.max(0, clock.x - left.x - x - Theme.gap * 4)
                 text: Hyprland.activeToplevel ? Hyprland.activeToplevel.title : ""
                 color: Theme.colors.surfaceVariantText
             }
         }
 
-        RowLayout {
+        Workspaces {
+            id: workspaces
             anchors.centerIn: parent
-            spacing: Theme.gap * 3
+        }
 
-            Clock {}
-            MediaWidget {
-                Layout.maximumWidth: bar.width / 4
+        Clock {
+            id: clock
+            anchors {
+                right: workspaces.left
+                verticalCenter: parent.verticalCenter
+                rightMargin: Theme.gap * 3
             }
         }
 
+        MediaWidget {
+            anchors {
+                left: workspaces.right
+                verticalCenter: parent.verticalCenter
+                leftMargin: Theme.gap * 3
+            }
+            // Up to the tray
+            width: Math.min(implicitWidth, right.x - x - Theme.gap * 4)
+        }
+
         RowLayout {
+            id: right
             anchors {
                 right: parent.right
                 verticalCenter: parent.verticalCenter

@@ -14,6 +14,42 @@ let
   matugenConfig = "$HOME/.config/matugen/config.toml";
   defaultColor = "#7db7e0"; # used until the first wallpaper is set
 
+  # Recolor every open terminal (matugen's `sequences` post_hook runs this). Each terminal
+  # window and each Zellij pane is a pty; writing escape codes to it changes its colors without
+  # the program in it seeing anything.
+  #   terminal windows (kitty, foot)  get the new palette (sequences.txt)
+  #   Zellij panes                    get their color overrides cleared instead. Zellij keeps
+  #                                   per-pane colors and repaints only changed lines, so new
+  #                                   colors there would show up line by line. Without
+  #                                   overrides a pane shows the outer terminal's palette, which
+  #                                   the line above has just updated, and OSC 110/111 make
+  #                                   Zellij repaint the whole pane.
+  theme-terminals = pkgs.writeShellApplication {
+    name = "theme-terminals";
+    runtimeInputs = with pkgs; [
+      coreutils
+      procps
+      gnugrep
+    ];
+    text = ''
+      seq="$HOME/.local/state/theme/sequences.txt"
+      [ -f "$seq" ] || exit 0
+      # Reset palette (104), foreground (110), background (111), cursor (112)
+      reset=$'\e]104\e\\\e]110\e\\\e]111\e\\\e]112\e\\'
+
+      for t in /dev/pts/[0-9]*; do
+        [ -O "$t" ] || continue
+        # The pty's session leader is the shell started in it; Zellij sets $ZELLIJ for panes
+        sid=$(ps -o sid= -t "''${t#/dev/}" 2>/dev/null | head -n 1 | tr -d ' ') || true
+        if [ -n "$sid" ] && grep -qz '^ZELLIJ=' "/proc/$sid/environ" 2>/dev/null; then
+          printf '%s' "$reset" > "$t" 2>/dev/null || true
+        else
+          cat "$seq" > "$t" 2>/dev/null || true
+        fi
+      done
+    '';
+  };
+
   theme-wallpaper = pkgs.writeShellApplication {
     name = "theme-wallpaper";
     runtimeInputs = with pkgs; [
@@ -57,7 +93,10 @@ in
   home.packages = [
     pkgs.quickshell # `qs` / `quickshell`
     pkgs.matugen
+    pkgs.ddcutil # monitor brightness over DDC (bar: scroll on its left half); brightnessctl
+    # (packages.nix) is the fallback for built-in screens
     theme-wallpaper
+    theme-terminals
   ];
 
   # First switch: generate a default theme so every app has its color file (kitty, fuzzel,

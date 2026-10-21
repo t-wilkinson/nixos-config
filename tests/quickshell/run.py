@@ -12,7 +12,8 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 from PySide6.QtCore import (QAbstractListModel, QModelIndex, QObject, Property, QTimer,
                             Qt, QtMsgType, Signal, qInstallMessageHandler)
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtCore import QPoint, QPointF
+from PySide6.QtGui import QGuiApplication, QWheelEvent
 from PySide6.QtQml import (QmlAttached, QmlElement, QmlUncreatable, QQmlComponent,
                            QQmlEngine, QJSValue)
 from PySide6.QtCore import QEnum, QMetaObject
@@ -199,7 +200,7 @@ def main():
         return 1
 
     probe = QQmlComponent(engine)
-    probe_src = 'import QtQuick\nimport "file://' + shell + '"\nQtObject { property var s: ShellState; property var t: Theme; function clear() { s.clearNotifications(); } function report() { console.log("HARNESS: theme surface=" + t.colors.surface + " surfaceText=" + t.colors.surfaceText + " red=" + t.colors.red) } }\n'
+    probe_src = 'import QtQuick\nimport Quickshell.Services.Pipewire\nimport "file://' + shell + '"\nQtObject { property var s: ShellState; property var t: Theme; property var b: Brightness; property real vol: Pipewire.defaultAudioSink.audio.volume; function clear() { s.clearNotifications(); } function brightness() { const m = b.ddc["DP-1"]; console.log("HARNESS: brightness monitors=" + Object.keys(b.ddc) + " DP-1 bus=" + (m ? m.bus : "-") + " value=" + (m ? m.value.toFixed(2) : "-")) } function builtin() { b.adjust("eDP-1", -0.05) } function ipcUp() { b.adjustFocused(b.step) } function report() { console.log("HARNESS: theme surface=" + t.colors.surface + " surfaceText=" + t.colors.surfaceText + " red=" + t.colors.red) } }\n'
     probe.setData(probe_src.encode(), "file://" + shell + "/probe.qml")
     pobj = probe.create()
     if pobj is None:
@@ -220,9 +221,41 @@ def main():
         ("open sidebar again", lambda: state.setProperty("sidebarOpen", True)),
         ("toggle dnd", lambda: state.setProperty("dnd", True)),
         ("theme values", lambda: QMetaObject.invokeMethod(pobj, "report")),
+        ("screenshot of the bar (HARNESS_SCREENSHOT=file.png)", lambda: screenshot()),
+        ("brightness detected", lambda: QMetaObject.invokeMethod(pobj, "brightness")),
+        ("scroll up at the top edge, left half (brightness)", lambda: wheel(0.15, 1, 120)),
+        ("scroll up again, as touchpad fractions", lambda: [wheel(0.15, 1, 40) for _ in range(3)]),
+        ("brightness after scrolling", lambda: QMetaObject.invokeMethod(pobj, "brightness")),
+        ("scroll down at the top edge, right half (volume)", lambda: wheel(0.85, 1, -120)),
+        ("volume after scrolling", lambda: print_volume()),
+        ("scroll over the workspaces", lambda: wheel(0.5, 25, -120)),
+        ("brightness key (ipc up)", lambda: QMetaObject.invokeMethod(pobj, "ipcUp")),
+        ("built-in screen (brightnessctl)", lambda: QMetaObject.invokeMethod(pobj, "builtin")),
         ("clear notifications", lambda: QMetaObject.invokeMethod(pobj, "clear")),
         ("done", lambda: app.quit()),
     ]
+
+    def bar_window():
+        for w in QGuiApplication.topLevelWindows():
+            if w.metaObject().className().startswith("Bar_QMLTYPE"):
+                return w
+        raise RuntimeError("no bar window")
+
+    def wheel(fx, y, delta):
+        # A wheel event at fraction fx of the bar's width, y pixels from the top of the screen
+        w = bar_window()
+        pos = QPointF(w.width() * fx, y)
+        ev = QWheelEvent(pos, pos, QPoint(0, 0), QPoint(0, delta), Qt.NoButton, Qt.NoModifier,
+                         Qt.NoScrollPhase, False)
+        QGuiApplication.sendEvent(w, ev)
+
+    def screenshot():
+        path = os.environ.get("HARNESS_SCREENSHOT")
+        if path:
+            bar_window().grabWindow().save(path)
+
+    def print_volume():
+        messages.append(("info", "HARNESS: volume=" + str(round(pobj.property("vol"), 2))))
 
     def run(i=0):
         if i < len(steps):

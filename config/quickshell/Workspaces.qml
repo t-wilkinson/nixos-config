@@ -23,12 +23,20 @@ Item {
     implicitWidth: row.implicitWidth
     implicitHeight: row.implicitHeight
 
-    // Scroll over the workspaces to move between them (elsewhere on the bar: volume)
+    // Scroll over the workspaces to move between them (elsewhere on the bar: brightness on
+    // the left half, volume on the right)
     MouseArea {
         anchors.fill: parent
-        anchors.margins: -6
+        anchors.margins: -4
         acceptedButtons: Qt.NoButton
-        onWheel: wheel => Hyprland.dispatch(wheel.angleDelta.y > 0 ? "workspace m-1" : "workspace m+1")
+        property real pending: 0 // touchpads send fractions of a notch
+        onWheel: wheel => {
+            pending += wheel.angleDelta.y;
+            if (Math.abs(pending) < 120)
+                return;
+            Hyprland.dispatch(pending > 0 ? "workspace m-1" : "workspace m+1");
+            pending = 0;
+        }
     }
 
     RowLayout {

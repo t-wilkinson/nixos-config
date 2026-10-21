@@ -11,7 +11,7 @@ Window {
     property Region mask
     property bool aboveWindows
     property bool focusable
-    width: implicitWidth > 0 ? implicitWidth : 800
+    width: implicitWidth > 0 ? implicitWidth : screen && screen.width ? screen.width : 800
     height: implicitHeight > 0 ? implicitHeight : 40
     visible: true
 }

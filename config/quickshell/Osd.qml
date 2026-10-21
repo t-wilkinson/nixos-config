@@ -1,11 +1,13 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 
-// Volume indicator at the bottom of the screen whenever the output volume or mute changes
-// (from the keyboard, the bar or any other app). Clicks pass through it.
+// Indicator at the bottom of the screen when the volume or mute changes (from the keyboard,
+// the bar or any other app; on the focused monitor) or a monitor's brightness changes (on
+// that monitor). Clicks pass through it.
 Scope {
     id: root
 
@@ -13,12 +15,23 @@ Scope {
     readonly property bool ready: sink !== null && sink.audio !== null
     property bool shown: false
     property bool armed: false // ignore the initial values when the sink first binds
+    property string kind: "volume" // or "brightness"
+    property real brightness: 0
+    property string monitor: ""
 
-    function show() {
+    readonly property real value: kind === "brightness" ? brightness : ready ? sink.audio.volume : 0
+    readonly property bool off: kind === "volume" && (!ready || sink.audio.muted)
+
+    function show(kind, monitor) {
         if (!armed)
             return;
+        root.kind = kind;
+        root.monitor = monitor;
         shown = true;
         hideTimer.restart();
+    }
+    function focusedMonitor() {
+        return Hyprland.focusedMonitor !== null ? Hyprland.focusedMonitor.name : "";
     }
 
     PwObjectTracker {
@@ -27,8 +40,20 @@ Scope {
 
     Connections {
         target: root.ready ? root.sink.audio : null
-        function onVolumesChanged() { root.show(); }
-        function onMutedChanged() { root.show(); }
+        function onVolumesChanged() {
+            root.show("volume", root.focusedMonitor());
+        }
+        function onMutedChanged() {
+            root.show("volume", root.focusedMonitor());
+        }
+    }
+
+    Connections {
+        target: Brightness
+        function onAdjusted(monitor, value) {
+            root.brightness = value;
+            root.show("brightness", monitor);
+        }
     }
 
     Timer {
@@ -47,6 +72,7 @@ Scope {
         active: root.shown
 
         PanelWindow {
+            screen: Quickshell.screens.find(s => s.name === root.monitor) || null
             anchors.bottom: true
             margins.bottom: 80
             exclusiveZone: 0
@@ -71,7 +97,7 @@ Scope {
                     spacing: 14
 
                     Icon {
-                        text: !root.ready || root.sink.audio.muted ? "volume_off" : "volume_up"
+                        text: root.kind === "brightness" ? "brightness_6" : root.off ? "volume_off" : "volume_up"
                         size: 22
                         fill: 1
                         color: Theme.colors.primary
@@ -85,10 +111,10 @@ Scope {
                         color: Theme.colors.surfaceContainerHighest
 
                         Rectangle {
-                            width: parent.width * Math.min(1, root.ready ? root.sink.audio.volume : 0)
+                            width: parent.width * Math.max(0, Math.min(1, root.value))
                             height: parent.height
                             radius: 4
-                            color: root.ready && root.sink.audio.muted ? Theme.colors.outline : Theme.colors.primary
+                            color: root.off ? Theme.colors.outline : Theme.colors.primary
                             Behavior on width { NumberAnimation { duration: 80 } }
                         }
                     }
@@ -96,7 +122,7 @@ Scope {
                     StyledText {
                         Layout.preferredWidth: 36
                         horizontalAlignment: Text.AlignRight
-                        text: root.ready ? Math.round(root.sink.audio.volume * 100) : ""
+                        text: Math.round(root.value * 100)
                     }
                 }
             }

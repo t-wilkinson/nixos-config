@@ -2,8 +2,9 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell.Services.Mpris
 
-// The playing song/video in the bar: click to play/pause, scroll for next/previous,
-// right click for the sidebar (full controls). Hidden when nothing is playing.
+// The playing song/video in the bar: click to play/pause, right click for the sidebar (full
+// controls, next/previous). Hidden when nothing is playing. Scrolling over it changes the
+// volume, like the rest of the bar's right half.
 MouseArea {
     id: root
 
@@ -21,15 +22,6 @@ MouseArea {
             player.togglePlaying();
     }
 
-    onWheel: wheel => {
-        if (!player)
-            return;
-        if (wheel.angleDelta.y < 0 && player.canGoNext)
-            player.next();
-        else if (wheel.angleDelta.y > 0 && player.canGoPrevious)
-            player.previous();
-    }
-
     RowLayout {
         id: row
         anchors.fill: parent
@@ -43,7 +35,6 @@ MouseArea {
         }
         StyledText {
             Layout.fillWidth: true
-            Layout.maximumWidth: root.Layout.maximumWidth - 26
             text: {
                 if (!root.player)
                     return "";
