@@ -79,15 +79,15 @@ Scope {
 
                             Icon {
                                 text: "search"
-                                color: Theme.colors.onSurfaceVariant
+                                color: Theme.colors.surfaceVariantText
                             }
                             TextField {
                                 id: search
                                 Layout.fillWidth: true
                                 focus: true
                                 placeholderText: "Search apps"
-                                placeholderTextColor: Theme.colors.onSurfaceVariant
-                                color: Theme.colors.onSurface
+                                placeholderTextColor: Theme.colors.surfaceVariantText
+                                color: Theme.colors.surfaceText
                                 font.family: Theme.font
                                 font.pixelSize: Theme.fontSize + 2
                                 background: null
@@ -142,14 +142,14 @@ Scope {
                                     StyledText {
                                         Layout.fillWidth: true
                                         text: entry.modelData.name
-                                        color: entry.ListView.isCurrentItem ? Theme.colors.onPrimaryContainer : Theme.colors.onSurface
+                                        color: entry.ListView.isCurrentItem ? Theme.colors.primaryContainerText : Theme.colors.surfaceText
                                     }
                                     StyledText {
                                         Layout.fillWidth: true
                                         visible: text !== ""
                                         text: entry.modelData.comment || entry.modelData.genericName
                                         font.pixelSize: Theme.fontSize - 2
-                                        color: entry.ListView.isCurrentItem ? Theme.colors.onPrimaryContainer : Theme.colors.onSurfaceVariant
+                                        color: entry.ListView.isCurrentItem ? Theme.colors.primaryContainerText : Theme.colors.surfaceVariantText
                                     }
                                 }
                             }

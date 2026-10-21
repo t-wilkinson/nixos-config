@@ -49,7 +49,7 @@ RowLayout {
             Rectangle {
                 anchors.fill: parent
                 radius: height / 2
-                color: pill.focused ? Theme.colors.primary : pill.occupied ? Theme.colors.onSurfaceVariant : Theme.colors.outlineVariant
+                color: pill.focused ? Theme.colors.primary : pill.occupied ? Theme.colors.surfaceVariantText : Theme.colors.outlineVariant
                 Behavior on color { ColorAnimation { duration: Theme.animMs } }
             }
         }

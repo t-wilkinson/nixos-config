@@ -57,7 +57,7 @@ PanelWindow {
             StyledText {
                 Layout.maximumWidth: bar.width / 4
                 text: Hyprland.activeToplevel ? Hyprland.activeToplevel.title : ""
-                color: Theme.colors.onSurfaceVariant
+                color: Theme.colors.surfaceVariantText
             }
         }
 

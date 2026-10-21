@@ -32,11 +32,11 @@ MouseArea {
 
         Icon {
             text: root.muted ? "volume_off" : root.volume > 0.5 ? "volume_up" : root.volume > 0 ? "volume_down" : "volume_mute"
-            color: root.muted ? Theme.colors.outline : Theme.colors.onSurfaceVariant
+            color: root.muted ? Theme.colors.outline : Theme.colors.surfaceVariantText
         }
         StyledText {
             text: Math.round(root.volume * 100) + "%"
-            color: Theme.colors.onSurfaceVariant
+            color: Theme.colors.surfaceVariantText
         }
     }
 }

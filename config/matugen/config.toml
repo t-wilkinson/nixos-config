@@ -42,7 +42,8 @@ output_path = "~/.local/state/theme/colors.json"
 [templates.kitty]
 input_path = "./templates/kitty.conf"
 output_path = "~/.local/state/theme/kitty.conf"
-post_hook = "pkill -USR1 -x kitty || true"
+# SIGUSR1 makes kitty reread its config. On NixOS the process is the wrapped binary.
+post_hook = "pkill -USR1 -x .kitty-wrapped; pkill -USR1 -x kitty; true"
 
 [templates.zellij]
 input_path = "./templates/zellij.kdl"
