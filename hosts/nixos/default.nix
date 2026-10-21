@@ -156,7 +156,9 @@
       enable = true;
       enableFishIntegration = true;
     };
-    ssh.startAgent = true;
+    # SSH keys live in Vaultwarden and the Bitwarden desktop app is the agent
+    # (SSH_AUTH_SOCK: config/hypr/hyprland/env.conf and home-manager/default.nix)
+    ssh.startAgent = false;
     kdeconnect = {
       enable = true;
       package = pkgs.gnomeExtensions.gsconnect;
