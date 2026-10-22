@@ -41,7 +41,7 @@ in
         config = {
           ROCKET_PORT = services.vault.port;
           SIGNUPS_ALLOWED = false;
-          INVITATIONS_ALLOWED = false;
+          INVITATIONS_ALLOWED = true;
           SHOW_PASSWORD_HINT = false;
           WEBSOCKET_ENABLED = true;
           DOMAIN = "https://${services.vault.publicDomain}";

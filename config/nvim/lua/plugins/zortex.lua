@@ -80,11 +80,6 @@ return {
           search = { keys = { cycle_mode = "<M-m>" } },
           highlights = { preset = "rose-pine" },
           preview = { on_hover = false },
-          planner = {
-            templates = {
-              weekday = { "07:30 Meditate", "07:40 Planner", "08:00 MSCS" },
-            },
-          },
         },
       })
 
