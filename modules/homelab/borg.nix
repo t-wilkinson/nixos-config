@@ -54,9 +54,16 @@ in
       borgbackup
     ];
 
-    systemd.services."borgbackup-job-homelab".unitConfig.OnFailure = "borg-job-failure-notify.service";
+    systemd.services."borgbackup-job-homelab" = {
+      unitConfig.OnFailure = "borg-job-failure-notify.service";
+      # systemd creates ${dumpDir} on every start, before it sets up the sandbox, and makes it
+      # writable despite the job's ProtectSystem=strict. (A ReadWritePaths entry that doesn't
+      # exist yet fails the whole unit with 226/NAMESPACE.) 0700: the dumps include
+      # Vaultwarden's and Authelia's databases.
+      serviceConfig.StateDirectory = "borg-db-dumps";
+      serviceConfig.StateDirectoryMode = "0700";
+    };
     systemd.services."borg-job-failure-notify" = notifyFailure "borgbackup-job-homelab" "Backup";
-    systemd.services."borgbackup-job-homelab".serviceConfig.StateDirectory = "borg-db-dumps";
 
     # Monthly: check the repo and every archive's metadata (not the file contents themselves;
     # that is `borg check --verify-data`, worth running by hand once in a while).
@@ -90,7 +97,12 @@ in
         "/home/${homelab.username}" # Syncthing's config and keys
         "/etc/ssh" # host keys and the sops age key
       ];
-      # readWritePaths = [ dumpDir ];
+
+      # /var/lib and /srv/sync are live, so borg regularly warns (exit 1) that a file changed
+      # while it was read. With the default (true) that fails the job: the archive keeps its
+      # .failed suffix, prune/compact are skipped and the failure alert fires. Real errors
+      # (exit 2) still fail it.
+      failOnWarnings = false;
 
       exclude = [
         "*.pyc"
@@ -160,7 +172,8 @@ in
       '';
 
       # Runs on exit, success or not; the job's exit status is $exitStatus (0 = success,
-      # 1 = warning, 2 = error). Failures notify through OnFailure above.
+      # including borg warnings since failOnWarnings = false; anything else = failed).
+      # Failures notify through OnFailure above.
       postHook =
         lib.optionalString mc.enable ''
           if ${pkgs.iputils}/bin/ping -c 1 -W 2 ${pc_ip_address} > /dev/null; then
@@ -178,9 +191,5 @@ in
           fi
         '';
     };
-
-    # systemd.tmpfiles.rules = [
-    #   "d ${dumpDir} 0700 root root - -"
-    # ];
   };
 }

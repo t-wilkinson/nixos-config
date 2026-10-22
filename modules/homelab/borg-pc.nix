@@ -33,6 +33,8 @@ let
   dumpDir = "/var/backup/borg-pc";
   stateDir = "/var/lib/borg-pc";
   canNotify = hl.services.ntfy.enable && config.sops.secrets ? ntfy_auth;
+  # On the Pi, ntfy is local and the auth header is a sops template (hosts/homelab/secrets.nix)
+  piCanNotify = hl.services.ntfy.runsHere && config.sops.templates ? "ntfy-auth-header";
   ssh = "ssh -i ${host.backupKeyFile} -o UserKnownHostsFile=${stateDir}/known_hosts -o StrictHostKeyChecking=accept-new -o BatchMode=yes";
   pg = config.services.postgresql.package;
   borg = "${pkgs.borgbackup}/bin/borg";
@@ -94,6 +96,8 @@ lib.mkIf cfg.enable (
           passCommand = "cat ${config.sops.secrets.borg_pass.path}";
         };
         compression = "auto,zstd";
+        # Nextcloud's files are live: a file changing mid-read is a warning, not a failed backup
+        failOnWarnings = false;
 
         # 04:00, or as soon as the PC wakes; waits for the network (persistent + remote repo)
         startAt = "*-*-* 04:00";
@@ -149,6 +153,7 @@ lib.mkIf cfg.enable (
       systemd.services.borg-pc-prune = {
         description = "Prune the PC's borg repo";
         unitConfig.ConditionPathExists = "${repo}/config"; # nothing to do before the first backup
+        unitConfig.OnFailure = lib.optional piCanNotify "borg-pc-maint-failure-notify@borg-pc-prune.service";
         serviceConfig = {
           Type = "oneshot";
           User = "borg-pc";
@@ -170,6 +175,44 @@ lib.mkIf cfg.enable (
         startAt = "Sun 05:30";
       };
       systemd.timers.borg-pc-prune.timerConfig.Persistent = true;
+
+      # Monthly integrity check of the PC's repo (borg-check in ./borg.nix only covers the Pi's
+      # own repo). Runs as borg-pc, not root, so nothing in the repo ends up owned by root.
+      systemd.services.borg-pc-check = {
+        description = "Check the PC's borg repo";
+        unitConfig.ConditionPathExists = "${repo}/config";
+        unitConfig.OnFailure = lib.optional piCanNotify "borg-pc-maint-failure-notify@borg-pc-check.service";
+        serviceConfig = {
+          Type = "oneshot";
+          User = "borg-pc";
+          Group = "borg-pc";
+          StateDirectory = "borg-pc-prune"; # same borg cache as the prune job
+          LoadCredential = "pass:${config.sops.secrets.borg_pass.path}";
+          CPUSchedulingPolicy = "idle";
+          IOSchedulingClass = "idle";
+        };
+        environment.BORG_BASE_DIR = "/var/lib/borg-pc-prune";
+        script = ''
+          export BORG_PASSCOMMAND="cat $CREDENTIALS_DIRECTORY/pass"
+          ${borg} check --lock-wait 3600 ${repo}
+        '';
+        startAt = "*-*-01 06:30";
+      };
+      systemd.timers.borg-pc-check.timerConfig.Persistent = true;
+
+      # %i: the unit that failed
+      systemd.services."borg-pc-maint-failure-notify@" = lib.mkIf piCanNotify {
+        description = "Notify that %i failed";
+        serviceConfig.Type = "oneshot";
+        script = ''
+          ${pkgs.curl}/bin/curl -sS -H @${config.sops.templates."ntfy-auth-header".path} \
+            -H "Title: $1 failed on ${config.networking.hostName}" \
+            -H "Priority: high" -H "Tags: warning,backup" \
+            -d "Check 'journalctl -u $1' for details." \
+            http://${hl.services.ntfy.localEndpoint}/homelab
+        '';
+        scriptArgs = "%i";
+      };
     })
   ]
 )
