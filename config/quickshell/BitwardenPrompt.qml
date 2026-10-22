@@ -15,6 +15,7 @@ Scope {
 
     property string openOn: "" // monitor showing special:bitwarden, "" when hidden
     property string summoned: "" // Bitwarden's address while we're showing it for a request
+    property real summonedAt: 0
 
     function norm(address) {
         return String(address).toLowerCase().replace(/^0x/, "");
@@ -33,12 +34,13 @@ Scope {
 
     function summon(address) {
         // Wherever it is (moved by hand, or opened before the rule applied), put it in its
-        // workspace, show that here and focus it
+        // workspace, then focus it. Focusing a window in a special workspace opens that workspace
+        // on the focused monitor, and does nothing more if it's already open: Bitwarden asks
+        // several times per request (list keys, then sign), so this must never toggle.
         Hyprland.dispatch("movetoworkspacesilent special:bitwarden,address:0x" + address);
-        if (openOn !== focusedMonitor())
-            Hyprland.dispatch("togglespecialworkspace bitwarden");
         Hyprland.dispatch("focuswindow address:0x" + address);
         summoned = address;
+        summonedAt = Date.now();
     }
 
     Connections {
@@ -60,7 +62,12 @@ Scope {
                     root.openOn = monitor;
                 else if (root.openOn === monitor)
                     root.openOn = "";
-            } else if (event.name === "activewindowv2" && root.summoned !== "" && root.norm(data) !== root.summoned) {
+            } else if (event.name === "activewindowv2" && root.summoned !== "") {
+                const address = root.norm(data);
+                // Ignore "no window focused" (Hyprland sends it in passing while switching) and
+                // the shuffle right after showing it: only you focusing another window counts
+                if (address === "" || address === root.summoned || Date.now() - root.summonedAt < 500)
+                    return;
                 // Done with Bitwarden: hide it again (after Hyprland has settled, in case
                 // focusing elsewhere already closed it)
                 root.summoned = "";
