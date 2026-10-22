@@ -17,3 +17,13 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.syntax = "markdown"
   end,
 })
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {
+    "zortex",
+  },
+  callback = function()
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+  end,
+})
