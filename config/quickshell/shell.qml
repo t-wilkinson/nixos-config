@@ -8,7 +8,8 @@
 //   Overview.qml       workspaces with live window previews; type to search apps
 //   Sidebar.qml        quick settings, sliders, media, Bluetooth, notification history
 //   Notifications.qml  notification daemon and popups
-//   Osd.qml            volume indicator
+//   Osd.qml            volume/brightness indicator
+//   BitwardenPrompt.qml shows Bitwarden when its SSH agent needs an unlock or approval
 //   Launcher.qml       app launcher
 //   PowerMenu.qml      lock / suspend / log out / reboot / power off
 //   ShellState.qml     what's open + IPC (`qs ipc show` lists the commands)
@@ -26,6 +27,7 @@ ShellRoot {
     Overview {}
     Sidebar {}
     Osd {}
+    BitwardenPrompt {}
     Launcher {}
     PowerMenu {}
 

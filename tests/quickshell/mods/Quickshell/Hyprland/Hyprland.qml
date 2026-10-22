@@ -16,8 +16,14 @@ QtObject {
         property QtObject workspace: h.ws12; property QtObject monitor: h.mon; property QtObject wayland: QtObject {}
         property var lastIpcObject: ({ at: [1290, 50], size: [1260, 1380], "class": "kitty", title: "kitty" })
     }
+    property QtObject t3: QtObject {
+        property string address: "55d0c0b17d"; property string title: "Bitwarden"
+        property QtObject workspace: h.ws12; property QtObject monitor: h.mon; property QtObject wayland: QtObject { property string appId: "Bitwarden" }
+        property var lastIpcObject: ({})
+    }
+    signal rawEvent(var event)
     property ObjectListModel workspaces: ObjectListModel { values: [ h.ws1, h.ws12 ] }
-    property ObjectListModel toplevels: ObjectListModel { values: [ h.t1, h.t2 ] }
+    property ObjectListModel toplevels: ObjectListModel { values: [ h.t1, h.t2, h.t3 ] }
     property ObjectListModel monitors: ObjectListModel { values: [ h.mon ] }
     property QtObject focusedWorkspace: ws12
     property QtObject focusedMonitor: mon
