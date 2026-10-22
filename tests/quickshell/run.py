@@ -16,7 +16,7 @@ from PySide6.QtCore import QPoint, QPointF
 from PySide6.QtGui import QGuiApplication, QWheelEvent
 from PySide6.QtQml import (QmlAttached, QmlElement, QmlUncreatable, QQmlComponent,
                            QQmlEngine, QJSValue)
-from PySide6.QtCore import QEnum, QMetaObject
+from PySide6.QtCore import QEnum, QMetaObject, Q_ARG
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 messages = []
@@ -200,7 +200,7 @@ def main():
         return 1
 
     probe = QQmlComponent(engine)
-    probe_src = 'import QtQuick\nimport Quickshell.Services.Pipewire\nimport "file://' + shell + '"\nQtObject { property var s: ShellState; property var t: Theme; property var b: Brightness; property real vol: Pipewire.defaultAudioSink.audio.volume; function clear() { s.clearNotifications(); } function brightness() { const m = b.ddc["DP-1"]; console.log("HARNESS: brightness monitors=" + Object.keys(b.ddc) + " DP-1 bus=" + (m ? m.bus : "-") + " value=" + (m ? m.value.toFixed(2) : "-")) } function builtin() { b.adjust("eDP-1", -0.05) } function ipcUp() { b.adjustFocused(b.step) } function report() { console.log("HARNESS: theme surface=" + t.colors.surface + " surfaceText=" + t.colors.surfaceText + " red=" + t.colors.red) } }\n'
+    probe_src = 'import QtQuick\nimport Quickshell.Services.Pipewire\nimport Quickshell.Hyprland\nimport "file://' + shell + '"\nQtObject { property var s: ShellState; property var t: Theme; property var b: Brightness; property real vol: Pipewire.defaultAudioSink.audio.volume; function clear() { s.clearNotifications(); } function brightness() { const m = b.ddc["DP-1"]; console.log("HARNESS: brightness monitors=" + Object.keys(b.ddc) + " DP-1 bus=" + (m ? m.bus : "-") + " value=" + (m ? m.value.toFixed(2) : "-")) } function builtin() { b.adjust("eDP-1", -0.05) } function ipcUp() { b.adjustFocused(b.step) } function hypr(name, data) { Hyprland.rawEvent({ name: name, data: data }) } function report() { console.log("HARNESS: theme surface=" + t.colors.surface + " surfaceText=" + t.colors.surfaceText + " red=" + t.colors.red) } }\n'
     probe.setData(probe_src.encode(), "file://" + shell + "/probe.qml")
     pobj = probe.create()
     if pobj is None:
@@ -232,6 +232,12 @@ def main():
         ("scroll down, then up, over the media", lambda: [wheel_on("MediaWidget", -120), wheel_on("MediaWidget", 120)]),
         ("brightness key (ipc up)", lambda: QMetaObject.invokeMethod(pobj, "ipcUp")),
         ("built-in screen (brightnessctl)", lambda: QMetaObject.invokeMethod(pobj, "builtin")),
+        ("another app asks for focus (kitty): nothing", lambda: hypr("urgent", "55d0c0ff00")),
+        ("Bitwarden asks for focus (ssh needs it): shown here", lambda: hypr("urgent", "55d0c0b17d")),
+        ("  Hyprland: special workspace opened, Bitwarden focused", lambda: [hypr("activespecial", "special:bitwarden,DP-1"), hypr("activewindowv2", "55d0c0b17d")]),
+        ("you approve, then focus kitty: Bitwarden hides", lambda: hypr("activewindowv2", "55d0c0ff00")),
+        ("  Hyprland: special workspace closed", lambda: hypr("activespecial", ",DP-1")),
+        ("focus moves again: nothing", lambda: hypr("activewindowv2", "55d0c0ffee")),
         ("clear notifications", lambda: QMetaObject.invokeMethod(pobj, "clear")),
         ("done", lambda: app.quit()),
     ]
@@ -272,6 +278,9 @@ def main():
         path = os.environ.get("HARNESS_SCREENSHOT")
         if path:
             bar_window().grabWindow().save(path)
+
+    def hypr(name, data):
+        QMetaObject.invokeMethod(pobj, "hypr", Q_ARG("QVariant", name), Q_ARG("QVariant", data))
 
     def print_volume():
         messages.append(("info", "HARNESS: volume=" + str(round(pobj.property("vol"), 2))))
