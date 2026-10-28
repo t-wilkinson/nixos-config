@@ -24,12 +24,12 @@ in
         refresh = 10000; # Every 10 seconds
         mappings = [
           {
-            field = "pending_count";
+            field = "pending";
             label = "Pending";
             format = "number";
           }
           {
-            field = "next_event";
+            field = "next";
             label = "Next Event";
           }
         ];

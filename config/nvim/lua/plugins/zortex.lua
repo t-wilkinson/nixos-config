@@ -78,7 +78,10 @@ return {
         -- UI Configuration
         ui = {
           search = { keys = { cycle_mode = "<M-m>" } },
-          highlights = { preset = "rose-pine" },
+          highlights = {
+            preset = "rose-pine",
+            link_separator = "/",
+          },
           preview = { on_hover = false },
         },
       })
