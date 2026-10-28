@@ -12,6 +12,7 @@ let
   net = homelab.network;
   nodes = homelab.nodes;
   cfg = services.dashboard;
+  files = homelab.statusFiles;
 
   # One tile per enabled service with a dashboard category (inventory.nix: name, description,
   # dashboard.{category,icon,extra}). Groups appear in groupOrder, then any others.
@@ -29,7 +30,7 @@ let
   categories = lib.unique (lib.mapAttrsToList (n: s: s.dashboard.category) tiled);
 
   # Extras that aren't services
-  extraTiles = {
+  extraTilesBase = {
     "Infrastructure" = [
       {
         "Root Certificate" = {
@@ -62,16 +63,107 @@ let
       )
     );
   };
+  # Health: status JSON written on the gateway (status-files.nix), read by Homepage's widgets
+  # over loopback. Each tile shows a few fields; the Security tile opens the panel in
+  # dashboard/security.js.
+  backupTile = id: name: description: {
+    "${name} backup" = {
+      icon = "mdi-backup-restore";
+      href = "https://${services.gatus.domain}";
+      inherit description;
+      widget = {
+        type = "customapi";
+        url = "${files.url}/backups.json";
+        refreshInterval = 60000;
+        mappings = [
+          {
+            field = "repos.${id}.statusText";
+            label = "Status";
+          }
+          {
+            field = "repos.${id}.added";
+            label = "Added";
+            format = "bytes";
+          }
+          {
+            field = "repos.${id}.size";
+            label = "Repo";
+            format = "bytes";
+          }
+          {
+            field = "repos.${id}.archives";
+            label = "Archives";
+            format = "number";
+          }
+        ];
+      };
+    };
+  };
+  healthTiles = lib.optionals files.enable (
+    lib.optional homelab.bans.enable {
+      "Security" = {
+        icon = "mdi-shield-lock";
+        href = "#security";
+        description = "Bans & failed logins";
+        widget = {
+          type = "customapi";
+          url = "${files.url}/security.json";
+          refreshInterval = 30000;
+          mappings = [
+            {
+              field = "summary.activeBans";
+              label = "Banned";
+              format = "number";
+            }
+            {
+              field = "summary.attempts24h";
+              label = "Failed (24h)";
+              format = "number";
+            }
+            {
+              field = "summary.lastBanText";
+              label = "Last ban";
+            }
+          ];
+        };
+      };
+    }
+    ++ lib.optional services.borg.enable (backupTile "homelab" "Pi" "Pi state, nightly")
+    ++ lib.optional services.borg-pc.enable (backupTile "pc" "PC" "PC databases & Nextcloud")
+    ++ lib.optional (homelab.jobReports.enable && homelab.jobs != { }) {
+      "Backup jobs" = {
+        icon = "mdi-calendar-check";
+        href = "https://${services.gatus.domain}";
+        description = "Last run of each job (Gatus)";
+        widget = {
+          type = "customapi";
+          url = "${files.url}/backups.json";
+          refreshInterval = 60000;
+          display = "list";
+          mappings = lib.mapAttrsToList (id: j: {
+            field = "jobs.${id}.summary";
+            label = j.name;
+          }) homelab.jobs;
+        };
+      };
+    }
+  );
+  extraTiles = extraTilesBase // lib.optionalAttrs (healthTiles != [ ]) { "Health" = healthTiles; };
+
   groupOrder = [
     "Applications"
+    "Health"
     "Infrastructure"
     "Compute Nodes"
   ];
-  homepageGroups = map (group: {
-    ${group} =
-      lib.mapAttrsToList (n: s: mkTile s) (lib.filterAttrs (n: s: s.dashboard.category == group) tiled)
-      ++ (extraTiles.${group} or [ ]);
-  }) (groupOrder ++ lib.subtractLists groupOrder categories);
+  groupTiles =
+    group:
+    lib.mapAttrsToList (n: s: mkTile s) (lib.filterAttrs (n: s: s.dashboard.category == group) tiled)
+    ++ (extraTiles.${group} or [ ]);
+  # Groups with no tiles (e.g. Health before its status files exist) are left out
+  homepageGroups = map (group: { ${group} = groupTiles group; }) (
+    lib.filter (group: groupTiles group != [ ]) (groupOrder ++ lib.subtractLists groupOrder categories)
+  );
 in
 {
   config = lib.mkMerge [
@@ -123,6 +215,11 @@ in
               style = "row";
               columns = 2;
               icon = "mdi-desktop-tower-monitor";
+            };
+            "Health" = {
+              style = "row";
+              columns = 2;
+              icon = "mdi-heart-pulse";
             };
           };
         };
@@ -208,6 +305,7 @@ in
                 setTimeout(() => el.remove(), 250);
               }, kind === "fail" ? 8000 : 4500);
             }
+            window.zToast = toast; // also used by the Security panel (dashboard/security.js)
 
             // Buttons with href "#wake-<node>" / "#sleep-<node>" call /hooks/<action>-<node> (Caddy routes
             // wake to the Pi's webhook, sleep to the node's own)
@@ -258,7 +356,8 @@ in
             new MutationObserver(countGroups).observe(document.documentElement, { childList: true, subtree: true });
             countGroups();
           })();
-        '';
+        ''
+        + lib.optionalString (homelab.bans.enable && files.enable) (builtins.readFile ./dashboard/security.js);
 
         # Zortex look: warm near-black panels, paper-white text, one orange accent. Retints Homepage's
         # palette variables, then styles groups as panels and tiles as rows with icon chips.
@@ -793,6 +892,8 @@ in
           #version {
             font-size: 0.75rem;
           }
+
+          ${lib.optionalString (homelab.bans.enable && files.enable) (builtins.readFile ./dashboard/security.css)}
 
           @media (prefers-reduced-motion: reduce) {
             *,

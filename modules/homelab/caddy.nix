@@ -48,6 +48,10 @@ let
       # Everything below runs inside `route`, i.e. in the order written. (At the top level Caddy
       # sorts `handle` before `respond`, so access checks written as `respond` would never fire.)
 
+      # fail2ban's bans (fail2ban.nix): 403 for banned visitors, before anything else. A glob,
+      # so no file (nothing banned) is fine.
+      bans = lib.optionalString homelab.bans.enable "import ${homelab.bans.caddyImport}";
+
       # service.paths = { "/notes" = "127.0.0.1:8090"; }: the prefix is passed on
       pathRoutes = lib.concatStrings (
         lib.mapAttrsToList (path: endpoint: ''
@@ -67,6 +71,7 @@ let
           }
           redir @httpProto https://{host}{uri} permanent
           route {
+            ${bans}
             ${lanOnly}
             ${authCheck}
             ${service.extraConfig}

@@ -162,6 +162,9 @@
       domain = "home.lab";
       publicDomain = "treywilkinson.com";
       cloudflareTunnelId = "39990619-972b-46ab-9812-ee8fe70d87f0"; # <id>.cfargotunnel.com - CNAME cloudflared tunnel
+      # Zone ID of publicDomain (Cloudflare -> treywilkinson.com -> Overview, "API" box). With
+      # the cloudflare_ban_token secret, fail2ban bans also block at Cloudflare's edge.
+      cloudflareZoneId = null;
       containerNetwork = "192.168.100";
     };
 
@@ -297,6 +300,9 @@
         dashboard.category = null;
         auth = true;
         authBypass = [ "/root.crt" ]; # new devices fetch the CA before they trust HTTPS
+        # Loopback port Caddy serves the status JSON on, for the dashboard's widgets
+        # (modules/homelab/status-files.nix)
+        data.statusPort = 8095;
       };
       gatus = {
         # Uptime checks + status page, generated from this file; alerts to ntfy

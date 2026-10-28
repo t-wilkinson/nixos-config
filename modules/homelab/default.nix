@@ -7,6 +7,8 @@
   imports = [
     ./module.nix
     ./storage.nix # volumes, shares, NFS exports/mounts (homelab.storage)
+    ./jobs.nix # scheduled jobs report each run to Gatus (homelab.jobs)
+    ./status-files.nix # status JSON the dashboard displays (backups, security)
 
     # Gateway (Pi): proxy, DNS, tunnel, subnet router, NFS exports, fail2ban
     ./caddy.nix
@@ -14,7 +16,7 @@
     ./cloudflared.nix
     ./tailscale.nix
     ./nfs.nix
-    ./fail2ban.nix
+    ./fail2ban.nix # bans in Caddy and at Cloudflare, ban notifications, dashboard unban
 
     # Services (each runs on the node named by its `host`)
     ./authelia.nix
@@ -34,6 +36,7 @@
     ./borg.nix
     ./borg-mirror.nix # the Pi's borg repo, copied to the PC
     ./borg-pc.nix # the PC's databases, backed up to the Pi
+    ./backup-report.nix # backups.json for the dashboard
     ./nextcloud.nix
     ./immich.nix
 

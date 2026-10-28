@@ -30,7 +30,8 @@ let
   repo = "${hl.storage.shares.backup.path}/homelab";
   dest = "${hl.storage.shares.${cfg.data.share}.path}/pi-borg";
   stateDir = "/var/lib/borg-mirror";
-  canNotify = hl.services.ntfy.enable && config.sops.secrets ? ntfy_auth;
+  # Until jobs report to Gatus (./jobs.nix), failures notify ntfy directly
+  canNotify = hl.services.ntfy.enable && config.sops.secrets ? ntfy_auth && !hl.jobReports.enable;
   ssh = "ssh -i ${host.backupKeyFile} -o UserKnownHostsFile=${stateDir}/known_hosts -o StrictHostKeyChecking=accept-new -o BatchMode=yes";
 in
 lib.mkIf cfg.enable (
@@ -46,6 +47,14 @@ lib.mkIf cfg.enable (
           message = "homelab.services.borg-mirror copies the borg repo, so borg must run on ${cfg.data.source}.";
         }
       ];
+
+      # Reported to Gatus (./jobs.nix)
+      homelab.jobs.borg-mirror = {
+        name = "Backup mirror";
+        node = cfg.host;
+        unit = "borg-mirror";
+        heartbeat = "96h"; # daily while the PC is awake
+      };
     }
 
     # PC: pull
