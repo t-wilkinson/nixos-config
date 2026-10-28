@@ -21,6 +21,17 @@ let
       (mod n 256)
     ];
   blockSize = prefix: foldl' (acc: _: acc * 2) 1 (range 1 (32 - prefix));
+
+  # Top-level key names of a sops YAML file (stored in plaintext, so no decryption needed).
+  # Same parsing as ../sops-check.nix.
+  sopsKeys =
+    file:
+    lib.pipe (builtins.readFile file) [
+      (splitString "\n")
+      (map (builtins.match "([A-Za-z0-9_.-]+):.*"))
+      (filter (m: m != null))
+      (map builtins.head)
+    ];
 in
 {
   options.homelab = {
@@ -210,6 +221,15 @@ in
         type = types.nullOr types.str;
         default = null;
         description = "UUID of the cloudflared tunnel (<id>.cfargotunnel.com).";
+      };
+      cloudflareZoneId = mkOption {
+        type = types.nullOr types.str;
+        default = null;
+        description = ''
+          Zone ID of publicDomain (Cloudflare dashboard -> the domain -> Overview, right column).
+          With the cloudflare_ban_token secret, fail2ban bans are also applied at Cloudflare's
+          edge (./fail2ban.nix).
+        '';
       };
       privateRanges = mkOption {
         type = types.listOf types.str;
@@ -493,6 +513,12 @@ in
       };
 
       mkSecretMounts = secretsList: foldl' (acc: s: acc // (hlcfg.lib.mkRoMount s.path)) { } secretsList;
+
+      # The homelab's secrets file (decryptable by the Pi, the PC and your own age key)
+      secretsFile = ../../hosts/homelab/secrets.yaml;
+      # Does a sops YAML file have this top-level key? Features that need a new secret check
+      # this, so the config still evaluates (and warns) until the secret is added with `sops`.
+      sopsHasKey = file: key: builtins.pathExists file && elem key (sopsKeys file);
     };
   };
 }

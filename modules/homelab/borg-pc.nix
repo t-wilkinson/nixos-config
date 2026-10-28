@@ -32,9 +32,12 @@ let
   repo = hl.storage.shares.${cfg.data.share}.path; # /srv/backup/pc on the Pi
   dumpDir = "/var/backup/borg-pc";
   stateDir = "/var/lib/borg-pc";
-  canNotify = hl.services.ntfy.enable && config.sops.secrets ? ntfy_auth;
+  # Failures notify ntfy directly only until jobs report to Gatus (./jobs.nix), which then
+  # alerts on failures and on runs that stop happening
+  canNotify = hl.services.ntfy.enable && config.sops.secrets ? ntfy_auth && !hl.jobReports.enable;
   # On the Pi, ntfy is local and the auth header is a sops template (hosts/homelab/secrets.nix)
-  piCanNotify = hl.services.ntfy.runsHere && config.sops.templates ? "ntfy-auth-header";
+  piCanNotify =
+    hl.services.ntfy.runsHere && config.sops.templates ? "ntfy-auth-header" && !hl.jobReports.enable;
   ssh = "ssh -i ${host.backupKeyFile} -o UserKnownHostsFile=${stateDir}/known_hosts -o StrictHostKeyChecking=accept-new -o BatchMode=yes";
   pg = config.services.postgresql.package;
   borg = "${pkgs.borgbackup}/bin/borg";
@@ -52,6 +55,28 @@ lib.mkIf cfg.enable (
           message = "homelab.services.borg-pc: share ${cfg.data.share} must be on ${cfg.data.target}.";
         }
       ];
+
+      # Reported to Gatus (./jobs.nix)
+      homelab.jobs = {
+        borg-pc = {
+          name = "PC backup";
+          node = cfg.host;
+          unit = "borgbackup-job-pc";
+          heartbeat = "96h"; # nightly while the PC is awake
+        };
+        borg-pc-prune = {
+          name = "PC backup prune";
+          node = cfg.data.target;
+          unit = "borg-pc-prune";
+          heartbeat = "192h"; # weekly
+        };
+        borg-pc-check = {
+          name = "PC backup check";
+          node = cfg.data.target;
+          unit = "borg-pc-check";
+          heartbeat = "768h"; # monthly
+        };
+      };
     }
 
     # PC: dump and push

@@ -4,6 +4,8 @@
 #   - each monitored service, probed directly on its host (not through Caddy/Authelia)
 #   - each public service through Cloudflare (tunnel + certificate)
 #   - LAN DNS (Blocky), the Cloudflare tunnel's readiness, and every node by ping
+#   - every scheduled job (./jobs.nix) as an external endpoint: jobs push each run's result,
+#     and a job that stops reporting for longer than its heartbeat counts as failed
 # Services and nodes that sleep (wakeOnLan = true, the PC) are shown but never alert.
 # homelab-status still covers what Gatus can't see: units, disks, NFS, backups.
 {
@@ -87,44 +89,79 @@ let
     conditions = [ "[CONNECTED] == true" ];
     alerts = alertsFor n;
   }) (lib.filterAttrs (n: node: node.ipv4 != null && n != homelab.thisNode) nodes);
+
+  # Jobs alert on their first failure (and recovery), not after three like probes
+  jobEndpoints = lib.mapAttrsToList (n: j: {
+    name = j.name;
+    group = homelab.jobReports.group;
+    token = "\${GATUS_PUSH_TOKEN}";
+    heartbeat.interval = if j.heartbeat == null then "0s" else j.heartbeat;
+    alerts = [
+      {
+        type = "ntfy";
+        failure-threshold = 1;
+        success-threshold = 1;
+        send-on-resolved = true;
+        description = "journalctl -u ${j.unit} on ${nodes.${j.node}.name}";
+      }
+    ];
+  }) homelab.jobs;
 in
 {
-  config = lib.mkIf cfg.runsHere {
-    # ntfy token for alerts (Gatus substitutes ${NTFY_TOKEN} from the environment)
-    sops.templates."gatus-env" = {
-      content = "NTFY_TOKEN=${config.sops.placeholder.ntfy_auth}";
-      restartUnits = [ "gatus.service" ];
-    };
+  config = lib.mkMerge [
+    {
+      # Other nodes (the PC) push job results through Caddy; Gatus checks the token itself
+      homelab.services.gatus.authBypass = lib.mkIf homelab.jobReports.enable [
+        "/api/v1/endpoints/*/external"
+      ];
+    }
 
-    services.gatus = {
-      enable = true;
-      environmentFile = config.sops.templates."gatus-env".path;
-      settings = {
-        web = {
-          address = "127.0.0.1";
-          port = cfg.port;
-        };
-        ui = {
-          title = "Homelab status";
-          header = "Homelab status";
-        };
-        storage = {
-          type = "sqlite";
-          path = "/var/lib/gatus/data.db";
-        };
-        alerting.ntfy = {
-          url = "http://${services.ntfy.localEndpoint}";
-          topic = "homelab";
-          token = "\${NTFY_TOKEN}";
-          priority = 4;
-          default-alert = {
-            failure-threshold = 3;
-            success-threshold = 2;
-            send-on-resolved = true;
-          };
-        };
-        endpoints = serviceEndpoints ++ publicEndpoints ++ infraEndpoints;
+    (lib.mkIf cfg.runsHere {
+      # ntfy token for alerts (Gatus substitutes ${NTFY_TOKEN} from the environment), and the
+      # token jobs push results with
+      sops.templates."gatus-env" = {
+        content = ''
+          NTFY_TOKEN=${config.sops.placeholder.ntfy_auth}
+        ''
+        + lib.optionalString homelab.jobReports.enable ''
+          GATUS_PUSH_TOKEN=${config.sops.placeholder.gatus_push_token}
+        '';
+        restartUnits = [ "gatus.service" ];
       };
-    };
-  };
+
+      services.gatus = {
+        enable = true;
+        environmentFile = config.sops.templates."gatus-env".path;
+        settings = {
+          web = {
+            address = "127.0.0.1";
+            port = cfg.port;
+          };
+          ui = {
+            title = "Homelab status";
+            header = "Homelab status";
+          };
+          storage = {
+            type = "sqlite";
+            path = "/var/lib/gatus/data.db";
+          };
+          alerting.ntfy = {
+            url = "http://${services.ntfy.localEndpoint}";
+            topic = "homelab";
+            token = "\${NTFY_TOKEN}";
+            priority = 4;
+            default-alert = {
+              failure-threshold = 3;
+              success-threshold = 2;
+              send-on-resolved = true;
+            };
+          };
+          endpoints = serviceEndpoints ++ publicEndpoints ++ infraEndpoints;
+        }
+        // lib.optionalAttrs (homelab.jobReports.enable && jobEndpoints != [ ]) {
+          external-endpoints = jobEndpoints;
+        };
+      };
+    })
+  ];
 }
