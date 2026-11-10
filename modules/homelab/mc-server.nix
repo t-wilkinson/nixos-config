@@ -7,7 +7,7 @@
 #   mc-switch                       show what's running
 #   sudo mc-switch atm10            switch to a server (or: paper, oneblock, off)
 #   sudo mc-switch cmd 'op Trey'    run a console command on the running server
-#   journalctl -M mc-atm10 -f       the running server's log
+#   sudo mc-switch logs [-f]        the selected server's log (also after it failed)
 #
 # The dashboard does the same with its Minecraft tiles (webhook hooks mc-status and
 # mc-switch-<name> on the PC, routed by the Pi's Caddy).
@@ -53,8 +53,9 @@ let
       seed = ''
         if [ ! -e world/level.dat ]; then
           echo "New OneBlock world from ${packs.oneblock.world}"
-          rm -rf world
-          cp -r --no-preserve=mode,ownership ${packs.oneblock.world} world
+          rm -rf world world.new
+          copy_tree ${packs.oneblock.world} world.new
+          mv world.new world
         fi
       '';
     };
@@ -81,7 +82,11 @@ let
               continue
             fi
             rm -rf "./$name"
-            cp -r --no-preserve=mode,ownership "$src" "./$name"
+            if [ -d "$src" ]; then
+              copy_tree "$src" "./$name"
+            else
+              cp --no-preserve=mode,ownership "$src" "./$name"
+            fi
           done
           echo ${packs.atm10.version} > .atm10-version
         fi
@@ -92,6 +97,10 @@ let
   ready = lib.filterAttrs (n: s: s.ready) servers;
   names = lib.attrNames ready;
   unit = n: "container@mc-${n}.service";
+
+  # Exit status of a container whose server gave up (see mc-gave-up below): its container unit
+  # then shows as failed instead of restarting, so the dashboard says Failed, not Starting
+  gaveUpStatus = 77;
 
   # Enforced in server.properties before each start (the server writes the rest itself).
   # The RCON password comes from the environment file, never the Nix store.
@@ -109,6 +118,23 @@ let
 
   startPre = n: s: ''
     : "''${RCON_PASSWORD:?missing from the environment file}"
+
+    # Copies a tree into the share without setting any permissions. The share's directories are
+    # setgid (new files get the serverdata group), and `cp -r` re-applies that bit to each
+    # directory it creates, which the server's sandbox (RestrictSUIDSGID) refuses. mkdir and
+    # plain file copies inherit the group without asking for the bit.
+    copy_tree() {
+      local src=$1 dst=$2 path
+      mkdir -p "$dst"
+      while IFS= read -r -d "" path; do
+        if [ -d "$src/$path" ] && [ ! -L "$src/$path" ]; then
+          mkdir -p "$dst/$path"
+        else
+          cp -P --no-preserve=mode,ownership "$src/$path" "$dst/$path"
+        fi
+      done < <(cd "$src" && find . -mindepth 1 -printf '%P\0' | sort -z)
+    }
+
     ${s.seed}
 
     set_prop() {
@@ -156,6 +182,15 @@ let
         # nix-minecraft would make the data directory 0770 minecraft:minecraft; on the share it
         # stays 2775 :serverdata (the first rule for a path wins)
         systemd.tmpfiles.rules = lib.mkBefore [ "d /srv/minecraft/${n} 2775 minecraft serverdata - -" ];
+
+        # When the server stops retrying (5 failed starts in 2 minutes), stop the container with
+        # a status the host recognizes (gaveUpStatus) rather than leaving it up and idle
+        systemd.services."minecraft-server-${n}".unitConfig.OnFailure = [ "mc-gave-up.service" ];
+        systemd.services.mc-gave-up = {
+          description = "Stop the container: the Minecraft server failed";
+          serviceConfig.Type = "oneshot";
+          script = "systemctl exit ${toString gaveUpStatus}";
+        };
 
         services.minecraft-servers = {
           enable = true;
@@ -249,6 +284,21 @@ let
         status)
           ${lib.getExe status} | jq -r '"Selected: \(.selected)", (.servers | to_entries[] | "  \(.key)\t\(.value.status)")'
           ;;
+        logs)
+          # The server's journal, kept in the container's state directory, so this works after
+          # it stopped too. `mc-switch logs` = the selected server; add -f to follow.
+          shift
+          name=$(${lib.getExe status} | jq -r .selected)
+          case "''${1:-}" in
+            ${lib.concatStringsSep " | " names}) name=$1; shift ;;
+          esac
+          if [ "$name" = off ]; then
+            echo "usage: mc-switch logs [${lib.concatStringsSep " | " names}] [journalctl options]" >&2
+            exit 2
+          fi
+          exec journalctl -D "/var/lib/nixos-containers/mc-$name/var/log/journal" \
+            -u "minecraft-server-$name" -u mc-gave-up -n 200 "$@"
+          ;;
         cmd)
           shift
           running=$(${lib.getExe status} | jq -r .running)
@@ -261,7 +311,7 @@ let
           echo "Sent to $running; see journalctl -M mc-$running -u minecraft-server-$running -n 20"
           ;;
         -h | --help)
-          echo "usage: mc-switch [status | ${lib.concatStringsSep " | " (names ++ [ "off" ])} | cmd <console command>]"
+          echo "usage: mc-switch [status | ${lib.concatStringsSep " | " (names ++ [ "off" ])} | cmd <console command> | logs [server]]"
           ;;
         *)
           systemctl start "mc-switch@$1.service"
@@ -373,6 +423,7 @@ in
           n: s:
           lib.nameValuePair "container@mc-${n}" {
             conflicts = map unit (lib.remove n names);
+            serviceConfig.RestartPreventExitStatus = toString gaveUpStatus;
           }
         ) ready
         // {
