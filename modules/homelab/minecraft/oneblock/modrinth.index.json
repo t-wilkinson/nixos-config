@@ -1,0 +1,12 @@
+{
+  "formatVersion": 1,
+  "game": "minecraft",
+  "versionId": "0.0.0",
+  "name": "Wilkinson OneBlock",
+  "summary": "Not locked yet: run update-modpack.py (see modules/homelab/minecraft/README.md)",
+  "files": [],
+  "dependencies": {
+    "minecraft": "1.21.11",
+    "fabric-loader": "0.20.1"
+  }
+}
