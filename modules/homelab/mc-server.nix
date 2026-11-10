@@ -8,6 +8,7 @@
 #   sudo mc-switch atm10            switch to a server (or: paper, oneblock, off)
 #   sudo mc-switch cmd 'op Trey'    run a console command on the running server
 #   sudo mc-switch logs [-f]        the selected server's log (also after it failed)
+#   sudo mc-switch restart          restart the selected server
 #
 # The dashboard does the same with its Minecraft tiles (webhook hooks mc-status and
 # mc-switch-<name> on the PC, routed by the Pi's Caddy).
@@ -308,13 +309,36 @@ let
           fi
           # The server reads its console from this socket (nix-minecraft's systemd-socket mode)
           nixos-container run "mc-$running" -- sh -c 'printf "%s\n" "$1" > "/run/minecraft/$2.stdin"' _ "$*" "$running"
-          echo "Sent to $running; see journalctl -M mc-$running -u minecraft-server-$running -n 20"
+          echo "Sent to $running; see: sudo mc-switch logs -n 20"
+          ;;
+        restart)
+          # Restart the selected server's container: after a failure, or when a rebuild updated
+          # it in place without restarting a server that had already given up
+          name=$(${lib.getExe status} | jq -r .selected)
+          if [ "$name" = off ]; then
+            echo "Minecraft is off; start a server with: sudo mc-switch <server>" >&2
+            exit 1
+          fi
+          systemctl restart --no-block "container@mc-$name.service"
+          echo "Restarting $name. Follow it with: sudo mc-switch logs -f"
           ;;
         -h | --help)
-          echo "usage: mc-switch [status | ${lib.concatStringsSep " | " (names ++ [ "off" ])} | cmd <console command> | logs [server]]"
+          echo "usage: mc-switch [status | ${lib.concatStringsSep " | " (names ++ [ "off" ])} | restart | logs [server] [-f] | cmd <console command>]"
           ;;
         *)
+          current=$(${lib.getExe status})
+          running=$(jq -r .running <<< "$current")
+          if [ "$1" != off ] && [ "$1" = "$running" ]; then
+            echo "$1 is already running ($(jq -r --arg n "$1" '.servers[$n].status' <<< "$current"))."
+            echo "Restart it with: sudo mc-switch restart"
+            exit 0
+          fi
           systemctl start "mc-switch@$1.service"
+          if [ "$1" = off ]; then
+            if [ -n "$running" ]; then echo "Stopping $running"; else echo "Minecraft is already off"; fi
+          else
+            echo "Starting $1''${running:+ (stopping $running)}. Follow it with: sudo mc-switch logs -f"
+          fi
           ;;
       esac
     '';
