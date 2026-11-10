@@ -127,6 +127,42 @@ in
         url = curseforge fileId fileName;
         hash = "sha256-9rxWuz2dkqy0HySnpzZaDQQYEkijRk77PVMi4VpOT/U="; # nix store prefetch-file --json '<url>' | jq -r .hash  (about 1.2 GB)
       };
+
+      # Mods in the server pack that break on this server, left out of its mods folder (matched
+      # against jar file names, case-insensitively). Players keep them; these are client-side.
+      #   crash.?assistant: Crash Assistant (a crash-report window for players) loads through an
+      #     early service whose mixin config can't be read here, and NeoForge stops at startup:
+      #     "The specified resource 'crash_assistant.mixins.json' was invalid or could not be read"
+      serverExclude = [ "crash.?assistant" ];
+
+      files = unpackTo {
+        name = "atm10-server-${release.version}";
+        src = pkgs.fetchurl {
+          name = "atm10-server-${release.version}.zip";
+          inherit (release) url hash;
+        };
+        marker = "mods";
+      };
+
+      # The pack's mods/ minus serverExclude. Fails if a pattern matches nothing (a renamed jar),
+      # so the list can't silently go stale.
+      serverMods = pkgs.runCommand "atm10-server-mods-${release.version}" { } ''
+        mkdir $out
+        for jar in ${files}/mods/*; do
+          name=$(basename "$jar")
+          if printf '%s\n' "$name" | grep -qiE ${lib.escapeShellArg (lib.concatStringsSep "|" serverExclude)}; then
+            echo "Leaving out $name"
+          else
+            ln -s "$jar" "$out/$name"
+          fi
+        done
+        ${lib.concatMapStrings (pattern: ''
+          if ! ls ${files}/mods | grep -qiE ${lib.escapeShellArg pattern}; then
+            echo "serverExclude: no jar in the ATM10 pack matches '${pattern}'; update packs.nix" >&2
+            exit 1
+          fi
+        '') serverExclude}
+      '';
     in
     {
       label = "ATM10";
@@ -137,16 +173,8 @@ in
         lib.optional (release.hash == null)
           "set release.hash in modules/homelab/minecraft/packs.nix (nix store prefetch-file --json '${release.url}' | jq -r .hash)";
       inherit (release) version;
+      inherit files serverMods;
 
       package = p: p.neoforgeServers."neoforge-${escape release.minecraft}-${escape release.neoforge}";
-
-      files = unpackTo {
-        name = "atm10-server-${release.version}";
-        src = pkgs.fetchurl {
-          name = "atm10-server-${release.version}.zip";
-          inherit (release) url hash;
-        };
-        marker = "mods";
-      };
     };
 }

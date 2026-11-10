@@ -66,7 +66,7 @@ let
       properties = {
         allow-flight = "true"; # jetpacks, flying mounts: otherwise players get kicked for flying
       };
-      symlinks.mods = "${packs.atm10.files}/mods";
+      symlinks.mods = packs.atm10.serverMods; # the pack's mods minus serverExclude (packs.nix)
       # First start, and after a pack update: take the pack's config/, defaultconfigs/, kubejs/,
       # ... (replacing yours, as ATM's update guide says). Keep server.properties if there is one.
       seed = ''
