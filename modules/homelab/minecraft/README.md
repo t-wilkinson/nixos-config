@@ -22,7 +22,7 @@ On the PC:
 ```sh
 mc-switch                 # what's selected and running
 sudo mc-switch oneblock   # paper | oneblock | atm10 | off
-journalctl -M mc-oneblock -u minecraft-server-oneblock -f
+sudo mc-switch logs -f      # the selected server's log; also works after it failed
 ```
 
 Or use the Minecraft tiles on the dashboard. The choice is kept across reboots.
