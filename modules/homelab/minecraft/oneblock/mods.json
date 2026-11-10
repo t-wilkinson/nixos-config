@@ -2,7 +2,7 @@
   "name": "Wilkinson OneBlock",
   "version": "1.0.0",
   "summary": "OneBlock Reborn with lucky blocks and cozy extras",
-  "minecraft": "1.21.11",
+  "minecraft": "1.21.1",
   "loader": "fabric",
   "loaderVersion": "0.20.1",
   "mods": [

@@ -54,9 +54,9 @@ in
       loaderVersion = index.dependencies."fabric-loader";
 
       world = rec {
-        version = "1.2.4";
-        fileId = 7335453; # curseforge.com/minecraft/worlds/oneblock-reborn/files/7335453
-        fileName = "OneBlock Reborn ${version}.zip";
+        version = "1.1.6";
+        fileId = 5661118; # curseforge.com/minecraft/worlds/oneblock-reborn/files/7335453
+        fileName = "OneBlock_Reborn_${version}.zip";
         url = curseforge fileId fileName;
         hash = null; # nix store prefetch-file --json '<url>' | jq -r .hash
       };
@@ -70,8 +70,11 @@ in
       icon = "mdi-cube";
       ready = locked && world.hash != null;
       notReady =
-        lib.optional (!locked) "lock its mods: python3 modules/homelab/minecraft/update-modpack.py modules/homelab/minecraft/oneblock"
-        ++ lib.optional (world.hash == null) "set world.hash in modules/homelab/minecraft/packs.nix (nix store prefetch-file --json '${world.url}' | jq -r .hash)";
+        lib.optional (!locked)
+          "lock its mods: python3 modules/homelab/minecraft/update-modpack.py modules/homelab/minecraft/oneblock"
+        ++
+          lib.optional (world.hash == null)
+            "set world.hash in modules/homelab/minecraft/packs.nix (nix store prefetch-file --json '${world.url}' | jq -r .hash)";
       inherit gameVersion loaderVersion;
 
       package = p: p.fabricServers."fabric-${escape gameVersion}".override { inherit loaderVersion; };
@@ -130,7 +133,9 @@ in
       description = "All the Mods 10 · ${release.version} · NeoForge ${release.minecraft}";
       icon = "mdi-hammer-wrench";
       ready = release.hash != null;
-      notReady = lib.optional (release.hash == null) "set release.hash in modules/homelab/minecraft/packs.nix (nix store prefetch-file --json '${release.url}' | jq -r .hash)";
+      notReady =
+        lib.optional (release.hash == null)
+          "set release.hash in modules/homelab/minecraft/packs.nix (nix store prefetch-file --json '${release.url}' | jq -r .hash)";
       inherit (release) version;
 
       package = p: p.neoforgeServers."neoforge-${escape release.minecraft}-${escape release.neoforge}";
