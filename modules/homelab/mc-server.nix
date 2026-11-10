@@ -332,6 +332,26 @@ in
       );
     }
 
+    # The Pi: forward 25565 to the PC, so mc.home.lab (which resolves to the Pi, like every
+    # *.home.lab name) reaches whichever server is running. A TCP proxy rather than DNAT: the PC
+    # answers over its own default route (Wi-Fi), so a NATed connection's replies would never
+    # come back through the Pi. Players show up with the Pi's address in the server's logs.
+    (lib.mkIf (cfg.enable && homelab.isGateway) {
+      systemd.services.mc-proxy = {
+        description = "Forward Minecraft to the PC";
+        wantedBy = [ "multi-user.target" ];
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.socat}/bin/socat TCP-LISTEN:${toString cfg.port},fork,reuseaddr TCP:${pc.ipv4}:${toString cfg.port}";
+          Restart = "always";
+          DynamicUser = true;
+          AmbientCapabilities = lib.mkIf (cfg.port < 1024) [ "CAP_NET_BIND_SERVICE" ];
+        };
+      };
+      networking.firewall.allowedTCPPorts = [ cfg.port ];
+    })
+
     (lib.mkIf cfg.runsHere {
       assertions = [
         {
