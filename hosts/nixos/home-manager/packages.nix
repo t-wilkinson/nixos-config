@@ -95,7 +95,7 @@
 
         # MISC
         # android-file-transfer
-        # appimage-run
+        appimage-run # run AppImage files
         # texliveFull
 
         # Office-tools
