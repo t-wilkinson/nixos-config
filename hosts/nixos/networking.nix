@@ -68,6 +68,7 @@ in
         ];
         allowedTCPPorts = [
           22
+          mcServerPort
           # 6229 # ssh
           # 5900 # vnc
         ];

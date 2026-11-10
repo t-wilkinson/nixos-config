@@ -21,6 +21,20 @@ in
       };
     }
 
+    (lib.mkIf (homelab.isGateway && cfg.enable) {
+      systemd.services.mc-proxy = {
+        description = "Forward Minecraft to the PC";
+        wantedBy = [ "multi-user.target" ];
+        wants = [ "network-online.target" ];
+        after = [ "network-online.target" ];
+        serviceConfig = {
+          ExecStart = "${pkgs.socat}/bin/socat TCP-LISTEN:${toString cfg.port},fork,reuseaddr TCP:${homelab.nodes.pc.ipv4}:${toString cfg.port}";
+          Restart = "always";
+          DynamicUser = true;
+        };
+      };
+    })
+
     (lib.mkIf cfg.runsHere {
 
       # RCON password for the container (borg on the Pi uses the same secret)

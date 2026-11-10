@@ -164,7 +164,7 @@
       cloudflareTunnelId = "39990619-972b-46ab-9812-ee8fe70d87f0"; # <id>.cfargotunnel.com - CNAME cloudflared tunnel
       # Zone ID of publicDomain (Cloudflare -> treywilkinson.com -> Overview, "API" box). With
       # the cloudflare_ban_token secret, fail2ban bans also block at Cloudflare's edge.
-      cloudflareZoneId = null;
+      cloudflareZoneId = "07c5053fb3444ac6c47c43caf6a9fa34";
       containerNetwork = "192.168.100";
     };
 
@@ -201,7 +201,7 @@
       "jupyter"
       "borg-mirror" # Pi's borg repo -> PC
       "borg-pc" # PC's databases -> Pi
-      # "mc-server"
+      "mc-server"
     ];
 
     services = {
