@@ -58,7 +58,7 @@ in
         fileId = 5661118; # curseforge.com/minecraft/worlds/oneblock-reborn/files/7335453
         fileName = "OneBlock_Reborn_${version}.zip";
         url = curseforge fileId fileName;
-        hash = null; # nix store prefetch-file --json '<url>' | jq -r .hash
+        hash = "sha256-6zq+AFsOVTAEXqRi+Ft2QsJ9s5+Jm+hjzq1Z0KgaRSE="; # nix store prefetch-file --json '<url>' | jq -r .hash
       };
 
       serverSide = lib.filter (f: (f.env.server or "required") != "unsupported") index.files;
@@ -125,7 +125,7 @@ in
         fileId = 9366998; # curseforge.com/minecraft/modpacks/all-the-mods-10/files/9366998
         fileName = "ServerFiles-${version}.zip";
         url = curseforge fileId fileName;
-        hash = null; # nix store prefetch-file --json '<url>' | jq -r .hash  (about 1.2 GB)
+        hash = "sha256-9rxWuz2dkqy0HySnpzZaDQQYEkijRk77PVMi4VpOT/U="; # nix store prefetch-file --json '<url>' | jq -r .hash  (about 1.2 GB)
       };
     in
     {
