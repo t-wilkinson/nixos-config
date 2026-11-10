@@ -23,6 +23,7 @@ On the PC:
 mc-switch                 # what's selected and running
 sudo mc-switch oneblock   # paper | oneblock | atm10 | off
 sudo mc-switch logs -f      # the selected server's log; also works after it failed
+sudo mc-switch restart      # restart the selected server (e.g. after a rebuild or a failure)
 ```
 
 Or use the Minecraft tiles on the dashboard. The choice is kept across reboots.
