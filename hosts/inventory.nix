@@ -105,17 +105,34 @@
         node = "pi";
         mountPoint = "/var/lib";
         shares = {
+          # Minecraft worlds (modules/homelab/mc-server.nix): one share per server, each mounted
+          # into its container on the PC. Not recursive: a 2775 mode on files sets setgid, which
+          # the hardened server can't copy, and Paper/Fabric crash saving their configs. No
+          # idle-timeout: the container keeps using the mount from its own namespace, so it
+          # looks idle, and unmounting it stops the container. Hard (the default), not soft: a
+          # network blip waits instead of failing writes into region files.
           minecraft = {
             group = "serverdata";
             mode = "2775";
-            recursive = true;
             nfs.pc = {
               mountPoint = "/var/lib/minecraft";
-              extraOptions = [
-                "x-systemd.idle-timeout=10"
-                "rw"
-                "soft"
-              ];
+              extraOptions = [ "rw" ];
+            };
+          };
+          minecraft-oneblock = {
+            group = "serverdata";
+            mode = "2775";
+            nfs.pc = {
+              mountPoint = "/var/lib/minecraft-oneblock";
+              extraOptions = [ "rw" ];
+            };
+          };
+          minecraft-atm10 = {
+            group = "serverdata";
+            mode = "2775";
+            nfs.pc = {
+              mountPoint = "/var/lib/minecraft-atm10";
+              extraOptions = [ "rw" ];
             };
           };
           actual-budget = {
@@ -348,12 +365,15 @@
           icon = "jupyter";
         };
       };
+      # Paper, OneBlock and ATM10, one at a time (modules/homelab/mc-server.nix; switch with
+      # `mc-switch` on the PC or the dashboard's Minecraft tiles)
       mc-server = {
         host = "pc";
         port = 25565;
         subdomain = "mc";
         isPublic = true;
         expose = false;
+        data.defaultServer = "paper"; # what runs until you pick something else
       };
       mealie = {
         host = "pi";

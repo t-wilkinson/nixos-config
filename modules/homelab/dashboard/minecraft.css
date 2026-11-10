@@ -1,0 +1,60 @@
+/* Minecraft tiles (dashboard/minecraft.js): actions like wake/sleep, with the running server
+   marked. data-mc-state is set on the running server's tile, data-mc-selected on the chosen one. */
+.service a[href^="#mc-switch-"].service-title-text::after {
+  content: "Start";
+  opacity: 1;
+  transform: none;
+  padding: 3px 10px;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid var(--z-border-strong);
+  border-radius: 999px;
+  color: var(--z-dim);
+}
+.service a[href="#mc-switch-off"].service-title-text::after {
+  content: "Stop";
+}
+.service-card:hover a[href^="#mc-switch-"].service-title-text::after {
+  color: var(--z-accent);
+  border-color: var(--z-accent);
+}
+
+.service-card[data-mc-selected] {
+  border-color: var(--z-accent-line);
+}
+.service-card[data-mc-selected]::before {
+  transform: scaleY(1);
+}
+.service-card[data-mc-state="online"] {
+  border-color: var(--z-ok);
+}
+.service-card[data-mc-state="online"]::before {
+  background: var(--z-ok);
+  transform: scaleY(1);
+}
+.service-card[data-mc-state="online"] .service-icon {
+  background: var(--z-ok-soft);
+}
+.service-card[data-mc-state="online"] .service-icon > div {
+  background: var(--z-ok) !important;
+}
+.service-card[data-mc-state="starting"] .service-icon,
+.service-card[data-mc-state="stopping"] .service-icon {
+  animation: z-pulse 1.4s ease-in-out infinite;
+}
+.service-card[data-mc-state="failed"] {
+  border-color: var(--z-bad);
+}
+/* The running server's pill reads "Running" instead of "Start" */
+.service-card[data-mc-state] a[href^="#mc-switch-"].service-title-text::after {
+  content: "Running";
+  color: var(--z-ok);
+  border-color: var(--z-ok);
+}
+.service-card[data-mc-state="starting"] a[href^="#mc-switch-"].service-title-text::after {
+  content: "Starting";
+  color: var(--z-accent);
+  border-color: var(--z-accent);
+}

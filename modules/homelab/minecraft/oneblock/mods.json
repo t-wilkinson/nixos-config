@@ -1,0 +1,26 @@
+{
+  "name": "Wilkinson OneBlock",
+  "version": "1.0.0",
+  "summary": "OneBlock Reborn with lucky blocks and cozy extras",
+  "minecraft": "1.21.11",
+  "loader": "fabric",
+  "loaderVersion": "0.20.1",
+  "mods": [
+    "fabric-api",
+
+    { "slug": "simple-lucky-block", "optional": true },
+    "rightclickharvest",
+    { "slug": "waystones", "optional": true },
+    { "slug": "farmers-delight-refabricated", "optional": true },
+    { "slug": "supplementaries", "optional": true },
+    { "slug": "handcrafted", "optional": true },
+    { "slug": "comforts", "optional": true },
+    "appleskin",
+    "jade",
+
+    { "slug": "emi", "side": "client" },
+    { "slug": "xaeros-minimap", "side": "client" },
+    { "slug": "xaeros-world-map", "side": "client" },
+    { "slug": "sodium", "side": "client" }
+  ]
+}

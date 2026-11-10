@@ -29,8 +29,55 @@ let
   ) services;
   categories = lib.unique (lib.mapAttrsToList (n: s: s.dashboard.category) tiled);
 
+  # Minecraft (mc-server.nix): a tile per server that switches the PC to it, an Off tile, and the
+  # client packs to download. Widgets read the PC's mc-status hook; dashboard/minecraft.js marks
+  # the running server and does the switching.
+  mc = services.mc-server;
+  mcStatusWidget = mappings: {
+    type = "customapi";
+    url = mc.data.statusUrl;
+    refreshInterval = 10000;
+    inherit mappings;
+  };
+  mcTiles =
+    lib.mapAttrsToList (n: s: {
+      ${s.label} = {
+        inherit (s) icon description;
+        href = "#mc-switch-${n}";
+        widget = mcStatusWidget [
+          {
+            field = "servers.${n}.status";
+            label = "Status";
+          }
+        ];
+      };
+    }) mc.data.servers
+    ++ [
+      {
+        "Off" = {
+          icon = "mdi-power";
+          href = "#mc-switch-off";
+          description = "Stop whichever server is running";
+          widget = mcStatusWidget [
+            {
+              field = "summary";
+              label = "Now";
+            }
+          ];
+        };
+      }
+    ]
+    ++ lib.mapAttrsToList (file: p: {
+      ${p.label} = {
+        icon = "mdi-download";
+        href = "https://${cfg.domain}/minecraft/${file}";
+        inherit (p) description;
+      };
+    }) mc.data.clientPacks;
+
   # Extras that aren't services
   extraTilesBase = {
+    "Minecraft" = lib.optionals mc.enable mcTiles;
     "Infrastructure" = [
       {
         "Root Certificate" = {
@@ -155,6 +202,7 @@ let
     "Health"
     "Infrastructure"
     "Compute Nodes"
+    "Minecraft"
   ];
   groupTiles =
     group:
@@ -220,6 +268,11 @@ in
               style = "row";
               columns = 2;
               icon = "mdi-heart-pulse";
+            };
+            "Minecraft" = {
+              style = "row";
+              columns = 3;
+              icon = "mdi-pickaxe";
             };
           };
         };
@@ -357,7 +410,8 @@ in
             countGroups();
           })();
         ''
-        + lib.optionalString (homelab.bans.enable && files.enable) (builtins.readFile ./dashboard/security.js);
+        + lib.optionalString (homelab.bans.enable && files.enable) (builtins.readFile ./dashboard/security.js)
+        + lib.optionalString mc.enable (builtins.readFile ./dashboard/minecraft.js);
 
         # Zortex look: warm near-black panels, paper-white text, one orange accent. Retints Homepage's
         # palette variables, then styles groups as panels and tiles as rows with icon chips.
@@ -894,6 +948,7 @@ in
           }
 
           ${lib.optionalString (homelab.bans.enable && files.enable) (builtins.readFile ./dashboard/security.css)}
+          ${lib.optionalString mc.enable (builtins.readFile ./dashboard/minecraft.css)}
 
           @media (prefers-reduced-motion: reduce) {
             *,

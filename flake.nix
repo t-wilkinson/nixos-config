@@ -22,6 +22,7 @@
       nixpkgs-darwin,
       nixpkgs-nixos,
       nixpkgs-unstable,
+      nix-minecraft,
       sops-nix,
       thorium,
       wrapper-modules,
@@ -342,6 +343,11 @@
     };
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     zortex.url = "github:t-wilkinson/zortex.nvim";
+    # Minecraft servers: Paper, Fabric, NeoForge packages and a multi-server module (mc-server.nix)
+    nix-minecraft = {
+      url = "github:Infinidoge/nix-minecraft";
+      inputs.nixpkgs.follows = "nixpkgs-nixos";
+    };
 
     # Virtualization
     # NixVirt = {

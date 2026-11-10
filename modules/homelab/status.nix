@@ -161,7 +161,7 @@ in
           "redis-nextcloud.service"
         ];
         immich = [ "immich-server.service" ];
-        mc-server = [ "container@mc-server.service" ];
+        mc-server = [ "mc-switch-boot.service" ]; # monitor = false: servers start and stop by choice
       };
     }
 
