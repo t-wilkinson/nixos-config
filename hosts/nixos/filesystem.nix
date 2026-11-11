@@ -34,40 +34,41 @@ in
   boot.supportedFilesystems = [ "zfs" ];
 
   fileSystems = {
-      "/" = {
-        device = "rpool/root";
-        fsType = "zfs";
-      };
-
-      "/nix" = {
-        device = "rpool/nix";
-        fsType = "zfs";
-      };
-
-      "/home" = {
-        device = "rpool/home";
-        fsType = "zfs";
-      };
-
-      "/boot" = {
-        device = "/dev/disk/by-id/nvme-CT1000P5PSSD8_2316402A1248-part1";
-        fsType = "vfat";
-        options = [
-          "nofail"
-          "fmask=0022"
-          "dmask=0022"
-        ];
-      };
-
-      "${storage.mountPoint}/.snapshots" = {
-        inherit (storage) device;
-        fsType = "btrfs";
-        options = [
-          "subvol=@snapshots"
-          "compress=zstd:1"
-          "noatime"
-          "space_cache=v2"
-        ];
-      };
+    "/" = {
+      device = "rpool/root";
+      fsType = "zfs";
     };
+
+    "/nix" = {
+      device = "rpool/nix";
+      fsType = "zfs";
+    };
+
+    "/home" = {
+      device = "rpool/home";
+      fsType = "zfs";
+      neededForBoot = true;
+    };
+
+    "/boot" = {
+      device = "/dev/disk/by-id/nvme-CT1000P5PSSD8_2316402A1248-part1";
+      fsType = "vfat";
+      options = [
+        "nofail"
+        "fmask=0022"
+        "dmask=0022"
+      ];
+    };
+
+    "${storage.mountPoint}/.snapshots" = {
+      inherit (storage) device;
+      fsType = "btrfs";
+      options = [
+        "subvol=@snapshots"
+        "compress=zstd:1"
+        "noatime"
+        "space_cache=v2"
+      ];
+    };
+  };
 }
