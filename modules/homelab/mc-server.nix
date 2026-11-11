@@ -442,6 +442,13 @@ in
 
       containers = lib.mapAttrs' (n: s: lib.nameValuePair "mc-${n}" (mkContainer n s)) ready;
 
+      # The single container from before the switch to several (container@mc-server). It's gone
+      # from the config, but leftover state kept starting it from the generic container@
+      # template, which fails every time ("per-container/mc-server/system: No such file").
+      # Masked, so nothing can start it. Its old root, /var/lib/nixos-containers/mc-server, has
+      # nothing in it you need (the world was always on the Pi) and can be deleted.
+      systemd.units."container@mc-server.service".enable = false;
+
       systemd.services =
         lib.mapAttrs' (
           n: s:
