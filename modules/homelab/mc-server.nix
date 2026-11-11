@@ -114,6 +114,9 @@ let
       "rcon.password" = "$RCON_PASSWORD";
       online-mode = lib.boolToString cfg.data.onlineMode;
       motd = "Wilkinson Homelab - ${s.label}";
+      # Off: otherwise, once anyone is op, everyone else can't build, break or open chests within
+      # 16 blocks of spawn, which on OneBlock is the whole game (the block is at spawn)
+      spawn-protection = "0";
     }
     // s.properties;
 
