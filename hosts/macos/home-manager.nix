@@ -80,6 +80,7 @@
             fswatch
             dockutil
             prismlauncher
+            obs
           ];
           file = {
             # A file outside the repo: link to it (a plain path would be copied into the store,
